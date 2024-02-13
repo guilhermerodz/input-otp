@@ -42,8 +42,9 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const clamppedCaretData = caretData.map(n =>
       n === null ? n : Math.max(0, Math.min(n, maxLength)),
     )
-    // const previousCaretData = usePrevious(caretData)
-    const lastClickedSlot = React.useRef<number | null>(null)
+    const previousCaretData = usePreviousValid(caretData, arr =>
+      arr.every(n => n !== null),
+    )
 
     function onInputSelect(e: React.SyntheticEvent<HTMLInputElement>) {
       const { selectionStart, selectionEnd } = e.currentTarget
@@ -122,16 +123,19 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       e.stopPropagation()
 
-      // Shift range selection
-      if (e.shiftKey && lastClickedSlot.current !== null) {
-        // const isMultiSelectionAlready = previousCaretData[0] !== previousCaretData[1] // TODO:
+      const lastClickedSlot = previousCaretData[0]
 
-        const p1: number = lastClickedSlot.current
+      // Shift range selection
+      if (e.shiftKey && lastClickedSlot !== null) {
+        const p1: number = lastClickedSlot
         const p2: number = slotIdx
 
         // Get the greatest between p1 and p2, then increment 1
-        const start = Math.min(p1, p2)
-        const end = Math.max(p1, p2) + 1
+        const _start = Math.min(p1, p2)
+        const _end = Math.max(p1, p2) + 1
+
+        const start = Math.max(0, _start)
+        const end = Math.min(_end, value.length)
 
         setCaretPosition(start, end)
         inputRef.current.focus()
@@ -140,7 +144,6 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
 
       const newSlotIdx = slotIdx > value.length ? value.length : slotIdx
-      lastClickedSlot.current = newSlotIdx
 
       setCaretPosition(newSlotIdx, newSlotIdx)
       inputRef.current.focus()
@@ -186,11 +189,11 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 )
 OTPInput.displayName = 'OTPInput'
 
-export function usePrevious<T>(value: T) {
+export function usePreviousValid<T>(value: T, isValid: (value: T) => boolean) {
   const [current, setCurrent] = React.useState<T>(value)
   const [previous, setPrevious] = React.useState<T>(value)
 
-  if (value !== current) {
+  if (value !== current && isValid(value)) {
     setPrevious(current)
     setCurrent(value)
   }
