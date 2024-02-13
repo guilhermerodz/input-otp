@@ -115,8 +115,10 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
+      const newSlotIdx = slotIdx > value.length ? value.length : slotIdx
+
       e.stopPropagation()
-      handleFocus({ newCaretPositions: [slotIdx, slotIdx] })
+      handleFocus({ newCaretPositions: [newSlotIdx, newSlotIdx] })
     }
 
     return (
