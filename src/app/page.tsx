@@ -151,8 +151,6 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     return (
       <div className="relative">
-        <div className="text-white">{JSON.stringify({ caretData })}</div>
-
         <div className="flex items-center gap-2" onClick={onContainerClick}>
           {Array.from({ length: maxLength }).map((_, idx) => {
             return (
@@ -173,7 +171,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         <input
           className={cn(
             'pointer-events-none',
-            // "absolute inset-0 opacity-0"
+            "absolute inset-0 opacity-0"
           )}
           ref={inputRef}
           maxLength={maxLength}
