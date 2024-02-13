@@ -42,6 +42,8 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const clamppedCaretData = caretData.map(n =>
       n === null ? n : Math.max(0, Math.min(n, maxLength)),
     )
+    // const previousCaretData = usePrevious(caretData)
+    const lastClickedSlot = React.useRef<number | null>(null)
 
     function onInputSelect(e: React.SyntheticEvent<HTMLInputElement>) {
       const { selectionStart, selectionEnd } = e.currentTarget
@@ -72,8 +74,11 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
-      if (!params.focusEvent) {
-        inputRef.current.focus()
+      const isSyntheticEvent =
+        (params.focusEvent?.nativeEvent as any).sourceCapabilities === null
+
+      if (isSyntheticEvent) {
+        return
       }
 
       const lastPos = value.length
@@ -107,7 +112,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
-      handleFocus()
+      // handleFocus()
     }
 
     function onSlotClick(e: React.MouseEvent<HTMLDivElement>, slotIdx: number) {
@@ -115,14 +120,36 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
-      const newSlotIdx = slotIdx > value.length ? value.length : slotIdx
-
       e.stopPropagation()
-      handleFocus({ newCaretPositions: [newSlotIdx, newSlotIdx] })
+
+      // Shift range selection
+      if (e.shiftKey && lastClickedSlot.current !== null) {
+        // const isMultiSelectionAlready = previousCaretData[0] !== previousCaretData[1] // TODO:
+
+        const p1: number = lastClickedSlot.current
+        const p2: number = slotIdx
+
+        // Get the greatest between p1 and p2, then increment 1
+        const start = Math.min(p1, p2)
+        const end = Math.max(p1, p2) + 1
+
+        setCaretPosition(start, end)
+        inputRef.current.focus()
+
+        return
+      }
+
+      const newSlotIdx = slotIdx > value.length ? value.length : slotIdx
+      lastClickedSlot.current = newSlotIdx
+
+      setCaretPosition(newSlotIdx, newSlotIdx)
+      inputRef.current.focus()
     }
 
     return (
       <div className="relative">
+        <div className="text-white">{JSON.stringify({ caretData })}</div>
+
         <div className="flex items-center gap-2" onClick={onContainerClick}>
           {Array.from({ length: maxLength }).map((_, idx) => {
             return (
@@ -158,3 +185,15 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   },
 )
 OTPInput.displayName = 'OTPInput'
+
+export function usePrevious<T>(value: T) {
+  const [current, setCurrent] = React.useState<T>(value)
+  const [previous, setPrevious] = React.useState<T>(value)
+
+  if (value !== current) {
+    setPrevious(current)
+    setCurrent(value)
+  }
+
+  return previous
+}
