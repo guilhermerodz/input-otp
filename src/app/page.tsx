@@ -55,11 +55,31 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
 
       inputRef.current.setSelectionRange(start, end)
+      setCaretData([start, end])
     }
 
     function onInputFocus(e: React.SyntheticEvent<HTMLInputElement>) {
+      handleFocus({ focusEvent: e })
+    }
+
+    function handleFocus(
+      params: {
+        focusEvent?: React.SyntheticEvent<HTMLInputElement>
+        newCaretPositions?: number[]
+      } = {},
+    ) {
+      if (!inputRef.current) {
+        return
+      }
+
+      if (!params.focusEvent) {
+        inputRef.current.focus()
+      }
+
       const lastPos = value.length
-      setCaretPosition(lastPos, lastPos)
+      const positions = params.newCaretPositions ?? [lastPos, lastPos]
+
+      setCaretPosition(positions[0], positions[1])
     }
 
     function isSelected(slotIdx: number) {
@@ -82,13 +102,31 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       )
     }
 
+    function onContainerClick() {
+      if (!inputRef.current) {
+        return
+      }
+
+      handleFocus()
+    }
+
+    function onSlotClick(e: React.MouseEvent<HTMLDivElement>, slotIdx: number) {
+      if (!inputRef.current) {
+        return
+      }
+
+      e.stopPropagation()
+      handleFocus({ newCaretPositions: [slotIdx, slotIdx] })
+    }
+
     return (
       <div className="relative">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={onContainerClick}>
           {Array.from({ length: maxLength }).map((_, idx) => {
             return (
               <div
                 key={idx}
+                onClick={e => onSlotClick(e, idx)}
                 className={cn('w-10 h-10 bg-white rounded-md', {
                   'bg-[green]': isSelected(idx),
                   'bg-[yellow]': isCurrent(idx),
