@@ -18,7 +18,7 @@ export default function Home() {
         onChange={setOtpInputValue}
         maxLength={6}
         ref={getInputRef}
-        onComplete={() => console.log('completed!')}
+        regexp={/^\d+$/}
       />
     </div>
   )
@@ -28,16 +28,41 @@ interface OTPInputProps {
   value: string
   onChange: (value: string) => void
 
+  regexp?: RegExp
   onComplete?: (...args: any[]) => unknown
 
   maxLength: number
 }
 const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
-  ({ maxLength, value, onChange, onComplete, ...props }, ref) => {
+  ({ maxLength, value, onChange, regexp, onComplete, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(ref, () => inputRef.current! as any)
 
     const paddedValue = value.padEnd(maxLength, ' ')
+
+    // Workaround to track the input's  selection even if Meta key is pressed
+    // This was necessary due to the input `onSelect` only being called either 1. before Meta key is pressed or 2. after Meta key is released
+    const [isMetaPressed, setIsMetaPressed] = React.useState<boolean>(false)
+    React.useEffect(() => {
+      if (!isMetaPressed) {
+        return
+      }
+
+      const interval = setInterval(() => {
+        if (!inputRef.current) {
+          return
+        }
+
+        onInputSelect({
+          overrideStart: inputRef.current.selectionStart,
+          overrideEnd: inputRef.current.selectionEnd,
+        })
+      }, 2)
+
+      return () => {
+        clearInterval(interval)
+      }
+    }, [isMetaPressed, onInputSelect])
 
     const [caretData, setCaretData] = React.useState<
       [number | null, number | null]
@@ -49,24 +74,49 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       arr.every(n => n !== null),
     )
 
-    function onInputSelect(e: React.SyntheticEvent<HTMLInputElement>) {
-      const { selectionStart, selectionEnd } = e.currentTarget
-
-      if (selectionStart === selectionEnd && selectionStart !== null) {
-        const n = selectionStart === maxLength ? maxLength - 1 : selectionStart
-
-        const start = Math.min(n, maxLength - 1)
-        const end = n + 1
-
-        setCaretPosition(start, end)
+    function onInputSelect(params: {
+      // TODO: only use `start` and `end` as params
+      e?: React.SyntheticEvent<HTMLInputElement>
+      overrideStart?: number | null
+      overrideEnd?: number | null
+    }) {
+      if (
+        !params.e &&
+        params.overrideStart === undefined &&
+        params.overrideEnd === undefined
+      ) {
         return
       }
 
-      setCaretData([selectionStart, selectionEnd])
+      const start =
+        params.overrideStart === undefined
+          ? params.e!.currentTarget.selectionStart
+          : params.overrideStart
+      const end =
+        params.overrideEnd === undefined
+          ? params.e!.currentTarget.selectionEnd
+          : params.overrideEnd
+
+      // Check if there is no selection range
+      if (start === end && start !== null) {
+        const n = start === maxLength ? maxLength - 1 : start
+
+        const _start = Math.min(n, maxLength - 1)
+        const _end = n + 1
+
+        setCaretPosition(_start, _end)
+        return
+      }
+
+      setCaretData([start, end])
     }
 
     function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'Meta') {
+        setIsMetaPressed(true)
+      }
+
+      if (!inputRef.current) {
         return
       }
 
@@ -74,15 +124,63 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
-      // check if arrow left
-      if (e.key === 'ArrowLeft' && !e.shiftKey) {
+      if (e.key === 'Backspace' && (e.metaKey || e.altKey)) {
+        // Check if there is a range selection
+        if (
+          inputRef.current.selectionStart !== null &&
+          inputRef.current.selectionEnd !== null &&
+          inputRef.current.selectionStart !== inputRef.current.selectionEnd
+        ) {
+          e.preventDefault()
+
+          const valueAfterDeletion = value.slice(
+            inputRef.current.selectionEnd,
+            value.length,
+          )
+
+          const oldCaretStart = inputRef.current.selectionStart
+
+          onChange(valueAfterDeletion)
+          // const deletedLength = value.length - valueAfterDeletion.length
+
+          // setCaretPosition(
+          //   oldCaretStart - deletedLength + 1,
+          //   oldCaretStart - deletedLength + 2,
+          // )
+        }
+      }
+
+      if (
+        e.key === 'ArrowLeft' &&
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
         e.preventDefault()
 
-        const start = Math.max(0, caretData[0] - 1)
-        const end = start + 1
+        if (caretData[0] !== null && caretData[1] !== null) {
+          const start = Math.max(0, caretData[0] - 1)
+          const end = start + 1
 
-        setCaretPosition(start, end)
-        return
+          setCaretPosition(start, end)
+        }
+      }
+      if (
+        e.key === 'ArrowRight' &&
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault()
+
+        if (caretData[0] !== null && caretData[1] !== null) {
+          const start = Math.min(caretData[1], maxLength - 1)
+          const end = Math.min(maxLength, caretData[1] + 1)
+
+          setCaretPosition(start, end)
+        }
       }
     }
 
@@ -96,6 +194,10 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     }
 
     function onInputFocus(e: React.SyntheticEvent<HTMLInputElement>) {
+      setCaretData([
+        e.currentTarget.selectionStart,
+        e.currentTarget.selectionEnd,
+      ])
       handleFocus({ focusEvent: e })
     }
 
@@ -160,6 +262,16 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const newValue = e.target.value
 
       e.preventDefault()
+
+      const valueWithoutSpaces = newValue.replaceAll(' ', '').trim()
+      if (
+        regexp !== undefined &&
+        valueWithoutSpaces.length > 0 &&
+        !regexp.test(valueWithoutSpaces)
+      ) {
+        return
+      }
+
       onChange(newValue)
       if (newValue.length === maxLength && onComplete) {
         onComplete()
@@ -182,30 +294,76 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       e.preventDefault()
       e.stopPropagation()
 
-      const lastClickedSlot = previousCaretData[0]
+      // const lastClickedSlot = previousCaretData[0]
+
+      // // Shift range selection
+      // if (e.shiftKey && lastClickedSlot !== null) {
+      //   const p1: number = lastClickedSlot
+      //   const p2: number = slotIdx
+
+      //   // Get the greatest between p1 and p2, then increment 1
+      //   const _start = Math.min(p1, p2)
+      //   const _end = Math.max(p1, p2) + 1
+
+      //   const start = Math.max(0, _start)
+      //   const end = Math.min(_end, value.length)
+
+      //   setCaretPosition(start, end)
+      //   inputRef.current.focus()
+
+      //   return
+      // }
 
       // Shift range selection
-      if (e.shiftKey && lastClickedSlot !== null) {
-        const p1: number = lastClickedSlot
-        const p2: number = slotIdx
+      if (e.shiftKey && previousCaretData[0] !== null && previousCaretData[1] !== null) {
+        console.log({caretData})
+        
+        // const dir = slotIdx < previousCaretData[0] ? 0 : 1
 
-        // Get the greatest between p1 and p2, then increment 1
-        const _start = Math.min(p1, p2)
-        const _end = Math.max(p1, p2) + 1
+        // const start = dir === 0 ? slotIdx : previousCaretData[0]
+        // const end = dir === 1 ? slotIdx + 1 : previousCaretData[1]
 
-        const start = Math.max(0, _start)
-        const end = Math.min(_end, value.length)
-
-        setCaretPosition(start, end)
-        inputRef.current.focus()
+        // console.log({start,end,dir,previousCaretData})
+        
+        // setCaretPosition(start, end)
+        // inputRef.current.focus()
 
         return
       }
 
       const newSlotIdx = slotIdx > value.length ? value.length : slotIdx
 
-      setCaretPosition(newSlotIdx, newSlotIdx)
+      setCaretPosition(newSlotIdx, newSlotIdx + 1)
       inputRef.current.focus()
+    }
+
+    function onInputKeyUp(e: React.KeyboardEvent<HTMLInputElement>) {
+      if (e.key === 'Meta') {
+        setIsMetaPressed(false)
+      }
+
+      if (!inputRef.current) {
+        return
+      }
+
+      const start = inputRef.current.selectionStart
+      const end = inputRef.current.selectionEnd
+
+      if (e.key === 'Meta' || e.key === 'Alt' || e.key === 'Control') {
+        if (start !== null && end !== null) {
+          if (start === end) {
+            if (value.length === 0) {
+              // Do nothing
+            } else if (start === 0) {
+              setCaretPosition(0, 1)
+            } else if (start === maxLength) {
+              setCaretPosition(maxLength - 1, maxLength)
+            } else if (start === value.length) {
+              setCaretPosition(value.length, value.length)
+            }
+          }
+        }
+      }
     }
 
     return (
@@ -213,12 +371,14 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         <div
           className="flex items-center gap-0 text-[2rem] leading-none"
           onClick={onContainerClick}
+          tabIndex={-1}
         >
           {Array.from({ length: maxLength }).map((_, idx) => {
             return (
               <div
                 key={idx}
                 onClick={e => onSlotClick(e, idx)}
+                aria-hidden
                 className={cn(
                   'relative w-10 h-[52px] bg-white [--bsh-width:0px] transition-all border-slate-300 border-r border-y flex items-center justify-center',
                   '[&:nth-child(1)]:rounded-l-md [&:nth-child(1)]:border-l [&:nth-child(4)]:rounded-l-md [&:nth-child(4)]:border-l',
@@ -247,13 +407,15 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
         <input
           className={cn('pointer-events-none', 'absolute inset-0 opacity-0')}
+          className={cn('pointer-events-none')}
           ref={inputRef}
           maxLength={maxLength}
           value={value}
           onFocus={onInputFocus}
           onChange={onInputChange}
-          onSelect={onInputSelect}
+          onSelect={e => onInputSelect({ e })}
           onKeyDown={onInputKeyDown}
+          onKeyUp={onInputKeyUp}
           onBlur={() => setCaretData([null, null])}
         />
       </div>
