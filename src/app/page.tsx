@@ -161,7 +161,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
                 key={idx}
                 onClick={e => onSlotClick(e, idx)}
                 className={cn(
-                  'w-10 h-[52px] bg-white [--bsh-width:0px] transition-all border-slate-300 border-r border-y flex items-center justify-center',
+                  'relative w-10 h-[52px] bg-white [--bsh-width:0px] transition-all border-slate-300 border-r border-y flex items-center justify-center',
                   {
                     '[box-shadow:0_0_0_var(--bsh-width)_rgb(147_197_253_/_.7)] border-blue-300 [--bsh-width:4px] z-10':
                       isCurrent(idx) || isSelected(idx),
@@ -174,6 +174,15 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
                 )}
               >
                 {paddedValue[idx]}
+
+                {/* Blinking Caret */}
+                {isCurrent(idx) && (
+                  <FakeCaretRoot>
+                    <div className="absolute pointer-events-none inset-0 flex items-center justify-center">
+                      <div className="w-px h-[32px] bg-black" />
+                    </div>
+                  </FakeCaretRoot>
+                )}
               </div>
             )
           })}
@@ -205,4 +214,45 @@ export function usePreviousValid<T>(value: T, isValid: (value: T) => boolean) {
   }
 
   return previous
+}
+
+interface FakeCaretProps {
+  blinking: boolean
+  blinkingMsOn: number
+  blinkingMsOff: number
+
+  children: React.ReactNode
+}
+function FakeCaretRoot({
+  blinking = true,
+  blinkingMsOn = 600,
+  blinkingMsOff = 600,
+  children,
+  ...props
+}: FakeCaretProps) {
+  const [on, setOn] = React.useState<boolean>(true)
+
+  React.useEffect(() => {
+    const interval = setInterval(
+      () => {
+        setOn(prev => !prev)
+      },
+      on ? blinkingMsOn : blinkingMsOff,
+    )
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [blinkingMsOff, blinkingMsOn, on])
+  // TODO: count `lastUpdated` to reset the timer
+
+  return (
+    <div
+      style={{
+        opacity: on ? 1 : 0,
+      }}
+    >
+      {children}
+    </div>
+  )
 }
