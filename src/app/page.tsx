@@ -146,7 +146,10 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       e.preventDefault()
 
-      handleFocus()
+      const insertPos = value.length + 1
+      const clamppedInsertPos = Math.max(insertPos, maxLength - 1)
+      setCaretPosition(clamppedInsertPos - 1, clamppedInsertPos)
+      inputRef.current.focus()
     }
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
