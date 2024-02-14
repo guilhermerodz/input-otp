@@ -18,6 +18,7 @@ export default function Home() {
         onChange={setOtpInputValue}
         maxLength={6}
         ref={getInputRef}
+        onComplete={() => console.log('completed!')}
       />
     </div>
   )
@@ -27,10 +28,12 @@ interface OTPInputProps {
   value: string
   onChange: (value: string) => void
 
+  onComplete?: (...args: any[]) => unknown
+
   maxLength: number
 }
 const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
-  ({ maxLength, value, onChange, ...props }, ref) => {
+  ({ maxLength, value, onChange, onComplete, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(ref, () => inputRef.current! as any)
 
@@ -157,6 +160,9 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const newValue = e.target.value
 
       onChange(newValue)
+      if (newValue.length === maxLength && onComplete) {
+        onComplete()
+      }
 
       if (
         prevValue.length === maxLength &&
@@ -239,10 +245,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         </div>
 
         <input
-          className={cn(
-            'pointer-events-none',
-            'absolute inset-0 opacity-0'
-          )}
+          className={cn('pointer-events-none', 'absolute inset-0 opacity-0')}
           ref={inputRef}
           maxLength={maxLength}
           value={value}
