@@ -159,6 +159,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const prevValue = e.currentTarget.value
       const newValue = e.target.value
 
+      e.preventDefault()
       onChange(newValue)
       if (newValue.length === maxLength && onComplete) {
         onComplete()
