@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { cn } from './util/cn'
 
 export default function Home() {
-  const [otpInputValue, setOtpInputValue] = React.useState<string>('')
+  const [otpInputValue, setOtpInputValue] = React.useState<string>('123123')
 
   function getInputRef(el: HTMLInputElement) {
     // console.log({el})
@@ -49,7 +49,38 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     function onInputSelect(e: React.SyntheticEvent<HTMLInputElement>) {
       const { selectionStart, selectionEnd } = e.currentTarget
 
+      if (selectionStart === selectionEnd && selectionStart !== null) {
+        const n = selectionStart === maxLength ? maxLength - 1 : selectionStart
+
+        const start = Math.min(n, maxLength - 1)
+        const end = n + 1
+
+        setCaretPosition(start, end)
+        return
+      }
+
       setCaretData([selectionStart, selectionEnd])
+    }
+
+    function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+      if (e.ctrlKey || e.metaKey) {
+        return
+      }
+
+      if (caretData[0] === null) {
+        return
+      }
+
+      // check if arrow left
+      if (e.key === 'ArrowLeft' && !e.shiftKey) {
+        e.preventDefault()
+
+        const start = Math.max(0, caretData[0] - 1)
+        const end = start + 1
+
+        setCaretPosition(start, end)
+        return
+      }
     }
 
     function setCaretPosition(start: number, end: number) {
@@ -108,12 +139,29 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       )
     }
 
-    function onContainerClick() {
+    function onContainerClick(e: React.MouseEvent<HTMLDivElement>) {
       if (!inputRef.current) {
         return
       }
 
-      // handleFocus()
+      e.preventDefault()
+
+      handleFocus()
+    }
+
+    function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+      const prevValue = e.currentTarget.value
+      const newValue = e.target.value
+
+      onChange(newValue)
+
+      if (
+        prevValue.length === maxLength &&
+        prevValue.length === newValue.length
+      ) {
+        const lastPos = newValue.length
+        setCaretPosition(lastPos - 1, lastPos)
+      }
     }
 
     function onSlotClick(e: React.MouseEvent<HTMLDivElement>, slotIdx: number) {
@@ -121,6 +169,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         return
       }
 
+      e.preventDefault()
       e.stopPropagation()
 
       const lastClickedSlot = previousCaretData[0]
@@ -162,21 +211,19 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
                 onClick={e => onSlotClick(e, idx)}
                 className={cn(
                   'relative w-10 h-[52px] bg-white [--bsh-width:0px] transition-all border-slate-300 border-r border-y flex items-center justify-center',
+                  '[&:nth-child(1)]:rounded-l-md [&:nth-child(1)]:border-l [&:nth-child(4)]:rounded-l-md [&:nth-child(4)]:border-l',
+                  '[&:last-child]:rounded-r-md [&:nth-child(3)]:rounded-r-md',
+                  '[&:nth-child(4)]:ml-10',
                   {
                     '[box-shadow:0_0_0_var(--bsh-width)_rgb(147_197_253_/_.7)] border-blue-300 [--bsh-width:4px] z-10':
                       isCurrent(idx) || isSelected(idx),
-                    '[&:nth-child(1)]:rounded-l-md [&:nth-child(1)]:border-l [&:nth-child(4)]:rounded-l-md [&:nth-child(4)]:border-l':
-                      true,
-                    '[&:last-child]:rounded-r-md [&:nth-child(3)]:rounded-r-md':
-                      true,
-                    'ml-10': idx === 3,
                   },
                 )}
               >
                 {paddedValue[idx]}
 
                 {/* Blinking Caret */}
-                {isCurrent(idx) && (
+                {isCurrent(idx) && paddedValue[idx] === ' ' && (
                   <FakeCaretRoot>
                     <div className="absolute pointer-events-none inset-0 flex items-center justify-center">
                       <div className="w-px h-[32px] bg-black" />
@@ -189,13 +236,17 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         </div>
 
         <input
-          className={cn('pointer-events-none', 'absolute inset-0 opacity-0')}
+          className={cn(
+            'pointer-events-none',
+            'absolute inset-0 opacity-0'
+          )}
           ref={inputRef}
           maxLength={maxLength}
           value={value}
           onFocus={onInputFocus}
-          onChange={e => onChange(e.target.value)}
+          onChange={onInputChange}
           onSelect={onInputSelect}
+          onKeyDown={onInputKeyDown}
           onBlur={() => setCaretData([null, null])}
         />
       </div>
@@ -217,9 +268,9 @@ export function usePreviousValid<T>(value: T, isValid: (value: T) => boolean) {
 }
 
 interface FakeCaretProps {
-  blinking: boolean
-  blinkingMsOn: number
-  blinkingMsOff: number
+  blinking?: boolean
+  blinkingMsOn?: number
+  blinkingMsOff?: number
 
   children: React.ReactNode
 }
