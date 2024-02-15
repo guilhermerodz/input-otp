@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+const SPECIAL_KEYS = ['Meta', 'Alt', 'Control', 'Tab', 'Z']
+
 interface OTPInputProps {
   name?: string
   onBlur?: (...args: any[]) => unknown
@@ -13,6 +15,8 @@ interface OTPInputProps {
   allowSpaces?: boolean
 
   onComplete?: (...args: any[]) => unknown
+
+  behavior?: 'insert-and-navigate' | 'insert-only'
 
   render: (props: {
     triggerProps: {
@@ -38,7 +42,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
       maxLength,
       regexp = /^\d+$/,
-      allowSpaces = true,
+      allowSpaces = false,
 
       onComplete,
 
@@ -48,9 +52,33 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     },
     ref,
   ) => {
+    // console.count('rerender')
+
     /** Logic */
     const inputRef = React.useRef<HTMLInputElement>(null)
-    React.useImperativeHandle(ref, () => inputRef.current! as any)
+    React.useImperativeHandle(
+      ref,
+      () => {
+        const el = inputRef.current as HTMLInputElement
+
+        // const _setSelectionRange = el.setSelectionRange.bind(el)
+        // el.setSelectionRange = (
+        //   ...args: Parameters<typeof _setSelectionRange>
+        // ) => {
+        //   console.count('calling setSelectionRange')
+        //   _setSelectionRange(...args)
+        // }
+
+        const _select = el.select.bind(el)
+        el.select = () => {
+          _select()
+          // Proxy to update the caretData
+          setCaretData([0, el.value.length])
+        }
+        return el
+      },
+      [],
+    )
 
     const [isFocused, setIsFocused] = React.useState<boolean>(false)
 
@@ -94,39 +122,37 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           return
         }
 
+        if (caretData[0] === start && caretData[1] === end) {
+          return
+        }
         setCaretData([start, end])
       },
-      [maxLength],
+      [caretData, maxLength],
     )
 
     // Workaround to track the input's  selection even if Meta key is pressed
     // This was necessary due to the input `onSelect` only being called either 1. before Meta key is pressed or 2. after Meta key is released
     // TODO: track `Meta` and `Tab`
-    const [isMetaPressed, setIsMetaPressed] = React.useState<boolean>(false)
-    React.useEffect(() => {
-      if (!isMetaPressed) {
-        return
-      }
-
-      const interval = setInterval(() => {
-        if (!inputRef.current) {
-          return
-        }
-
-        onInputSelect({
-          overrideStart: inputRef.current.selectionStart,
-          overrideEnd: inputRef.current.selectionEnd,
-        })
-      }, 2)
-
-      return () => {
-        clearInterval(interval)
-      }
-    }, [isMetaPressed, onInputSelect])
+    const [isSpecialPressed, setIsSpecialPressed] =
+      React.useState<boolean>(false)
 
     function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (e.key === 'Meta') {
-        setIsMetaPressed(true)
+      if (SPECIAL_KEYS.includes(e.key)) {
+        setIsSpecialPressed(true)
+      }
+
+      // Sync to update UI
+      if (isSpecialPressed) {
+        setTimeout(() => {
+          if (!inputRef.current) {
+            return
+          }
+
+          onInputSelect({
+            overrideStart: inputRef.current.selectionStart,
+            overrideEnd: inputRef.current.selectionEnd,
+          })
+        }, 2_0)
       }
 
       if (!inputRef.current) {
@@ -181,8 +207,11 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         e.preventDefault()
 
         if (caretData[0] !== null && caretData[1] !== null) {
-          const start = Math.min(caretData[1], maxLength - 1)
-          const end = Math.min(maxLength, caretData[1] + 1)
+          const start = Math.min(
+            caretData[1],
+            Math.min(value.length, maxLength - 1),
+          )
+          const end = Math.min(maxLength, start + 1)
 
           setCaretPosition(start, end)
         }
@@ -225,16 +254,18 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
       e.preventDefault()
 
-      const valueWithoutSpaces = newValue.replaceAll(' ', '').trim()
+      const valueToTest = allowSpaces
+        ? newValue.replaceAll(' ', '').trim()
+        : newValue
       if (
         regexp !== null &&
-        valueWithoutSpaces.length > 0 &&
-        !regexp.test(valueWithoutSpaces)
+        valueToTest.length > 0 &&
+        !regexp.test(valueToTest)
       ) {
         return
       }
 
-      onChange(newValue)
+      onChange(newValue.slice(0, maxLength))
       if (newValue.length === maxLength && onComplete) {
         onComplete()
       }
@@ -249,8 +280,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     }
 
     function onInputKeyUp(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (e.key === 'Meta') {
-        setIsMetaPressed(false)
+      if (SPECIAL_KEYS.includes(e.key)) {
+        setIsSpecialPressed(false)
       }
 
       if (!inputRef.current) {
@@ -281,7 +312,18 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       setIsFocused(false)
       setCaretData([null, null])
 
+      setIsSpecialPressed(false)
+
       onBlur?.()
+    }
+
+    function onInputBeforeInput(e: React.FormEvent<HTMLInputElement>) {
+      if (e.currentTarget.selectionStart === e.currentTarget.selectionEnd) {
+        if (value.length === maxLength) {
+          e.nativeEvent.preventDefault()
+          return
+        }
+      }
     }
 
     const isSelected = React.useCallback(
@@ -344,11 +386,15 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
         <input
           style={{
-            position: 'absolute',
-            inset: 0,
-            opacity: 0,
+            // position: 'absolute',
+            // inset: 0,
+            // opacity: 0,
             pointerEvents: 'none',
             outline: 'none !important',
+
+            // debug purposes
+            color: 'black',
+            background: 'white',
           }}
           name={name}
           disabled={disabled}
@@ -361,50 +407,10 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           onKeyDown={onInputKeyDown}
           onKeyUp={onInputKeyUp}
           onBlur={onInputBlur}
+          onBeforeInput={onInputBeforeInput}
         />
       </div>
     )
   },
 )
 OTPInput.displayName = 'OTPInput'
-
-// interface FakeCaretProps {
-//   blinking?: boolean
-//   blinkingMsOn?: number
-//   blinkingMsOff?: number
-
-//   children: React.ReactNode
-// }
-// export function FakeCaretRoot({
-//   blinking = true,
-//   blinkingMsOn = 600,
-//   blinkingMsOff = 600,
-//   children,
-//   ...props
-// }: FakeCaretProps) {
-//   const [on, setOn] = React.useState<boolean>(true)
-
-//   React.useEffect(() => {
-//     const interval = setInterval(
-//       () => {
-//         setOn(prev => !prev)
-//       },
-//       on ? blinkingMsOn : blinkingMsOff,
-//     )
-
-//     return () => {
-//       clearInterval(interval)
-//     }
-//   }, [blinkingMsOff, blinkingMsOn, on])
-//   // TODO: count `lastUpdated` to reset the timer
-
-//   return (
-//     <div
-//       style={{
-//         opacity: on ? 1 : 0,
-//       }}
-//     >
-//       {children}
-//     </div>
-//   )
-// }
