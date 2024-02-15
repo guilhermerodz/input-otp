@@ -1,17 +1,14 @@
-import * as React from 'react'
-import { cn } from '../../../lib/utils/cn'
-import { Controller, useForm } from 'react-hook-form'
-import { OTPInput } from '../../component'
+import Link from 'next/link'
+import { Icons } from '../../../components/icons'
 import {
   PageActions,
   PageHeader,
   PageHeaderDescription,
   PageHeaderHeading,
 } from '../../../components/page-header'
-import Link from 'next/link'
-import { Icons } from '../../../components/icons'
 import { buttonVariants } from '../../../components/ui/button'
 import { siteConfig } from '../../../config/site'
+import { cn } from '../../../lib/utils/cn'
 import { Showcase } from './_components/showcase'
 
 export default function IndexPage() {
@@ -26,7 +23,9 @@ export default function IndexPage() {
 
         <Showcase className={cn(fadeUpClassname, 'motion-safe:delay-1000')} />
 
-        <PageHeaderDescription className={cn(fadeUpClassname, 'motion-safe:delay-1500')}>
+        <PageHeaderDescription
+          className={cn(fadeUpClassname, 'motion-safe:delay-1500')}
+        >
           One-time password input component for React. Accessible. Unstyled.
           Customizable. Open Source.
         </PageHeaderDescription>
