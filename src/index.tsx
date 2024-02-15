@@ -53,6 +53,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
   ) => {
     // console.count('rerender')
 
+    // TODO: refactor like https://github.com/emilkowalski/vaul/blob/main/src/index.tsx
     /** Logic */
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(
@@ -80,8 +81,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     )
 
     const [isFocused, setIsFocused] = React.useState<boolean>(false)
-
-    const paddedValue = value.padEnd(maxLength, ' ')
 
     const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
@@ -282,7 +281,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       const end = Math.min(maxLength, value.length + 1)
       const start = Math.max(0, end - 1)
 
-      // console.log('c')
       mutateInputSelectionAndUpdateMirror(start, end)
     }
 
@@ -293,7 +291,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       e.preventDefault()
 
       const valueToTest = allowSpaces
-        ? newValue.replaceAll(' ', '').trim()
+        ? newValue.replace(/ /g, '').trim()
         : newValue
       if (
         regexp !== null &&

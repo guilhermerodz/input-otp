@@ -1,0 +1,54 @@
+{
+  "name": "otp-input",
+  "version": "0.1.0",
+  "description": "One-time password input component for React.",
+  "main": "index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "pnpm type-check && bunchee",
+    "dev": "bunchee --watch",
+    "dev:website": "turbo run dev --filter=website...",
+    "dev:test": "turbo run dev --filter=test...",
+    "format": "prettier --write .",
+    "test": "playwright test"
+  },
+  "keywords": [
+    "react",
+    "drawer",
+    "dialog",
+    "modal"
+  ],
+  "author": "Guilherme Rodz <g@rodz.dev>",
+  "license": "MIT",
+  "homepage": "https://rodz.dev/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guilhermerodz/input-otp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guilhermerodz/input-otp/issues"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "bunchee": "^4.4.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3"
+  }
+}
