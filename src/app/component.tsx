@@ -65,7 +65,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         // el.setSelectionRange = (
         //   ...args: Parameters<typeof _setSelectionRange>
         // ) => {
-        //   console.count('calling setSelectionRange')
+        //   // console.count('calling setSelectionRange')
         //   _setSelectionRange(...args)
         // }
 
@@ -88,12 +88,50 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       [number | null, number | null]
     >([null, null])
 
+    // TODO: rename to `mutateInputSelectionAndSyncCaretData`
+    const setCaretPosition = React.useCallback(
+      (start: number | null, end: number | null) => {
+        if (!inputRef.current) {
+          return
+        }
+
+        const isFocused = inputRef.current === document.activeElement
+
+        if (!isFocused) {
+          return
+        }
+
+        if (caretData[0] === start && caretData[1] === end) {
+          return
+        }
+
+        if (start === null || end === null) {
+          setCaretData([start, end])
+          inputRef.current.setSelectionRange(start, end)
+          return
+        }
+
+        const n = start === maxLength ? maxLength - 1 : start
+
+        const _start = Math.min(n, maxLength - 1)
+        const _end = n + 1
+
+        setCaretData([_start, _end])
+        inputRef.current.setSelectionRange(_start, _end)
+      },
+      [caretData, maxLength],
+    )
+
     const onInputSelect = React.useCallback(
       (params: {
         e?: React.SyntheticEvent<HTMLInputElement>
         overrideStart?: number | null
         overrideEnd?: number | null
       }) => {
+        if (!inputRef.current) {
+          return
+        }
+
         if (
           !params.e &&
           params.overrideStart === undefined &&
@@ -118,7 +156,13 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           const _start = Math.min(n, maxLength - 1)
           const _end = n + 1
 
-          setCaretPosition(_start, _end)
+          console.log('f')
+          // inputRef.current.selectionStart = _start
+          // inputRef.current.selectionEnd = _end
+          inputRef.current.setSelectionRange(_start, _end)
+          setCaretData([_start, _end])
+
+          // setCaretPosition(_start, _end)
           return
         }
 
@@ -127,7 +171,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         }
         setCaretData([start, end])
       },
-      [caretData, maxLength],
+      [caretData, maxLength, setCaretPosition],
     )
 
     // Workaround to track the input's  selection even if Meta key is pressed
@@ -136,23 +180,29 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     const [isSpecialPressed, setIsSpecialPressed] =
       React.useState<boolean>(false)
 
+    function syncTimeout() {
+      return setTimeout(() => {
+        if (!inputRef.current) {
+          return
+        }
+
+        onInputSelect({
+          overrideStart: inputRef.current.selectionStart,
+          overrideEnd: inputRef.current.selectionEnd,
+        })
+      }, 2_0)
+    }
+
     function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
       if (SPECIAL_KEYS.includes(e.key)) {
         setIsSpecialPressed(true)
+
+        syncTimeout()
       }
 
       // Sync to update UI
       if (isSpecialPressed) {
-        setTimeout(() => {
-          if (!inputRef.current) {
-            return
-          }
-
-          onInputSelect({
-            overrideStart: inputRef.current.selectionStart,
-            overrideEnd: inputRef.current.selectionEnd,
-          })
-        }, 2_0)
+        syncTimeout()
       }
 
       if (!inputRef.current) {
@@ -194,6 +244,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           const start = Math.max(0, caretData[0] - 1)
           const end = start + 1
 
+          console.log('a')
           setCaretPosition(start, end)
         }
       }
@@ -213,25 +264,10 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           )
           const end = Math.min(maxLength, start + 1)
 
+          console.log('b')
           setCaretPosition(start, end)
         }
       }
-    }
-
-    // TODO: rename to `mutateInputSelectionAndSyncCaretData`
-    function setCaretPosition(start: number | null, end: number | null) {
-      if (!inputRef.current) {
-        return
-      }
-
-      const isFocused = inputRef.current === document.activeElement
-
-      if (!isFocused) {
-        return
-      }
-
-      inputRef.current.setSelectionRange(start, end)
-      setCaretData([start, end])
     }
 
     function onInputFocus(e: React.SyntheticEvent<HTMLInputElement>) {
@@ -245,6 +281,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       const end = Math.min(maxLength, value.length + 1)
       const start = Math.max(0, end - 1)
 
+      console.log('c')
       setCaretPosition(start, end)
     }
 
@@ -275,6 +312,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         prevValue.length === newValue.length
       ) {
         const lastPos = newValue.length
+        console.log('d')
         setCaretPosition(lastPos - 1, lastPos)
       }
     }
@@ -282,6 +320,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     function onInputKeyUp(e: React.KeyboardEvent<HTMLInputElement>) {
       if (SPECIAL_KEYS.includes(e.key)) {
         setIsSpecialPressed(false)
+
+        syncTimeout()
       }
 
       if (!inputRef.current) {
@@ -291,19 +331,23 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       const start = inputRef.current.selectionStart
       const end = inputRef.current.selectionEnd
 
-      if (e.key === 'Meta' || e.key === 'Alt' || e.key === 'Control') {
-        if (start !== null && end !== null) {
-          if (start === end) {
-            if (value.length === 0) {
-              // Do nothing
-            } else if (start === 0) {
-              setCaretPosition(0, 1)
-            } else if (start === maxLength) {
-              setCaretPosition(maxLength - 1, maxLength)
-            } else if (start === value.length) {
-              setCaretPosition(value.length, value.length)
-            }
-          }
+      if (
+        (e.key === 'Meta' || e.key === 'Alt' || e.key === 'Control') &&
+        start !== null &&
+        end !== null &&
+        start === end
+      ) {
+        if (value.length === 0) {
+          // Do nothing
+        } else if (start === 0) {
+          // console.log('e1')
+          setCaretPosition(0, 1)
+        } else if (start === maxLength) {
+          // console.log('e2')
+          setCaretPosition(maxLength - 1, maxLength)
+        } else if (start === value.length) {
+          // console.log('e3')
+          setCaretPosition(value.length, value.length)
         }
       }
     }
@@ -409,6 +453,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           onBlur={onInputBlur}
           onBeforeInput={onInputBeforeInput}
         />
+
+        {JSON.stringify({ caretData })}
       </div>
     )
   },
