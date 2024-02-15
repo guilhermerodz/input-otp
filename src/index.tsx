@@ -177,7 +177,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     }
 
     function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (SPECIAL_KEYS.includes(e.key)) {
+      if (SPECIAL_KEYS.indexOf(e.key) !== -1) {
         setIsSpecialPressed(true)
 
         syncTimeout()
@@ -317,7 +317,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     }
 
     function onInputKeyUp(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (SPECIAL_KEYS.includes(e.key)) {
+      if (SPECIAL_KEYS.indexOf(e.key) !== -1) {
         setIsSpecialPressed(false)
 
         syncTimeout()
