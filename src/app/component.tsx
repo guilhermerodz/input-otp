@@ -13,10 +13,9 @@ interface OTPInputProps {
   maxLength: number
   regexp?: RegExp | null
   allowSpaces?: boolean
+  allowNavigation?: boolean
 
   onComplete?: (...args: any[]) => unknown
-
-  behavior?: 'insert-and-navigate' | 'insert-only'
 
   render: (props: {
     triggerProps: {
@@ -27,7 +26,6 @@ interface OTPInputProps {
     }
     slots: { isActive: boolean; char: string | null }[]
     isFocused: boolean
-    paddedValue: string
   }) => React.ReactElement
 }
 export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
@@ -43,6 +41,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       maxLength,
       regexp = /^\d+$/,
       allowSpaces = false,
+      allowNavigation = true,
 
       onComplete,
 
@@ -73,7 +72,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         el.select = () => {
           _select()
           // Proxy to update the caretData
-          setCaretData([0, el.value.length])
+          setSelectionMirror([0, el.value.length])
         }
         return el
       },
@@ -84,29 +83,19 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
     const paddedValue = value.padEnd(maxLength, ' ')
 
-    const [caretData, setCaretData] = React.useState<
+    const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
     >([null, null])
 
     // TODO: rename to `mutateInputSelectionAndSyncCaretData`
-    const setCaretPosition = React.useCallback(
+    const mutateInputSelectionAndUpdateMirror = React.useCallback(
       (start: number | null, end: number | null) => {
         if (!inputRef.current) {
           return
         }
 
-        const isFocused = inputRef.current === document.activeElement
-
-        if (!isFocused) {
-          return
-        }
-
-        if (caretData[0] === start && caretData[1] === end) {
-          return
-        }
-
         if (start === null || end === null) {
-          setCaretData([start, end])
+          setSelectionMirror([start, end])
           inputRef.current.setSelectionRange(start, end)
           return
         }
@@ -116,10 +105,16 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         const _start = Math.min(n, maxLength - 1)
         const _end = n + 1
 
-        setCaretData([_start, _end])
+        if (selectionMirror[0] === _start && selectionMirror[1] === _end) {
+          return
+        }
+
+        // mutate input selection
         inputRef.current.setSelectionRange(_start, _end)
+        // force UI update
+        setSelectionMirror([_start, _end])
       },
-      [caretData, maxLength],
+      [selectionMirror, maxLength],
     )
 
     const onInputSelect = React.useCallback(
@@ -151,27 +146,16 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
         // Check if there is no selection range
         if (start === end && start !== null) {
-          const n = start === maxLength ? maxLength - 1 : start
-
-          const _start = Math.min(n, maxLength - 1)
-          const _end = n + 1
-
-          console.log('f')
-          // inputRef.current.selectionStart = _start
-          // inputRef.current.selectionEnd = _end
-          inputRef.current.setSelectionRange(_start, _end)
-          setCaretData([_start, _end])
-
-          // setCaretPosition(_start, _end)
+          mutateInputSelectionAndUpdateMirror(start, end)
           return
         }
 
-        if (caretData[0] === start && caretData[1] === end) {
+        if (selectionMirror[0] === start && selectionMirror[1] === end) {
           return
         }
-        setCaretData([start, end])
+        setSelectionMirror([start, end])
       },
-      [caretData, maxLength, setCaretPosition],
+      [selectionMirror, mutateInputSelectionAndUpdateMirror],
     )
 
     // Workaround to track the input's  selection even if Meta key is pressed
@@ -205,11 +189,26 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         syncTimeout()
       }
 
+      if (
+        !allowNavigation &&
+        (e.key === 'ArrowLeft' ||
+          e.key === 'ArrowRight' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown')
+      ) {
+        console.log('preventing default')
+        e.preventDefault()
+        mutateInputSelectionAndUpdateMirror(
+          selectionMirror[0],
+          selectionMirror[1],
+        )
+      }
+
       if (!inputRef.current) {
         return
       }
 
-      if (caretData[0] === null) {
+      if (selectionMirror[0] === null) {
         return
       }
 
@@ -233,6 +232,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
       if (
         e.key === 'ArrowLeft' &&
+        allowNavigation &&
         !e.shiftKey &&
         !e.ctrlKey &&
         !e.metaKey &&
@@ -240,16 +240,17 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       ) {
         e.preventDefault()
 
-        if (caretData[0] !== null && caretData[1] !== null) {
-          const start = Math.max(0, caretData[0] - 1)
+        if (selectionMirror[0] !== null && selectionMirror[1] !== null) {
+          const start = Math.max(0, selectionMirror[0] - 1)
           const end = start + 1
 
-          console.log('a')
-          setCaretPosition(start, end)
+          console.log('moving left')
+          mutateInputSelectionAndUpdateMirror(start, end)
         }
       }
       if (
         e.key === 'ArrowRight' &&
+        allowNavigation &&
         !e.shiftKey &&
         !e.ctrlKey &&
         !e.metaKey &&
@@ -257,15 +258,15 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       ) {
         e.preventDefault()
 
-        if (caretData[0] !== null && caretData[1] !== null) {
+        if (selectionMirror[0] !== null && selectionMirror[1] !== null) {
           const start = Math.min(
-            caretData[1],
+            selectionMirror[1],
             Math.min(value.length, maxLength - 1),
           )
           const end = Math.min(maxLength, start + 1)
 
-          console.log('b')
-          setCaretPosition(start, end)
+          // console.log('b')
+          mutateInputSelectionAndUpdateMirror(start, end)
         }
       }
     }
@@ -281,8 +282,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       const end = Math.min(maxLength, value.length + 1)
       const start = Math.max(0, end - 1)
 
-      console.log('c')
-      setCaretPosition(start, end)
+      // console.log('c')
+      mutateInputSelectionAndUpdateMirror(start, end)
     }
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -312,8 +313,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         prevValue.length === newValue.length
       ) {
         const lastPos = newValue.length
-        console.log('d')
-        setCaretPosition(lastPos - 1, lastPos)
+        // console.log('d')
+        mutateInputSelectionAndUpdateMirror(lastPos - 1, lastPos)
       }
     }
 
@@ -341,20 +342,20 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           // Do nothing
         } else if (start === 0) {
           // console.log('e1')
-          setCaretPosition(0, 1)
+          mutateInputSelectionAndUpdateMirror(0, 1)
         } else if (start === maxLength) {
           // console.log('e2')
-          setCaretPosition(maxLength - 1, maxLength)
+          mutateInputSelectionAndUpdateMirror(maxLength - 1, maxLength)
         } else if (start === value.length) {
           // console.log('e3')
-          setCaretPosition(value.length, value.length)
+          mutateInputSelectionAndUpdateMirror(value.length, value.length)
         }
       }
     }
 
     function onInputBlur() {
       setIsFocused(false)
-      setCaretData([null, null])
+      setSelectionMirror([null, null])
 
       setIsSpecialPressed(false)
 
@@ -373,24 +374,24 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     const isSelected = React.useCallback(
       (slotIdx: number) => {
         return (
-          caretData[0] !== null &&
-          caretData[1] !== null &&
-          slotIdx >= caretData[0] &&
-          slotIdx < caretData[1]
+          selectionMirror[0] !== null &&
+          selectionMirror[1] !== null &&
+          slotIdx >= selectionMirror[0] &&
+          slotIdx < selectionMirror[1]
         )
       },
-      [caretData],
+      [selectionMirror],
     )
 
     const isCurrent = React.useCallback(
       (slotIdx: number) => {
-        if (caretData[0] === null || caretData[1] === null) {
+        if (selectionMirror[0] === null || selectionMirror[1] === null) {
           return false
         }
 
-        return slotIdx >= caretData[0] && slotIdx < caretData[1]
+        return slotIdx >= selectionMirror[0] && slotIdx < selectionMirror[1]
       },
-      [caretData],
+      [selectionMirror],
     )
 
     /** JSX */
@@ -410,7 +411,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           isActive: isCurrent(slotIdx) || isSelected(slotIdx),
         })),
         isFocused,
-        paddedValue,
       })
     }, [
       disabled,
@@ -418,7 +418,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       isFocused,
       isSelected,
       maxLength,
-      paddedValue,
       render,
       value,
     ])
@@ -430,15 +429,15 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
         <input
           style={{
-            // position: 'absolute',
-            // inset: 0,
-            // opacity: 0,
+            position: 'absolute',
+            inset: 0,
+            opacity: 0,
             pointerEvents: 'none',
             outline: 'none !important',
 
             // debug purposes
-            color: 'black',
-            background: 'white',
+            // color: 'black',
+            // background: 'white',
           }}
           name={name}
           disabled={disabled}
@@ -454,7 +453,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           onBeforeInput={onInputBeforeInput}
         />
 
-        {JSON.stringify({ caretData })}
+        {/* {JSON.stringify({ caretData: selectionMirror })} */}
       </div>
     )
   },
