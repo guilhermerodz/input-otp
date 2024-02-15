@@ -44,6 +44,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
   const getSlotClassnames = (isFocused: boolean, isSlotActive: boolean) =>
     cn(
       'relative w-10 md:w-20 h-14 md:h-28 text-[2rem] lg:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md transition-all [transition-duration:300ms] [--bsh-width:0] [box-shadow:0_0_0_var(--bsh-width)_hsl(var(--accent-foreground)_/_1)]',
+      'group-hover:border-accent-foreground/20',
       {
         'border-accent-foreground/20': isFocused,
         '[--bsh-width:4px] z-10': isSlotActive,
@@ -68,7 +69,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
             maxLength={6}
             // regexp={null} // Allow everything
             render={({ triggerProps, slots, isFocused }) => (
-              <button {...triggerProps} className="flex items-center">
+              <button {...triggerProps} className="flex items-center group">
                 <div className="flex">
                   {slots.slice(0, 3).map((slot, idx) => (
                     <div
