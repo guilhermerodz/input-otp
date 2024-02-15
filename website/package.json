@@ -1,5 +1,5 @@
 {
-  "name": "otp-input",
+  "name": "website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,7 +20,8 @@
     "react-hook-form": "^7.50.1",
     "react-wrap-balancer": "^1.1.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "otp-input": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20",
