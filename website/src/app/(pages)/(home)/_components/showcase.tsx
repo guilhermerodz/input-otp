@@ -3,8 +3,8 @@
 import React from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
-import { OTPInput } from '@/app/component'
-import { cn } from '@/lib/utils'
+import { OTPInput } from '../../../component'
+import { cn } from '../../../../lib/utils'
 
 type FormValues = {
   otp: string

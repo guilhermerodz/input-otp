@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { Controller, useForm } from 'react-hook-form'
-import { OTPInput } from '@/app/component'
+import { OTPInput } from '../../component'
 import {
   PageActions,
   PageHeader,
   PageHeaderDescription,
   PageHeaderHeading,
-} from '@/components/page-header'
+} from '../../../components/page-header'
 import Link from 'next/link'
-import { Icons } from '@/components/icons'
-import { buttonVariants } from '@/components/ui/button'
-import { siteConfig } from '@/config/site'
+import { Icons } from '../../../components/icons'
+import { buttonVariants } from '../../../components/ui/button'
+import { siteConfig } from '../../../config/site'
 import { Showcase } from './_components/showcase'
 
 export default function IndexPage() {

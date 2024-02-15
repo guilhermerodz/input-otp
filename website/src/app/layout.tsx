@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
-import { siteConfig } from '@/config/site'
+import { SiteFooter } from '../components/site-footer'
+import { SiteHeader } from '../components/site-header'
+import { siteConfig } from '../config/site'
 import { fontSans } from '../lib/fonts'
 import { cn } from '../lib/utils/cn'
 import './globals.css'
-import { AppProvider } from '@/components/provider'
+import { AppProvider } from '../components/provider'
 
 export const metadata: Metadata = {
   title: {
