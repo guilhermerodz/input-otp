@@ -18,7 +18,6 @@ export default function Home() {
         onChange={setOtpInputValue}
         maxLength={6}
         ref={getInputRef}
-        regexp={/^\d+$/}
       />
     </div>
   )
@@ -28,13 +27,16 @@ interface OTPInputProps {
   value: string
   onChange: (value: string) => void
 
-  regexp?: RegExp
+  regexp?: RegExp | null
   onComplete?: (...args: any[]) => unknown
 
   maxLength: number
 }
 const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
-  ({ maxLength, value, onChange, regexp, onComplete, ...props }, ref) => {
+  (
+    { maxLength, value, onChange, regexp = /^\d+$/, onComplete, ...props },
+    ref,
+  ) => {
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(ref, () => inputRef.current! as any)
 
@@ -79,13 +81,10 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           const _start = Math.min(n, maxLength - 1)
           const _end = n + 1
 
-          console.log('no selection range, setting caret position')
-
           setCaretPosition(_start, _end)
           return
         }
 
-        console.log('setting cd', start, end)
         setCaretData([start, end])
       },
       [maxLength],
@@ -254,7 +253,7 @@ const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       const valueWithoutSpaces = newValue.replaceAll(' ', '').trim()
       if (
-        regexp !== undefined &&
+        regexp !== null &&
         valueWithoutSpaces.length > 0 &&
         !regexp.test(valueWithoutSpaces)
       ) {
