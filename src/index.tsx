@@ -13,6 +13,7 @@ interface OTPInputRenderProps {
   isFocused: boolean
 }
 interface OTPInputProps {
+  id?: string
   name?: string
   onBlur?: (...args: any[]) => unknown
   disabled?: boolean
@@ -33,6 +34,7 @@ interface OTPInputProps {
 export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
   (
     {
+      id,
       name,
       onBlur,
       disabled,
@@ -421,6 +423,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
             // background: 'white',
           }}
           name={name}
+          id={id}
           disabled={disabled}
           ref={inputRef}
           maxLength={maxLength}
