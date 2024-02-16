@@ -2,6 +2,16 @@ import * as React from 'react'
 
 const SPECIAL_KEYS = ['Meta', 'Alt', 'Control', 'Tab', 'Z']
 
+interface OTPInputRenderProps {
+  triggerProps: {
+    onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => unknown
+    tabIndex: number
+    type: 'button'
+    disabled?: boolean
+  }
+  slots: { isActive: boolean; char: string | null }[]
+  isFocused: boolean
+}
 interface OTPInputProps {
   name?: string
   onBlur?: (...args: any[]) => unknown
@@ -12,21 +22,13 @@ interface OTPInputProps {
 
   maxLength: number
   regexp?: RegExp | null
+  inputMode?: 'numeric' | 'text'
   allowSpaces?: boolean
   allowNavigation?: boolean
 
   onComplete?: (...args: any[]) => unknown
 
-  render: (props: {
-    triggerProps: {
-      onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => unknown
-      tabIndex: number
-      type: 'button'
-      disabled?: boolean
-    }
-    slots: { isActive: boolean; char: string | null }[]
-    isFocused: boolean
-  }) => React.ReactElement
+  render: (props: OTPInputRenderProps) => React.ReactElement
 }
 export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
   (
@@ -40,6 +42,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
       maxLength,
       regexp = /^\d+$/,
+      inputMode = 'numeric',
       allowSpaces = false,
       allowNavigation = true,
 
@@ -403,6 +406,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         {renderedChildren}
 
         <input
+          inputMode={inputMode}
+          pattern={regexp ? regexp.source : undefined}
           style={{
             position: 'absolute',
             inset: 0,
