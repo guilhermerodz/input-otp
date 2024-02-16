@@ -36,7 +36,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       onBlur,
       disabled,
 
-      value,
+      value: _value,
       onChange,
 
       maxLength,
@@ -59,6 +59,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
     // TODO: refactor like https://github.com/emilkowalski/vaul/blob/main/src/index.tsx
     /** Logic */
+    const value = typeof _value === 'string' ? _value : ''
+
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(
       ref,
@@ -448,9 +450,12 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
             // debug purposes
             // color: 'black',
             // background: 'white',
-            // opacity: 0.5,
+            // opacity: '1',
             // pointerEvents: 'all',
+            // inset: undefined,
+            // position: undefined,
           }}
+          // autoComplete="" // TODO: add support
           name={name}
           id={id}
           disabled={disabled}
