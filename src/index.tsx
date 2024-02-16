@@ -3,14 +3,9 @@ import * as React from 'react'
 const SPECIAL_KEYS = ['Meta', 'Alt', 'Control', 'Tab', 'Z']
 
 interface OTPInputRenderProps {
-  triggerProps: {
-    onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => unknown
-    tabIndex: number
-    type: 'button'
-    disabled?: boolean
-  }
   slots: { isActive: boolean; char: string | null }[]
   isFocused: boolean
+  isHovering: boolean
 }
 interface OTPInputProps {
   id?: string
@@ -30,6 +25,8 @@ interface OTPInputProps {
   onComplete?: (...args: any[]) => unknown
 
   render: (props: OTPInputRenderProps) => React.ReactElement
+
+  containerClassName?: string
 }
 export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
   (
@@ -51,6 +48,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       onComplete,
 
       render,
+
+      containerClassName,
 
       ...props
     },
@@ -77,6 +76,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       [],
     )
 
+    const [isHovering, setIsHovering] = React.useState<boolean>(false)
     const [isFocused, setIsFocused] = React.useState<boolean>(false)
 
     const [selectionMirror, setSelectionMirror] = React.useState<
@@ -359,6 +359,20 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       }
     }
 
+    function onContainerClick(e: React.MouseEvent<HTMLInputElement>) {
+      e.preventDefault()
+
+      if (!inputRef.current) {
+        return
+      }
+
+      if (document.activeElement === inputRef.current) {
+        return
+      }
+
+      inputRef.current.focus()
+    }
+
     const isSelected = React.useCallback(
       (slotIdx: number) => {
         return (
@@ -385,26 +399,40 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     /** JSX */
     const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
       return render({
-        triggerProps: {
-          onClick: e => {
-            e.preventDefault()
-            inputRef.current?.focus()
-          },
-          tabIndex: -1,
-          type: 'button',
-          disabled,
-        },
         slots: Array.from({ length: maxLength }).map((_, slotIdx) => ({
           char: value[slotIdx] !== undefined ? value[slotIdx] : null,
           isActive: isCurrent(slotIdx) || isSelected(slotIdx),
         })),
         isFocused,
+        isHovering,
       })
-    }, [disabled, isCurrent, isFocused, isSelected, maxLength, render, value])
+    }, [
+      disabled,
+      isCurrent,
+      isHovering,
+      isFocused,
+      isSelected,
+      maxLength,
+      render,
+      value,
+    ])
 
     // TODO: allow for custom container
     return (
-      <div ref={ref} style={{ position: 'relative' }} {...props}>
+      <div
+        ref={ref}
+        style={{
+          position: 'relative',
+          cursor: 'text',
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+        }}
+        onMouseDown={disabled ? undefined : onContainerClick}
+        onMouseOver={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        className={containerClassName}
+        {...props}
+      >
         {renderedChildren}
 
         <input
@@ -415,12 +443,13 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
             inset: 0,
             opacity: 0,
             pointerEvents: 'none',
-            fontSize: '1px',
             outline: 'none !important',
 
             // debug purposes
             // color: 'black',
             // background: 'white',
+            // opacity: 0.5,
+            // pointerEvents: 'all',
           }}
           name={name}
           id={id}
