@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 const SPECIAL_KEYS = ['Meta', 'Alt', 'Control', 'Tab', 'Z']
