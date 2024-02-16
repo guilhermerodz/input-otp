@@ -61,14 +61,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       () => {
         const el = inputRef.current as HTMLInputElement
 
-        // const _setSelectionRange = el.setSelectionRange.bind(el)
-        // el.setSelectionRange = (
-        //   ...args: Parameters<typeof _setSelectionRange>
-        // ) => {
-        //   // console.count('calling setSelectionRange')
-        //   _setSelectionRange(...args)
-        // }
-
         const _select = el.select.bind(el)
         el.select = () => {
           _select()
@@ -195,7 +187,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           e.key === 'ArrowUp' ||
           e.key === 'ArrowDown')
       ) {
-        console.log('preventing default')
         e.preventDefault()
         mutateInputSelectionAndUpdateMirror(
           selectionMirror[0],
@@ -243,7 +234,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           const start = Math.max(0, selectionMirror[0] - 1)
           const end = start + 1
 
-          console.log('moving left')
           mutateInputSelectionAndUpdateMirror(start, end)
         }
       }
@@ -264,7 +254,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           )
           const end = Math.min(maxLength, start + 1)
 
-          // console.log('b')
           mutateInputSelectionAndUpdateMirror(start, end)
         }
       }
@@ -311,7 +300,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         prevValue.length === newValue.length
       ) {
         const lastPos = newValue.length
-        // console.log('d')
         mutateInputSelectionAndUpdateMirror(lastPos - 1, lastPos)
       }
     }
@@ -339,13 +327,10 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         if (value.length === 0) {
           // Do nothing
         } else if (start === 0) {
-          // console.log('e1')
           mutateInputSelectionAndUpdateMirror(0, 1)
         } else if (start === maxLength) {
-          // console.log('e2')
           mutateInputSelectionAndUpdateMirror(maxLength - 1, maxLength)
         } else if (start === value.length) {
-          // console.log('e3')
           mutateInputSelectionAndUpdateMirror(value.length, value.length)
         }
       }
@@ -410,15 +395,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         })),
         isFocused,
       })
-    }, [
-      disabled,
-      isCurrent,
-      isFocused,
-      isSelected,
-      maxLength,
-      render,
-      value,
-    ])
+    }, [disabled, isCurrent, isFocused, isSelected, maxLength, render, value])
 
     // TODO: allow for custom container
     return (
@@ -431,6 +408,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
             inset: 0,
             opacity: 0,
             pointerEvents: 'none',
+            fontSize: '1px',
             outline: 'none !important',
 
             // debug purposes
