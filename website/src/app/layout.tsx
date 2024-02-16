@@ -69,12 +69,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          'min-h-screen bg-background font-sans antialiased dark',
+          'min-h-[100dvh] bg-background font-sans antialiased dark',
           fontSans.className,
         )}
       >
         <AppProvider>
-          <div className="relative flex min-h-screen flex-col bg-background">
+          <div className="relative flex min-h-[100dvh] flex-col bg-background">
             <SiteHeader />
 
             <main className="flex-1 flex flex-col">{children}</main>
