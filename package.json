@@ -44,13 +44,14 @@
     "url": "https://github.com/guilhermerodz/input-otp/issues"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "bunchee": "^4.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "^5.3.3",
-    "turbo": "^1.12.4"
+    "turbo": "^1.12.4",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
     "react": "^16.8 || ^17.0 || ^18.0",
