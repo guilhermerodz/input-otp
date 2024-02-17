@@ -126,6 +126,12 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       }, 1_0)
     }, [autoFocus])
 
+    React.useEffect(() => {
+      if (value.length === maxLength) {
+        onComplete?.()
+      }
+    }, [value, onComplete])
+
     const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
     >([null, null])
@@ -347,7 +353,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
       onChange(newValue.slice(0, maxLength))
       if (newValue.length === maxLength) {
-        onComplete?.()
         syncTimeout()
       }
     }
