@@ -21,7 +21,6 @@ export function BaseOTPInput(
         'opacity-50': disabled,
       })}
       maxLength={6}
-      // regexp={null} // Allow everything
       render={({ slots, isFocused, isHovering }) => (
         <div
           className="flex items-center gap-1"
