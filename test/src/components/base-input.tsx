@@ -23,7 +23,9 @@ export function BaseOTPInput(
       maxLength={6}
       render={({ slots, isFocused, isHovering }) => (
         <div
-          className="flex items-center gap-1"
+          className={cn('flex items-center gap-1', {
+            'opacity-50': overrideProps.disabled ?? disabled,
+          })}
           data-testid="otp-input-renderer"
           data-test-render-is-hovering={isHovering ? 'true' : undefined}
           data-test-render-is-focused={isFocused ? 'true' : undefined}
@@ -34,7 +36,7 @@ export function BaseOTPInput(
               data-test-char={slot.char ?? undefined}
               key={idx}
               className={cn(
-                'rounded-md border-black bg-white text-black w-10 h-14 border-[4px]',
+                'transition-all duration-300 rounded-md border-black bg-white text-black w-10 h-14 border-[4px]',
                 {
                   'border-[green]': isFocused,
                   'border-[red]': slot.isActive,
