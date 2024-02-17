@@ -57,7 +57,7 @@ function InputEngine({
   // Is the input ready to be used by the user?
   const [isReady, setIsReady] = React.useState<boolean>(false)
   // Shouldn't be used for any logic. Used for UI rendering purposes only.
-  const [uiSelection, setUiSelection] = React.useState<Selection>([null, null])
+  const [mirror, updateMirror] = React.useState<Selection>([null, null])
   const metadata = React.useRef<Metadata>({
     latestInputSelection: [null, null],
   })
@@ -82,6 +82,10 @@ function InputEngine({
   const handleSelection = React.useCallback(
     (sel: Selection, newValue?: string) => {
       if (!inputRef.current) {
+        return
+      }
+
+      if (sel[0] === null || sel[1] === null) {
         return
       }
 
@@ -116,7 +120,7 @@ function InputEngine({
         }
 
         setIsReady(true)
-        setUiSelection([
+        updateMirror([
           inputRef.current.selectionStart,
           inputRef.current.selectionEnd,
         ])
@@ -237,9 +241,9 @@ function _setClampedSelectionRange(
 }
 
 function syncTimeoutWorkaround<T extends Function>(fn: T): number[] {
-  const TIMES_MS = [1,5, 2_0, 5_0]
+  const TIMES_MS = [1, 5, 2_0, 5_0]
 
-  return TIMES_MS.map((time) => setTimeout(fn, time))
+  return TIMES_MS.map(time => setTimeout(fn, time))
 }
 
 const NAVIGATION_KEYS = [
