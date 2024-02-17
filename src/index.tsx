@@ -125,6 +125,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         }
       }, 1_0)
     }, [autoFocus])
+
     const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
     >([null, null])
@@ -146,10 +147,6 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
         const _start = Math.min(n, maxLength - 1)
         const _end = n + 1
-
-        if (selectionMirror[0] === _start && selectionMirror[1] === _end) {
-          return
-        }
 
         // mutate input selection
         inputRef.current.setSelectionRange(_start, _end)
@@ -233,7 +230,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         syncTimeout()
       }
 
-      if (e.metaKey && e.key.toLowerCase() === 'a' && !allowNavigation)  {
+      if (e.metaKey && e.key.toLowerCase() === 'a' && !allowNavigation) {
         e.preventDefault()
         return
       }
@@ -349,16 +346,9 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       }
 
       onChange(newValue.slice(0, maxLength))
-      if (newValue.length === maxLength && onComplete) {
-        onComplete()
-      }
-
-      if (
-        prevValue.length === maxLength &&
-        prevValue.length === newValue.length
-      ) {
-        const lastPos = newValue.length
-        mutateInputSelectionAndUpdateMirror(lastPos - 1, lastPos)
+      if (newValue.length === maxLength) {
+        onComplete?.()
+        syncTimeout()
       }
     }
 
