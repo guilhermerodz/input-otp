@@ -132,6 +132,12 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       }
     }, [value, onComplete])
 
+    React.useEffect(() => {
+      if (disabled) {
+        onInputBlur()
+      }
+    }, [disabled])
+
     const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
     >([null, null])
@@ -449,7 +455,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       return render({
         slots: Array.from({ length: maxLength }).map((_, slotIdx) => ({
           char: value[slotIdx] !== undefined ? value[slotIdx] : null,
-          isActive: isCurrent(slotIdx) || isSelected(slotIdx),
+          isActive: isFocused && (isCurrent(slotIdx) || isSelected(slotIdx)),
         })),
         isFocused,
         isHovering,
