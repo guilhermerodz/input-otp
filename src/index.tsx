@@ -69,6 +69,11 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
 
         const _select = el.select.bind(el)
         el.select = () => {
+          if (!allowNavigation) {
+            // Cannot select all chars as navigation is disabled
+            return
+          }
+
           _select()
           // Proxy to update the caretData
           setSelectionMirror([0, el.value.length])
