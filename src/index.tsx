@@ -67,6 +67,22 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       () => {
         const el = inputRef.current as HTMLInputElement
 
+        // TODO: support `otp` SMS transport
+        // if ('OTPCredential' in window) {
+        //   const ac = new AbortController()
+        //   navigator.credentials
+        //     .get({
+        //       ...{ otp: { transport: ['sms'] } },
+        //       signal: ac.signal,
+        //     })
+        //     .then(otp => {
+        //       input.value = otp.code
+        //     })
+        //     .catch(err => {
+        //       console.log(err)
+        //     })
+        // }
+
         const _select = el.select.bind(el)
         el.select = () => {
           if (!allowNavigation) {
@@ -190,6 +206,11 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       // Sync to update UI
       if (isSpecialPressed) {
         syncTimeout()
+      }
+
+      if (e.metaKey && e.key.toLowerCase() === 'a' && !allowNavigation)  {
+        e.preventDefault()
+        return
       }
 
       if (
@@ -461,6 +482,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
             // position: undefined,
           }}
           // autoComplete="" // TODO: add support
+          autoComplete="one-time-code"
           name={name}
           id={id}
           disabled={disabled}
