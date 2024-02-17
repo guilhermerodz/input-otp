@@ -466,7 +466,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
         ref={ref}
         style={{
           position: 'relative',
-          cursor: 'text',
+          cursor: disabled ? 'default' : 'text',
           userSelect: 'none',
           WebkitUserSelect: 'none',
         }}
