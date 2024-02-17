@@ -207,16 +207,18 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       React.useState<boolean>(false)
 
     function syncTimeout() {
-      return setTimeout(() => {
-        if (!inputRef.current) {
-          return
-        }
+      return [5, 10, 20, 50].map(delayMs =>
+        setTimeout(() => {
+          if (!inputRef.current) {
+            return
+          }
 
-        onInputSelect({
-          overrideStart: inputRef.current.selectionStart,
-          overrideEnd: inputRef.current.selectionEnd,
-        })
-      }, 2_0)
+          onInputSelect({
+            overrideStart: inputRef.current.selectionStart,
+            overrideEnd: inputRef.current.selectionEnd,
+          })
+        }, delayMs),
+      )
     }
 
     function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
