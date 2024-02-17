@@ -24,6 +24,8 @@ interface OTPInputProps {
   allowSpaces?: boolean
   allowNavigation?: boolean
 
+  autoFocus?: boolean
+
   onComplete?: (...args: any[]) => unknown
 
   render: (props: OTPInputRenderProps) => React.ReactElement
@@ -46,6 +48,8 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
       inputMode = 'numeric',
       allowSpaces = false,
       allowNavigation = true,
+
+      autoFocus = false,
 
       onComplete,
 
@@ -104,6 +108,23 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
     const [isHovering, setIsHovering] = React.useState<boolean>(false)
     const [isFocused, setIsFocused] = React.useState<boolean>(false)
 
+    React.useEffect(() => {
+      if (!autoFocus || !inputRef.current) {
+        return
+      }
+
+      setTimeout(() => {
+        const isAutoFocused = document.activeElement === inputRef.current
+
+        if (isAutoFocused) {
+          setIsFocused(true)
+          onInputSelect({
+            overrideStart: inputRef.current.selectionStart,
+            overrideEnd: inputRef.current.selectionEnd,
+          })
+        }
+      }, 1_0)
+    }, [autoFocus])
     const [selectionMirror, setSelectionMirror] = React.useState<
       [number | null, number | null]
     >([null, null])
@@ -485,6 +506,7 @@ export const OTPInput = React.forwardRef<HTMLDivElement, OTPInputProps>(
           }}
           // autoComplete="" // TODO: add support
           autoComplete="one-time-code"
+          autoFocus={autoFocus}
           name={name}
           id={id}
           disabled={disabled}
