@@ -30,6 +30,46 @@ importers:
         specifier: ^5.3.3
         version: 5.3.3
 
+  test:
+    dependencies:
+      next:
+        specifier: 14.1.0
+        version: 14.1.0(react-dom@18.2.0)(react@18.2.0)
+      react:
+        specifier: ^18
+        version: 18.2.0
+      react-dom:
+        specifier: ^18
+        version: 18.2.0(react@18.2.0)
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.11.18
+      '@types/react':
+        specifier: ^18
+        version: 18.2.55
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.2.19
+      autoprefixer:
+        specifier: ^10.0.1
+        version: 10.4.17(postcss@8.4.35)
+      eslint:
+        specifier: ^8
+        version: 8.56.0
+      eslint-config-next:
+        specifier: 14.1.0
+        version: 14.1.0(eslint@8.56.0)(typescript@5.3.3)
+      postcss:
+        specifier: ^8
+        version: 8.4.35
+      tailwindcss:
+        specifier: ^3.3.0
+        version: 3.4.1
+      typescript:
+        specifier: ^5
+        version: 5.3.3
+
   website:
     dependencies:
       '@radix-ui/react-slot':
@@ -62,9 +102,6 @@ importers:
       react-hook-form:
         specifier: ^7.50.1
         version: 7.50.1(react@18.2.0)
-      react-wrap-balancer:
-        specifier: ^1.1.0
-        version: 1.1.0(react@18.2.0)
       tailwind-merge:
         specifier: ^2.2.1
         version: 2.2.1
@@ -2775,14 +2812,6 @@ packages:
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
-
-  /react-wrap-balancer@1.1.0(react@18.2.0):
-    resolution: {integrity: sha512-EhF3jOZm5Fjx+Cx41e423qOv2c2aOvXAtym2OHqrGeMUnwERIyNsRBgnfT3plB170JmuYvts8K2KSPEIerKr5A==}
-    peerDependencies:
-      react: '>=16.8.0 || ^17.0.0 || ^18'
-    dependencies:
-      react: 18.2.0
-    dev: false
 
   /react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
