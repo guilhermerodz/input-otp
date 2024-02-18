@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 /**
  * Read environment variables from file.
@@ -21,11 +21,11 @@ export default defineConfig({
     timeout: 5000,
   },
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: process.env.WINDOWED_TESTS ? false : true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -34,6 +34,10 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:3039',
+    headless: process.env.WINDOWED_TESTS ? false : true,
+    launchOptions: {
+      slowMo: process.env.WINDOWED_TESTS ? 500 : 0,
+    },
   },
   webServer: {
     command: 'npm run dev',
@@ -52,4 +56,4 @@ export default defineConfig({
   //     use: { ...devices['Pixel 5'] },
   //   },
   // ],
-});
+})
