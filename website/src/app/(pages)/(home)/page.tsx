@@ -1,19 +1,19 @@
-import Link from 'next/link'
-import { Icons } from '../../../components/icons'
+import { Icons } from '@/components/icons'
 import {
   PageActions,
   PageHeader,
   PageHeaderDescription,
   PageHeaderHeading,
-} from '../../../components/page-header'
-import { buttonVariants } from '../../../components/ui/button'
-import { siteConfig } from '../../../config/site'
-import { cn } from '../../../lib/utils/cn'
+} from '@/components/page-header'
+import { buttonVariants } from '@/components/ui/button'
+import { siteConfig } from '@/config/site'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
 import { Showcase } from './_components/showcase'
 
-export default function IndexPage() {
-  const fadeUpClassname = 'motion-safe:opacity-0 motion-safe:animate-fade-up'
+const fadeUpClassname = 'motion-safe:opacity-0 motion-safe:animate-fade-up'
 
+export default function IndexPage() {
   return (
     <div className="container relative flex-1 flex flex-col justify-center">
       <PageHeader>

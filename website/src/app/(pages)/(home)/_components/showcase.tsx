@@ -2,11 +2,11 @@
 
 import React from 'react'
 
-import { OTPInput } from 'otp-input'
 import { cn } from '@/lib/utils'
+import { OTPInput, REGEXP_ONLY_DIGITS } from 'otp-input'
 
 export function Showcase({ className, ...props }: { className?: string }) {
-  const [value, setValue] = React.useState('')
+  const [value, setValue] = React.useState('12')
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
@@ -41,7 +41,8 @@ export function Showcase({ className, ...props }: { className?: string }) {
         onChange={setValue}
         containerClassName={cn('group flex items-center')}
         maxLength={6}
-        // regexp={null} // Allow everything
+        allowNavigation={true}
+        pattern={REGEXP_ONLY_DIGITS}
         render={({ slots, isFocused }) => (
           <>
             <div className="flex">
