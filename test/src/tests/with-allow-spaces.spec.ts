@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/with-allow-spaces')
+  await page.goto('/with-allow-spaces')
 })
 
 test.describe('With allow spaces tests', () => {

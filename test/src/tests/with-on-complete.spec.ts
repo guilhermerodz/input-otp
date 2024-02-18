@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { modifier } from './util/modifier'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/with-on-complete')
+  await page.goto('/with-on-complete')
 })
 
 test.describe('With on complete tests', () => {

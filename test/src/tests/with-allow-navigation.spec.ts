@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { modifier } from './util/modifier'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/with-allow-navigation')
+  await page.goto('/with-allow-navigation')
 })
 
 async function copyAndGetClipboardContent(params: {

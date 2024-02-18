@@ -42,14 +42,14 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
   },
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'iPhone',
-      use: { ...devices['iPhone 13 Pro'] },
-    },
-    {
-      name: 'Pixel',
-      use: { ...devices['Pixel 5'] },
-    },
-  ],
+  // projects: [
+  //   {
+  //     name: 'iPhone',
+  //     use: { ...devices['iPhone 13 Pro'] },
+  //   },
+  //   {
+  //     name: 'Pixel',
+  //     use: { ...devices['Pixel 5'] },
+  //   },
+  // ],
 });

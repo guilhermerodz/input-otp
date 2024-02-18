@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/props')
+  await page.goto('/props')
 })
 
 test.describe('Props tests', () => {

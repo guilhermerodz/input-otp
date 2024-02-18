@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/base')
+  await page.goto('/base')
 })
 
 test.describe('Base tests - Selections', () => {

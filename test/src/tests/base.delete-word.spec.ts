@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { modifier } from './util/modifier'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('http://localhost:3039/base')
+  await page.goto('/base')
 })
 
 test.describe('Delete words', () => {
