@@ -17,7 +17,7 @@ test.describe('Delete words', () => {
     await input.press(`${modifier}+Backspace`)
     await expect(input).toHaveValue('')
   })
-  test('should backspace previous word (including selected character)', async ({ page }) => {
+  test('should backspace selected char', async ({ page }) => {
     const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
 
     await input.pressSequentially('123456')
@@ -27,7 +27,7 @@ test.describe('Delete words', () => {
     await input.press('ArrowLeft')
     await input.press(`${modifier}+Backspace`)
 
-    await expect(input).toHaveValue('56')
+    await expect(input).toHaveValue('12356')
   })
   test('should forward-delete character when pressing delete', async ({ page }) => {
     const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
