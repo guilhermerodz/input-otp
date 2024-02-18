@@ -76,10 +76,16 @@ const config = {
             opacity: '1',
           },
           '20%,50%': {
-            'opacity': '0',
+            opacity: '0',
           },
         },
 
+        'fade-in': {
+          from: {
+            opacity: '0',
+          },
+          to: { opacity: '1' },
+        },
         'fade-up': {
           from: {
             opacity: '0',
@@ -93,6 +99,7 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
 
         'caret-blink': 'caret-blink 1.2s ease-out infinite',
+        'fade-in': 'fade-in 0.3s ease-out forwards',
         'fade-up': 'fade-up 1s ease-out forwards',
       },
     },
