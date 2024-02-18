@@ -23,6 +23,11 @@ async function copyAndGetClipboardContent(params: {
 }
 
 test.describe('With allow navigation tests', () => {
+  test.skip(
+    process.env.CI === 'true',
+    'Breaks in CI as it cannot handle Arrow or Shift keys',
+  )
+
   test('should allow navigation to the sides (arrows only)', async ({
     page,
     context,
