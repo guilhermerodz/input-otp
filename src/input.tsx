@@ -248,12 +248,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           props.onKeyUp?.(e)
         }}
         onFocus={e => {
-          if (!allowNavigation) {
-            inputRef.current?.setSelectionRange(
-              Math.min(inputRef.current.value.length, maxLength - 1),
-              inputRef.current.value.length,
-            )
-          }
+          inputRef.current?.setSelectionRange(
+            Math.min(inputRef.current.value.length, maxLength - 1),
+            inputRef.current.value.length,
+          )
           setIsFocused(true)
 
           props.onFocus?.(e)
