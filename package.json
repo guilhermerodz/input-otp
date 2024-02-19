@@ -36,10 +36,10 @@
   ],
   "author": "Guilherme Rodz <g@rodz.dev>",
   "license": "MIT",
-  "homepage": "https://rodz.dev/",
+  "homepage": "https://input-otp.rodz.dev/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/guilhermerodz/input-otp.git"
+    "url": "git+https://github.com/guilhermerodz/input-otp.git"
   },
   "bugs": {
     "url": "https://github.com/guilhermerodz/input-otp/issues"
