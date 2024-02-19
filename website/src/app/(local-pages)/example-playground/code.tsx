@@ -102,6 +102,9 @@ export function ExampleCode() {
       <Code code={code} toCopy={tsx} />
 
       <div className="absolute inset-0 code-example-overlay pointer-events-none z-20 [animation-delay:5000ms]"></div>
+
+      {/* Anchor */}
+      <div className="code-example-anchor absolute pointer-events-none w-px h-px -top-[5.5rem]" />
     </div>
   )
 }

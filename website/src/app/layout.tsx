@@ -7,6 +7,7 @@ import { fontSans } from '../lib/fonts'
 import { cn } from '../lib/utils/cn'
 import './globals.css'
 import { AppProvider } from '../components/provider'
+import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
   title: {
@@ -82,6 +83,8 @@ export default function RootLayout({
             <SiteFooter />
           </div>
         </AppProvider>
+
+        <Toaster />
       </body>
     </html>
   )
