@@ -7,8 +7,8 @@ type OverrideProps<T, R> = Omit<T, keyof R> & R
 export type OTPInputProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
-    value: string
-    onChange: (...args: any[]) => unknown
+    value?: string
+    onChange?: (...args: any[]) => unknown
 
     maxLength: number
 

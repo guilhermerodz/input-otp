@@ -10,7 +10,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
       value: uncheckedValue,
-      onChange,
+      onChange: uncheckedOnChange,
 
       maxLength,
       pattern = REGEXP_ONLY_DIGITS,
@@ -29,8 +29,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     },
     ref,
   ) => {
+    // Only used when `value` state is not provided
+    const [internalValue, setInternalValue] = React.useState(props.defaultValue ?? '')
+    
     // Workarounds
-    const value = typeof uncheckedValue === 'string' ? uncheckedValue : ''
+    const value = uncheckedValue ?? internalValue
+    const onChange = uncheckedOnChange ?? setInternalValue
     const regexp = pattern
       ? typeof pattern === 'string'
         ? new RegExp(pattern)
