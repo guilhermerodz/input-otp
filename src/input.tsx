@@ -224,7 +224,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     function onContainerClick(e: React.MouseEvent<HTMLInputElement>) {
       e.preventDefault()
-      if (!inputRef.current || document.activeElement === inputRef.current) {
+      if (!inputRef.current) {
         return
       }
       inputRef.current.focus()
