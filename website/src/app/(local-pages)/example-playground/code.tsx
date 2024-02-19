@@ -99,10 +99,10 @@ ${tsx}
 
 export function ExampleCode() {
   return (
-    <div className="relative code-example w-full overflow-hidden">
+    <div className="relative code-example w-full overflow-hidden opacity-0 animate-fade-in [animation-delay:5000ms] lg:animate-none">
       <Code code={code} toCopy={tsx} />
 
-      <div className="absolute inset-0 code-example-overlay pointer-events-none z-20 [animation-delay:5000ms]"></div>
+      <div className="hidden lg:[display:unset] absolute inset-0 code-example-overlay pointer-events-none z-20 [animation-delay:5000ms]"></div>
 
       {/* Anchor */}
       <div className="code-example-anchor absolute pointer-events-none w-px h-px -top-[5.5rem]" />
