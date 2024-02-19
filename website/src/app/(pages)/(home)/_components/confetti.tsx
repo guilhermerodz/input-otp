@@ -1,5 +1,10 @@
-import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
+import VFX from 'react-canvas-confetti/dist/presets/explosion'
 
 export function Confetti() {
-  return <Fireworks autorun={{ speed: 1 }} />
+  return (
+    <VFX
+      autorun={{ speed: 1 }}
+      globalOptions={{ disableForReducedMotion: true }}
+    />
+  )
 }
