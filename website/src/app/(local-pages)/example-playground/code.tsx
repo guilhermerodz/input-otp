@@ -2,6 +2,7 @@ import { Code } from '@/components/code'
 
 const tsx =
 `'use client'
+import { OTPInput } from 'input-otp'
 
 <OTPInput
   maxLength={6}
