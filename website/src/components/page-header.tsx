@@ -25,7 +25,7 @@ function PageHeaderHeading({
   return (
     <h1
       className={cn(
-        "text-center text-3xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1]",
+        "text-center text-3xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1] text-balance",
         className
       )}
       {...props}
@@ -40,7 +40,7 @@ function PageHeaderDescription({
   return (
     <p
       className={cn(
-        "max-w-[750px] text-center text-lg text-muted-foreground sm:text-xl text-balance",
+        "max-w-[750px] text-center text-lg text-muted-foreground sm:text-xl text-pretty",
         className
       )}
       {...props}
