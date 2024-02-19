@@ -7,9 +7,9 @@ import dynamic from 'next/dynamic'
 import { OTPInput, REGEXP_ONLY_DIGITS } from 'input-otp'
 import { cn } from '@/lib/utils'
 
-const DynamicConfetti = dynamic(() =>
-  import('./confetti').then(m => m.Confetti),
-)
+// const DynamicConfetti = dynamic(() =>
+//   import('./confetti').then(m => m.Confetti),
+// )
 
 export function Showcase({ className, ...props }: { className?: string }) {
   const [value, setValue] = React.useState('12')
@@ -23,7 +23,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
   React.useEffect(() => {
     const t1 = setTimeout(() => {
       setDisabled(false)
-    }, 2_400)
+    }, 1_900)
     const t2 = setTimeout(() => {
       inputRef.current?.focus()
     }, 2_500)
@@ -73,12 +73,12 @@ export function Showcase({ className, ...props }: { className?: string }) {
     <>
       {preloadConfetti === 1 && (
         <div className="hidden">
-          <DynamicConfetti />
+          {/* <DynamicConfetti /> */}
         </div>
       )}
       {hasGuessed && (
         <div className="fixed inset-0 z-50 pointer-events-none motion-reduce:hidden">
-          <DynamicConfetti />
+          {/* <DynamicConfetti /> */}
         </div>
       )}
 
