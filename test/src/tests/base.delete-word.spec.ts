@@ -6,8 +6,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('Delete words', () => {
-  // test.skip(process.env.CI === 'true', 'Breaks in CI as it cannot handle Arrow or Shift keys')
-  
   test('should backspace previous word (even if there is not a selected character)', async ({ page }) => {
     const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
 
