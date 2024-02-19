@@ -36,15 +36,15 @@ export function Showcase({ className, ...props }: { className?: string }) {
 
   React.useEffect(() => {
     if (value.length > 3) {
-      setPreloadConfetti(p => p+1)
+      setPreloadConfetti(p => p + 1)
     }
   }, [value.length])
 
   async function onSubmit(e?: React.FormEvent<HTMLFormElement>) {
-    await new Promise(r => setTimeout(r, 5_00))
-    
-    e?.preventDefault?.()
+    inputRef.current?.select()
+    await new Promise(r => setTimeout(r, 1_00))
 
+    e?.preventDefault?.()
     inputRef.current?.blur()
 
     if (value === '123456') {
@@ -54,7 +54,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
         setHasGuessed(false)
       }, 1_000)
     } else {
-      toast("Try guessing the right password 🤔", { position: 'top-right' })
+      toast('Try guessing the right password 🤔', { position: 'top-right' })
     }
 
     const anchor = document.querySelector<HTMLInputElement>(
@@ -71,9 +71,11 @@ export function Showcase({ className, ...props }: { className?: string }) {
 
   return (
     <>
-      {preloadConfetti === 1 && <div className="hidden">
-        <DynamicConfetti />
-      </div>}
+      {preloadConfetti === 1 && (
+        <div className="hidden">
+          <DynamicConfetti />
+        </div>
+      )}
       {hasGuessed && (
         <div className="fixed inset-0 z-50 pointer-events-none motion-reduce:hidden">
           <DynamicConfetti />
