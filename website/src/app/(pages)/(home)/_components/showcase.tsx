@@ -3,7 +3,7 @@
 import React from 'react'
 
 import { cn } from '@/lib/utils'
-import { OTPInput, REGEXP_ONLY_DIGITS } from 'otp-input'
+import { OTPInput, REGEXP_ONLY_DIGITS } from 'input-otp'
 
 export function Showcase({ className, ...props }: { className?: string }) {
   const [value, setValue] = React.useState('12')

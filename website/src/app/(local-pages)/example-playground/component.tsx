@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils/cn'
 
-import { OTPInput } from 'otp-input'
+import { OTPInput } from 'input-otp'
 
 export function ExampleComponent() {
   return (

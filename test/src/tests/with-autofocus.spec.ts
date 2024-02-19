@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('With autofocus tests', () => {
   test('should autofocus', async ({ page }) => {
-    const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
+    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
 
     await expect(input).toBeFocused()
   })

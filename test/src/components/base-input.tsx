@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { OTPInput } from 'otp-input'
+import { OTPInput } from 'input-otp'
 import { cn } from '@/lib/utils'
 
 export function BaseOTPInput(
@@ -12,7 +12,7 @@ export function BaseOTPInput(
   return (
     <OTPInput
       // Test props
-      data-testid="otp-input-wrapper"
+      data-testid="input-otp-wrapper"
       // Normal props
       value={value}
       onChange={setValue}
@@ -26,7 +26,7 @@ export function BaseOTPInput(
           className={cn('flex items-center gap-1', {
             'opacity-50': overrideProps.disabled ?? disabled,
           })}
-          data-testid="otp-input-renderer"
+          data-testid="input-otp-renderer"
           data-test-render-is-hovering={isHovering ? 'true' : undefined}
           data-test-render-is-focused={isFocused ? 'true' : undefined}
         >

@@ -8,8 +8,8 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Base tests - Render', () => {
   test('should expose focus flags', async ({ page }) => {
-    const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
-    const renderer = page.getByTestId('otp-input-renderer')
+    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const renderer = page.getByTestId('input-otp-renderer')
 
     await input.focus()
     await expect(renderer).toHaveAttribute('data-test-render-is-focused', 'true')
@@ -19,7 +19,7 @@ test.describe('Base tests - Render', () => {
     await expect(renderer).not.toHaveAttribute('data-test-render-is-focused')
   })
   test('should expose hover flags', async ({ page }) => {
-    const renderer = page.getByTestId('otp-input-renderer')
+    const renderer = page.getByTestId('input-otp-renderer')
 
     await expect(renderer).not.toHaveAttribute('data-test-render-is-hovering')
 

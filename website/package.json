@@ -18,7 +18,7 @@
     "geist": "^1.2.2",
     "lucide-react": "^0.330.0",
     "next": "14.1.0",
-    "otp-input": "workspace:*",
+    "input-otp": "workspace:*",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.50.1",

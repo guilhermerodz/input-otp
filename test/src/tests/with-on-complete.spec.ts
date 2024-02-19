@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('With on complete tests', () => {
   test('should change the input value', async ({ page }) => {
-    const input = page.getByTestId('otp-input-wrapper').getByRole('textbox')
+    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
 
     await input.pressSequentially('123456')
     await expect(input).toHaveValue('123456')

@@ -27,7 +27,7 @@ test.describe('With allow navigation tests', () => {
     page,
     context,
   }) => {
-    const input = page.getByTestId('otp-input-wrapper-1').getByRole('textbox')
+    const input = page.getByTestId('input-otp-wrapper-1').getByRole('textbox')
     const getClipboard = () => copyAndGetClipboardContent({ page, context })
 
     await input.pressSequentially('1234')
@@ -47,7 +47,7 @@ test.describe('With allow navigation tests', () => {
     page,
     context,
   }) => {
-    const input = page.getByTestId('otp-input-wrapper-1').getByRole('textbox')
+    const input = page.getByTestId('input-otp-wrapper-1').getByRole('textbox')
     const getClipboard = () => copyAndGetClipboardContent({ page, context })
 
     await input.pressSequentially('123456')
@@ -64,7 +64,7 @@ test.describe('With allow navigation tests', () => {
     page,
     context,
   }) => {
-    const input = page.getByTestId('otp-input-wrapper-1').getByRole('textbox')
+    const input = page.getByTestId('input-otp-wrapper-1').getByRole('textbox')
     const getClipboard = () => copyAndGetClipboardContent({ page, context })
 
     await input.pressSequentially('123456')
