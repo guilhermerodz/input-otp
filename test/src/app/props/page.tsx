@@ -13,7 +13,7 @@ export default function Page() {
       <BaseOTPInput data-testid="otp-input-wrapper-4" containerClassName='testclassname' />
       <BaseOTPInput data-testid="otp-input-wrapper-5" maxLength={3} />
       <BaseOTPInput data-testid="otp-input-wrapper-6" id='testid' name='testname'  />
-      <BaseOTPInput data-testid="otp-input-wrapper-7" regexp={/ /}  />
+      <BaseOTPInput data-testid="otp-input-wrapper-7" pattern={' '}  />
     </div>
   )
 }

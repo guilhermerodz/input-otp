@@ -1,6 +1,6 @@
 {
   "name": "otp-input",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "One-time password input component for React.",
   "main": "index.js",
   "module": "./dist/index.mjs",
@@ -25,7 +25,8 @@
     "dev:website": "turbo run dev --filter=website...",
     "dev:test": "turbo run dev --filter=test...",
     "format": "prettier --write .",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:slow": "WINDOWED_TESTS=true playwright test"
   },
   "keywords": [
     "react",

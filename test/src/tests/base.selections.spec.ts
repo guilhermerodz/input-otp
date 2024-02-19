@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('Base tests - Selections', () => {
   test.skip(
     process.env.CI === 'true',
-    'Breaks in CI as it cannot handle Arrow or Shift keys',
+    'Breaks in CI as it cannot handle Shift key',
   )
 
   test('should replace selected char if another is pressed', async ({

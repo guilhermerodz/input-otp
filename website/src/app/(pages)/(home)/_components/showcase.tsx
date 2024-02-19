@@ -1,46 +1,31 @@
 'use client'
 
 import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
 
-import { OTPInput } from 'otp-input'
 import { cn } from '@/lib/utils'
-
-type FormValues = {
-  otp: string
-}
+import { OTPInput, REGEXP_ONLY_DIGITS } from 'otp-input'
 
 export function Showcase({ className, ...props }: { className?: string }) {
-  const [formDisabled, setFormDisabled] = React.useState(false)
-
-  const {
-    control,
-    handleSubmit,
-    setFocus,
-    reset,
-    setValue,
-    formState,
-    register,
-  } = useForm<FormValues>({
-    defaultValues: {
-      otp: '12',
-    },
-    disabled: formDisabled,
-  })
+  const [value, setValue] = React.useState('12')
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     setTimeout(() => {
-      setFocus('otp')
+      inputRef.current?.focus()
     }, 2000)
-  }, [setFocus])
+  }, [])
 
-  function onSubmit(values: FormValues) {
-    if (values.otp !== '123   ') {
-      window.alert('Invalid OTP')
-      reset()
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    if (value === '123456') {
+      // Easter egg...
       return
     }
-    window.alert('Valid OTP')
+
+    const firstDemoInput =
+      document.querySelector<HTMLInputElement>('#first-demo-input')
+    firstDemoInput!.focus()
   }
 
   return (
@@ -49,49 +34,45 @@ export function Showcase({ className, ...props }: { className?: string }) {
         'mx-auto flex max-w-[980px] justify-center pt-6 pb-4',
         className,
       )}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmit}
     >
-      <Controller
-        name="otp"
-        control={control}
-        render={({ field }) => (
-          <OTPInput
-            {...field}
-            containerClassName={cn('group flex items-center')}
-            maxLength={6}
-            // regexp={null} // Allow everything
-            render={({ slots, isFocused }) => (
-              <>
-                <div className="flex">
-                  {slots.slice(0, 3).map((slot, idx) => (
-                    <Slot
-                      isFocused={isFocused}
-                      key={idx}
-                      slotChar={slot.char}
-                      isSlotActive={slot.isActive}
-                      animateIdx={idx}
-                    />
-                  ))}
-                </div>
+      <OTPInput
+        value={value}
+        onChange={setValue}
+        containerClassName={cn('group flex items-center')}
+        maxLength={6}
+        allowNavigation={true}
+        pattern={REGEXP_ONLY_DIGITS}
+        render={({ slots, isFocused }) => (
+          <>
+            <div className="flex">
+              {slots.slice(0, 3).map((slot, idx) => (
+                <Slot
+                  isFocused={isFocused}
+                  key={idx}
+                  slotChar={slot.char}
+                  isSlotActive={slot.isActive}
+                  animateIdx={idx}
+                />
+              ))}
+            </div>
 
-                {/* Layout inspired by Stripe */}
-                <div className="flex w-10 justify-center items-center">
-                  <div className="w-3 h-1 rounded-full bg-border"></div>
-                </div>
+            {/* Layout inspired by Stripe */}
+            <div className="flex w-10 justify-center items-center">
+              <div className="w-3 h-1 rounded-full bg-border"></div>
+            </div>
 
-                <div className="flex">
-                  {slots.slice(3).map((slot, idx) => (
-                    <Slot
-                      isFocused={isFocused}
-                      key={idx}
-                      slotChar={slot.char}
-                      isSlotActive={slot.isActive}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          />
+            <div className="flex">
+              {slots.slice(3).map((slot, idx) => (
+                <Slot
+                  isFocused={isFocused}
+                  key={idx}
+                  slotChar={slot.char}
+                  isSlotActive={slot.isActive}
+                />
+              ))}
+            </div>
+          </>
         )}
       />
     </form>
