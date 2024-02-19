@@ -30,8 +30,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     ref,
   ) => {
     // Only used when `value` state is not provided
-    const [internalValue, setInternalValue] = React.useState(props.defaultValue ?? '')
-    
+    const [internalValue, setInternalValue] = React.useState(
+      typeof props.defaultValue === 'string' ? props.defaultValue : '',
+    )
+
     // Workarounds
     const value = uncheckedValue ?? internalValue
     const onChange = uncheckedOnChange ?? setInternalValue
