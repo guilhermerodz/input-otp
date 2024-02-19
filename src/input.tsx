@@ -90,7 +90,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         previousValue.length < maxLength &&
         value.length === maxLength
       ) {
-        console.log('calling oncomplete')
         onComplete?.(value)
       }
     }, [maxLength, onComplete, value])
