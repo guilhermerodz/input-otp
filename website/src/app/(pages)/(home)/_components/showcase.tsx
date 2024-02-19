@@ -72,9 +72,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
   return (
     <>
       {preloadConfetti === 1 && (
-        <div className="hidden">
-          {/* <DynamicConfetti /> */}
-        </div>
+        <div className="hidden">{/* <DynamicConfetti /> */}</div>
       )}
       {hasGuessed && (
         <div className="fixed inset-0 z-50 pointer-events-none motion-reduce:hidden">
