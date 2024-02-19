@@ -36,6 +36,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     // Workarounds
     const value = uncheckedValue ?? internalValue
+    const previousValue = usePrevious(value)
     const onChange = uncheckedOnChange ?? setInternalValue
     const regexp = pattern
       ? typeof pattern === 'string'
@@ -80,7 +81,16 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     /** Effects */
     React.useEffect(() => {
-      if (value.length === maxLength) {
+      if (previousValue === undefined) {
+        return
+      }
+
+      if (
+        value !== previousValue &&
+        previousValue.length < maxLength &&
+        value.length === maxLength
+      ) {
+        console.log('calling oncomplete')
         onComplete?.(value)
       }
     }, [maxLength, onComplete, value])
@@ -357,3 +367,11 @@ const inputStyle = {
   // inset: undefined,
   // position: undefined,
 } satisfies React.CSSProperties
+
+function usePrevious<T>(value: T) {
+  const ref = React.useRef<T>()
+  React.useEffect(() => {
+    ref.current = value
+  })
+  return ref.current
+}
