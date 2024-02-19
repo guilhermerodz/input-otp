@@ -266,11 +266,13 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           props.onKeyUp?.(e)
         }}
         onFocus={e => {
-          const start = Math.min(inputRef.current.value.length, maxLength - 1)
-          const end = inputRef.current.value.length
-          inputRef.current?.setSelectionRange(start, end)
-          setMirrorSelectionStart(start)
-          setMirrorSelectionEnd(end)
+          if (inputRef.current) {
+            const start = Math.min(inputRef.current.value.length, maxLength - 1)
+            const end = inputRef.current.value.length
+            inputRef.current?.setSelectionRange(start, end)
+            setMirrorSelectionStart(start)
+            setMirrorSelectionEnd(end)
+          }
           setIsFocused(true)
 
           props.onFocus?.(e)
