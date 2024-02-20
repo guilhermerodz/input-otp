@@ -16,7 +16,6 @@ export type OTPInputProps = OverrideProps<
     inputMode?: 'numeric' | 'text'
 
     onComplete?: (...args: any[]) => unknown
-    onBlur?: (...args: any[]) => unknown
 
     render: (props: OTPInputRenderProps) => React.ReactElement
 
