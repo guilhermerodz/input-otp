@@ -136,15 +136,14 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     }
 
     function _changeListener(e: React.ChangeEvent<HTMLInputElement>) {
-      if (
-        e.currentTarget.value.length > 0 &&
-        regexp &&
-        !regexp.test(e.currentTarget.value)
-      ) {
+      const newValue = e.currentTarget.value.slice(0, maxLength)
+      if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
         e.preventDefault()
         return
       }
-      onChange(e.currentTarget.value)
+      onChange(newValue)
+    }
+
     }
 
     function _keyDownListener(e: React.KeyboardEvent<HTMLInputElement>) {
