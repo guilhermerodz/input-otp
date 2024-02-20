@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { Showcase } from './_components/showcase'
 import { ExampleCode } from '@/app/(local-pages)/example-playground/code'
 
-const fadeUpClassname = 'motion-safe:opacity-0 motion-safe:animate-fade-up'
+const fadeUpClassname = 'lg:motion-safe:opacity-0 lg:motion-safe:animate-fade-up'
 
 export default function IndexPage() {
   return (
@@ -26,14 +26,14 @@ export default function IndexPage() {
         <Showcase
           className={cn(
             fadeUpClassname,
-            'motion-safe:[animation-delay:1000ms]',
+            'lg:motion-safe:[animation-delay:1000ms]',
           )}
         />
 
         <PageHeaderDescription
           className={cn(
             fadeUpClassname,
-            'motion-safe:[animation-delay:3000ms]',
+            'lg:motion-safe:[animation-delay:3000ms]',
           )}
         >
           One-time password input component for React. Accessible. Unstyled.
@@ -43,7 +43,7 @@ export default function IndexPage() {
         <PageActions
           className={cn(
             fadeUpClassname,
-            'motion-safe:[animation-delay:3000ms]',
+            'lg:motion-safe:[animation-delay:3000ms]',
           )}
         >
           <div className={buttonVariants({ variant: 'outline' })}>
