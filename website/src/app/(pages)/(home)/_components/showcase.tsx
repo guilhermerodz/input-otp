@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 // )
 
 export function Showcase({ className, ...props }: { className?: string }) {
-  const [value, setValue] = React.useState('12')
+  const [value, setValue] = React.useState('')
   const [disabled, setDisabled] = React.useState(true)
 
   const [preloadConfetti, setPreloadConfetti] = React.useState(0)
@@ -95,11 +95,12 @@ export function Showcase({ className, ...props }: { className?: string }) {
           onChange={setValue}
           containerClassName={cn('group flex items-center')}
           maxLength={6}
+          id="otp-input" // temporary styling
           allowNavigation={true}
           pattern={REGEXP_ONLY_DIGITS}
           render={({ slots, isFocused }) => (
             <>
-              <div className="flex">
+              <div className="flex pointer-events-none">
                 {slots.slice(0, 3).map((slot, idx) => (
                   <Slot
                     key={idx}
@@ -140,10 +141,11 @@ function Slot(props: {
   return (
     <div
       className={cn(
-        'relative w-10 md:w-20 h-14 md:h-28 text-[2rem] md:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md transition-all [transition-duration:300ms] outline outline-0 outline-accent-foreground/20',
+        'relative pointer-events-none w-10 md:w-20 h-14 md:h-28 text-[2rem] md:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md transition-all [transition-duration:300ms] outline outline-0 outline-accent-foreground/20',
         'group-hover:border-accent-foreground/20 group-focus-within:border-accent-foreground/20',
         {
-          'outline-4 outline-accent-foreground z-10': props.isActive,
+          'outline-4 outline-accent-foreground z-10 pointer-events-none':
+            props.isActive,
         },
       )}
     >

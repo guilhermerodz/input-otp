@@ -6,6 +6,16 @@ import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, SelectionType } from './types'
 import { REGEXP_ONLY_DIGITS } from './regexp'
 
+const GHOST_CHARACTER = '@'
+const includeGhostCharacter = (s: string) => {
+  if (s.includes(GHOST_CHARACTER)) return s
+  return GHOST_CHARACTER + s
+}
+
+const removeGhostCharacter = (s: string) => {
+  return s.replace(GHOST_CHARACTER, '')
+}
+
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
@@ -133,21 +143,29 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
 
       syncTimeouts(() => {
-        setMirrorSelectionStart(inputRef.current?.selectionStart ?? null)
-        setMirrorSelectionEnd(inputRef.current?.selectionEnd ?? null)
+        const fixSelection = (selection: number | null) => {
+          if (selection === null) return null
+          if (selection > 1) return selection - 1
+          return selection - 1
+        }
+
+        setMirrorSelectionStart(fixSelection(inputRef.current.selectionStart))
+        setMirrorSelectionEnd(fixSelection(inputRef.current.selectionEnd))
       })
     }
 
     function _changeListener(e: React.ChangeEvent<HTMLInputElement>) {
+      const withoutSpaces = e.currentTarget.value.replace(' ', '')
+      const withoutGhostCharacter = removeGhostCharacter(withoutSpaces)
       if (
-        e.currentTarget.value.length > 0 &&
+        withoutGhostCharacter.length > 0 &&
         regexp &&
-        !regexp.test(e.currentTarget.value)
+        !regexp.test(withoutGhostCharacter)
       ) {
         e.preventDefault()
         return
       }
-      onChange(e.currentTarget.value)
+      onChange(withoutGhostCharacter)
     }
 
     function _keyDownListener(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -240,15 +258,20 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         pattern={regexp?.source}
         style={inputStyle}
         autoFocus={autoFocus}
-        maxLength={maxLength}
-        value={value}
+        maxLength={maxLength + 1} // Ghost character
+        value={includeGhostCharacter(value)}
         ref={inputRef}
         onChange={_changeListener}
         onSelect={_selectListener}
         // onSelectionChange={_selectListener}
         // onSelectStart={_selectListener}
         // onBeforeXrSelect={_selectListener}
-
+        onCopy={e => {
+          if ('clipboard' in navigator) {
+            e.preventDefault()
+            navigator.clipboard.writeText(removeGhostCharacter(value))
+          }
+        }}
         onInput={e => {
           syncTimeouts(_selectListener)
 
@@ -267,7 +290,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }}
         onFocus={e => {
           if (inputRef.current) {
-            const start = Math.min(inputRef.current.value.length, maxLength - 1)
+            const start = Math.min(
+              inputRef.current.value.length - 1, // Ghost character
+              maxLength - 1,
+            )
             const end = inputRef.current.value.length
             inputRef.current?.setSelectionRange(start, end)
             setMirrorSelectionStart(start)
@@ -358,14 +384,17 @@ const rootStyle = (params: { disabled?: boolean }) =>
 const inputStyle = {
   position: 'absolute',
   inset: 0,
-  opacity: 0,
-  pointerEvents: 'none',
+  // opacity: 0,
+  // pointerEvents: 'none',
   outline: 'none !important',
   // debugging purposes
   // color: 'black',
-  // background: 'white',
-  // opacity: '1',
-  // pointerEvents: 'all',
+  opacity: 1,
+  backgroundColor: 'transparent',
+  pointerEvents: 'all',
+  caretColor: 'transparent',
+  color: 'transparent',
+  outlineStyle: 'none',
   // inset: undefined,
   // position: undefined,
 } satisfies React.CSSProperties

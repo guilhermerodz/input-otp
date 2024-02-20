@@ -82,3 +82,8 @@
     transform: translateY(-100%);
   }
 }
+
+/* This styling should probably be in the library itself. */
+#otp-input::selection {
+  background-color: transparent;
+}
