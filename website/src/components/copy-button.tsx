@@ -20,7 +20,7 @@ interface CopyButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 }
 
 export async function copyToClipboardWithMeta(value: string) {
-  window.isSecureContext && navigator.clipboard.writeText(value)
+  window && window.isSecureContext && navigator.clipboard.writeText(value)
 }
 
 export function CopyButton({

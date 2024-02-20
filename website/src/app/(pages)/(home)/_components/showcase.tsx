@@ -12,13 +12,8 @@ const DynamicConfetti = dynamic(() =>
 )
 
 export function Showcase({ className, ...props }: { className?: string }) {
-  const isMobile = useMemo(
-    () => window.matchMedia('(max-width: 1023px)').matches,
-    [],
-  )
-
   const [value, setValue] = React.useState('12')
-  const [disabled, setDisabled] = React.useState(isMobile ? false : true)
+  const [disabled, setDisabled] = React.useState(false)
 
   const [preloadConfetti, setPreloadConfetti] = React.useState(0)
   const [hasGuessed, setHasGuessed] = React.useState(false)
@@ -26,6 +21,10 @@ export function Showcase({ className, ...props }: { className?: string }) {
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches
+    if (!isMobile)  {
+      setDisabled(true)
+    }
     const t1 = setTimeout(() => {
       setDisabled(false)
     }, 1_900)
@@ -40,7 +39,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
       clearTimeout(t1)
       clearTimeout(t2)
     }
-  }, [isMobile])
+  }, [])
 
   React.useEffect(() => {
     if (value.length > 3) {
