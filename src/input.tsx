@@ -17,8 +17,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputMode = 'numeric',
       allowNavigation = true,
 
-      autoFocus = false,
-
       onComplete,
 
       render,
@@ -238,7 +236,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         inputMode={inputMode}
         pattern={regexp?.source}
         style={inputStyle}
-        autoFocus={autoFocus}
         maxLength={maxLength}
         value={value}
         ref={inputRef}

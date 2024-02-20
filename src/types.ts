@@ -12,7 +12,6 @@ export type OTPInputProps = OverrideProps<
 
     maxLength: number
 
-    autoFocus?: boolean
     allowNavigation?: boolean
     inputMode?: 'numeric' | 'text'
 
