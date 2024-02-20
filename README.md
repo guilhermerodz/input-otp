@@ -51,7 +51,7 @@ function Slot(props: { char: string | null; isActive: boolean }) {
         'border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md',
         'group-hover:border-accent-foreground/20 group-focus-within:border-accent-foreground/20',
         'outline outline-0 outline-accent-foreground/20',
-        { 'outline-4 outline-accent-foreground z-10': props.isActive },
+        { 'outline-4 outline-accent-foreground': props.isActive },
       )}
     >
       {props.char !== null && <div>{props.char}</div>}

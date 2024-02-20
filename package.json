@@ -1,6 +1,6 @@
 {
   "name": "input-otp",
-  "version": "0.3.1-beta",
+  "version": "0.3.12-beta",
   "description": "One-time password input component for React.",
   "main": "index.js",
   "module": "./dist/index.mjs",
