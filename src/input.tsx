@@ -83,6 +83,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       const updateRootHeight = () => {
         if (el) {
+          // const rect = el.getBoundingClientRect()
+          // el.style.setProperty('--root-height', `${rect.height}px`)
           el.style.setProperty('--root-height', `${el.clientHeight}px`)
         }
       }
@@ -451,6 +453,8 @@ const rootStyle = (params: { disabled?: boolean }) =>
 const inputStyle = {
   position: 'absolute',
   inset: 0,
+  width: '100%',
+  height: '100%',
   opacity: '1', // Mandatory for iOS hold-paste
 
   color: 'transparent',
