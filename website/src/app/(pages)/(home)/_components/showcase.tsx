@@ -1,19 +1,24 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 
 import { OTPInput, REGEXP_ONLY_DIGITS } from 'input-otp'
 import { cn } from '@/lib/utils'
 
-// const DynamicConfetti = dynamic(() =>
-//   import('./confetti').then(m => m.Confetti),
-// )
+const DynamicConfetti = dynamic(() =>
+  import('./confetti').then(m => m.Confetti),
+)
 
 export function Showcase({ className, ...props }: { className?: string }) {
+  const isMobile = useMemo(
+    () => window.matchMedia('(max-width: 1023px)').matches,
+    [],
+  )
+
   const [value, setValue] = React.useState('12')
-  const [disabled, setDisabled] = React.useState(true)
+  const [disabled, setDisabled] = React.useState(isMobile ? false : true)
 
   const [preloadConfetti, setPreloadConfetti] = React.useState(0)
   const [hasGuessed, setHasGuessed] = React.useState(false)
@@ -24,15 +29,18 @@ export function Showcase({ className, ...props }: { className?: string }) {
     const t1 = setTimeout(() => {
       setDisabled(false)
     }, 1_900)
-    const t2 = setTimeout(() => {
-      inputRef.current?.focus()
-    }, 2_500)
+    const t2 = setTimeout(
+      () => {
+        inputRef.current?.focus()
+      },
+      isMobile ? 0 : 2_500,
+    )
 
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
     }
-  }, [])
+  }, [isMobile])
 
   React.useEffect(() => {
     if (value.length > 3) {
@@ -45,7 +53,6 @@ export function Showcase({ className, ...props }: { className?: string }) {
     await new Promise(r => setTimeout(r, 1_00))
 
     e?.preventDefault?.()
-    inputRef.current?.blur()
 
     if (value === '123456') {
       setHasGuessed(true)
@@ -67,16 +74,21 @@ export function Showcase({ className, ...props }: { className?: string }) {
     })
 
     setValue('')
+    setTimeout(() => {
+      inputRef.current?.blur()
+    }, 20)
   }
 
   return (
     <>
       {preloadConfetti === 1 && (
-        <div className="hidden">{/* <DynamicConfetti /> */}</div>
+        <div className="hidden">
+          <DynamicConfetti />
+        </div>
       )}
       {hasGuessed && (
         <div className="fixed inset-0 z-50 pointer-events-none motion-reduce:hidden">
-          {/* <DynamicConfetti /> */}
+          <DynamicConfetti />
         </div>
       )}
 
@@ -143,13 +155,13 @@ function Slot(props: {
         'relative w-10 md:w-20 h-14 md:h-28 text-[2rem] md:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md transition-all [transition-duration:300ms] outline outline-0 outline-accent-foreground/20',
         'group-hover:border-accent-foreground/20 group-focus-within:border-accent-foreground/20',
         {
-          'outline-4 outline-accent-foreground z-10': props.isActive,
+          'outline-4 outline-accent-foreground': props.isActive,
         },
       )}
     >
       <div
         className={cn('duration-1000', {
-          'opacity-0 animate-fade-in': willAnimateChar,
+          'lg:opacity-0 lg:animate-fade-in': willAnimateChar,
           '[animation-delay:1.5s]': props.animateIdx === 0,
           '[animation-delay:2s]': props.animateIdx === 1,
         })}
@@ -161,7 +173,7 @@ function Slot(props: {
       {props.isActive && props.char === null && (
         <div
           className={cn({
-            'opacity-0 animate-fade-in': willAnimateCaret,
+            'lg:opacity-0 lg:animate-fade-in': willAnimateCaret,
           })}
         >
           <FakeCaret />
