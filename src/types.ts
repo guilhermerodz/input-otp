@@ -27,3 +27,6 @@ export enum SelectionType {
   CHAR = 1,
   MULTI = 2,
 }
+export type Metadata = {
+  lastClickTimestamp: number
+}

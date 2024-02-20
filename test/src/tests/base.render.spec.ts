@@ -23,7 +23,11 @@ test.describe('Base tests - Render', () => {
 
     await expect(renderer).not.toHaveAttribute('data-test-render-is-hovering')
 
-    await renderer.hover()
+    const _rect = await renderer.boundingBox({ timeout: 2_000 })
+    expect(_rect).not.toBeNull()
+    const rect = _rect!
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2)
+
     await expect(renderer).toHaveAttribute('data-test-render-is-hovering', 'true')
   })
 })
