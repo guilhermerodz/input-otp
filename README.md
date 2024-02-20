@@ -1,10 +1,14 @@
 # OTP Input for React
 
-Still writing docs/examples...
+https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
 
-## Installation
+## Usage
 
-`npm install input-otp`
+```bash
+npm install input-otp
+```
+
+Then import `<OTPInput maxLength={6} render={()  => ()} />`
 
 ## Default example
 
@@ -101,3 +105,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 ```
+
+## How it works
+
+There's currently no native OTP/2FA/MFA input in HTML, which means people are either going with 1. a simple input design or 2. custom designs like this one.
+This library works by rendering an invisible input as a sibling of the slots, contained by a `relative`ly positioned parent (the container root called _OTPInput_).
+
+## API Reference
+
+### OTPInput
+
+The root container. Define settings for the input via props. Then, use the `render` prop to create the slots.
