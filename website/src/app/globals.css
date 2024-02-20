@@ -74,6 +74,13 @@
     animation: none;
   }
 }
+@media screen and (orientation: portrait) {
+  .code-example-overlay {
+    background-image: linear-gradient(to bottom,
+        theme('colors.background') 100%,
+        transparent);
+  }
+}
 @keyframes move-overlay {
   0% {
     transform: translateY(0);
