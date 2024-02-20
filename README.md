@@ -1,4 +1,4 @@
-## OTP Input for React
+## [OTP Input for React](https://input-otp.rodz.dev)
 
 https://github.com/guilhermerodz/input-otp/assets/10366880/7de9c10f-d7aa-48e8-93bc-c2cf0e3dfd49
 
@@ -137,3 +137,7 @@ Additional props:
 `onComplete`: Attach a function to execute after the input value reaches its max length.
 
 `value`: For controlled inputs (like _react-hook-form_).
+
+## Website
+
+https://input-otp.rodz.dev
