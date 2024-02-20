@@ -43,29 +43,50 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       : null
 
     /** useRef */
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    React.useImperativeHandle(
-      ref,
-      () => {
-        const el = inputRef.current as HTMLInputElement
+    const inputRef = React.useRef<
+      HTMLInputElement & { __metadata__?: Metadata }
+    >(null)
+    React.useImperativeHandle(ref, () => inputRef.current, [allowNavigation])
 
-        const _select = el.select.bind(el)
-        el.select = () => {
-          if (!allowNavigation) {
-            // Cannot select all chars as navigation is disabled
-            return
-          }
+    function mutateInputRefAndReturn() {
+      const el = inputRef.current
 
-          _select()
-          // Workaround proxy to update UI as native `.select()` does not trigger focus event
-          setMirrorSelectionStart(0)
-          setMirrorSelectionEnd(el.value.length)
+      if (!el) {
+        return el
+      }
+
+      const _select = el.select.bind(el)
+      el.select = () => {
+        if (!allowNavigation) {
+          // Cannot select all chars as navigation is disabled
+          return
         }
 
-        return el
-      },
-      [allowNavigation],
-    )
+        _select()
+        // Workaround proxy to update UI as native `.select()` does not trigger focus event
+        setMirrorSelectionStart(0)
+        setMirrorSelectionEnd(el.value.length)
+      }
+
+      return el
+    }
+
+    React.useEffect(() => {
+      const el = mutateInputRefAndReturn()
+
+      const updateRootHeight = () => {
+        if (el) {
+          el.style.setProperty('--root-height', `${el.clientHeight}px`)
+        }
+      }
+      updateRootHeight()
+      const resizeObserver = new ResizeObserver(updateRootHeight)
+      resizeObserver.observe(el)
+
+      return () => {
+        resizeObserver.disconnect()
+      }
+    }, [])
 
     /** Mirrors for UI rendering purpose only */
     const [isHoveringContainer, setIsHoveringContainer] = React.useState(false)
