@@ -1,10 +1,18 @@
-# OTP Input for React
+## OTP Input for React
 
-Still writing docs/examples...
+https://github.com/guilhermerodz/input-otp/assets/10366880/7de9c10f-d7aa-48e8-93bc-c2cf0e3dfd49
 
-## Installation
+One time passcode Input. Accessible & unstyled.
 
-`npm install input-otp`
+_Still writing docs/examples..._
+
+## Usage
+
+```bash
+npm install input-otp
+```
+
+Import the `<OTPInput />`, create your `<Slot {...slot} />` component and perhaps a `<FakeCaret />`
 
 ## Default example
 
@@ -101,3 +109,31 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 ```
+
+## API Reference
+
+### OTPInput
+
+The input root itself. It's works as a _container div_ that renders 1. your custom `<Slot {...slot} />` component and 2. a hidden native input (opacity 0). The underlying invisible input makes it accessible as the user only execute actions on it, not the container.
+
+Mandatory props:
+
+`maxLength`: Number of slots.
+`render`: A JSX component for rendering slots. Receive the props:
+  - `slots`: `Slot[]` being `type Slot = { isActive: boolean, char: string | null, hasFakeCaret: boolean }`
+  - `isFocused`: Is the native input focused?
+  - `isHovering`: Is the user hovering the root container?
+
+Additional props:
+
+`allowNavigation`: Default `true`. When `false`, the input will prevent keyboard navigation (like arrows) and multi-range (2+ chars) selections.
+
+`inputMode`: Default `numeric`. When `text`, the component will set it's internal native HTML input attribute "inputMode".
+
+`onBlur`: Attach a function when the input triggers `blur` event.
+
+`onChange`: For controlled inputs (like _react-hook-form_).
+
+`onComplete`: Attach a function to execute after the input value reaches its max length.
+
+`value`: For controlled inputs (like _react-hook-form_).
