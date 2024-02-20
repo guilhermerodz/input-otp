@@ -161,8 +161,8 @@ function Slot(props: {
       <div
         className={cn('duration-1000', {
           'lg:opacity-0 lg:animate-fade-in': willAnimateChar,
-          '[animation-delay:1.5s]': props.animateIdx === 0,
-          '[animation-delay:2s]': props.animateIdx === 1,
+          'lg:[animation-delay:1.5s]': props.animateIdx === 0,
+          'lg:[animation-delay:2s]': props.animateIdx === 1,
         })}
       >
         {props.char && <div>{props.char}</div>}
