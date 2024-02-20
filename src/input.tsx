@@ -92,6 +92,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const resizeObserver = new ResizeObserver(updateRootHeight)
       resizeObserver.observe(el)
 
+      _selectListener()
+      setTimeout(() => {
+        setIsFocused(document.activeElement === inputRef.current)
+      }, 20)
+
       return () => {
         resizeObserver.disconnect()
         document.head.removeChild(styleEl)
