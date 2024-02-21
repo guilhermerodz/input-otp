@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "turbo run build --filter=*",
+    "build:lib": "turbo run build --filter=opt-input...",
     "build:website": "turbo run build --filter=website...",
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=*",
