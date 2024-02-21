@@ -1,29 +1,38 @@
 {
   "name": "input-otp",
   "version": "0.3.12-beta",
+  "author": "Guilherme Rodz <g@rodz.dev>",
   "description": "One-time password input component for React.",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
-    "import": {
-      "types": "./dist/index.d.mts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
       "default": "./dist/index.mjs"
     },
-    "require": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
+    "./package.json": "./package.json"
   },
   "scripts": {
     "type-check": "tsc --noEmit",
-    "build": "pnpm type-check && bunchee -m",
-    "dev": "bunchee --watch",
+    "build": "run-p build:*",
+    "build:tsup": "tsup --dts --minify",
+    "clean": "rimraf dist",
+    "dev": "tsup --watch --dts",
     "dev:website": "turbo run dev --filter=website...",
     "dev:test": "turbo run dev --filter=test...",
+    "lint": "run-p lint:*",
+    "lint:eslint": "eslint src --ext .ts",
+    "lint:eslint:fix": "bun run lint:eslint --fix",
+    "lint:format": "prettier --check \"src/**/*.ts\"",
+    "lint:format:fix": "bun run lint:format --write",
+    "lint:tsc": "tsc --project tsconfig.json --noEmit",
     "format": "prettier --write .",
     "test": "playwright test",
     "test:slow": "WINDOWED_TESTS=true playwright test"
@@ -34,7 +43,6 @@
     "input",
     "accessible"
   ],
-  "author": "Guilherme Rodz <g@rodz.dev>",
   "license": "MIT",
   "homepage": "https://input-otp.rodz.dev/",
   "repository": {
@@ -44,13 +52,25 @@
   "bugs": {
     "url": "https://github.com/guilhermerodz/input-otp/issues"
   },
+  "trustedDependencies": [
+    "npm-run-all"
+  ],
   "devDependencies": {
     "@playwright/test": "^1.41.2",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
-    "bunchee": "^4.4.6",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rimraf": "^5.0.5",
+    "tsup": "^8.0.2",
     "turbo": "^1.12.4",
     "typescript": "^5.3.3"
   },
@@ -58,5 +78,70 @@
     "react": "^16.8 || ^17.0 || ^18.0",
     "react-dom": "^16.8 || ^17.0 || ^18.0"
   },
-  "packageManager": "pnpm@8.7.1"
+  "prettier": {
+    "resolveGlobalModules": true,
+    "tabWidth": 2,
+    "printWidth": 80,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "avoid",
+    "endOfLine": "lf"
+  },
+  "eslintConfig": {
+    "root": true,
+    "reportUnusedDisableDirectives": true,
+    "ignorePatterns": [
+      "**/build",
+      "**/coverage",
+      "**/dist"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2020
+    },
+    "settings": {
+      "import/parsers": {
+        "@typescript-eslint/parser": [
+          ".ts",
+          ".tsx"
+        ]
+      },
+      "import/resolver": {
+        "typescript": true
+      },
+      "react": {
+        "version": "detect"
+      }
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "import"
+    ],
+    "extends": [
+      "plugin:react/jsx-runtime",
+      "plugin:react-hooks/recommended",
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/stylistic",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
+      "prettier"
+    ],
+    "env": {
+      "browser": true,
+      "es2020": true
+    },
+    "rules": {
+      "react/jsx-key": [
+        "error",
+        {
+          "checkFragmentShorthand": true
+        }
+      ],
+      "react-hooks/exhaustive-deps": "error"
+    }
+  }
 }
