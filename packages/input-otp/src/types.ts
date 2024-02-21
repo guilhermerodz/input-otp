@@ -8,14 +8,14 @@ export type OTPInputProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
     value?: string
-    onChange?: (...args: unknown[]) => unknown
+    onChange?: (...args: any[]) => unknown
 
     maxLength: number
 
     allowNavigation?: boolean
     inputMode?: 'numeric' | 'text'
 
-    onComplete?: (...args: unknown[]) => unknown
+    onComplete?: (...args: any[]) => unknown
 
     render: (props: OTPInputRenderProps) => React.ReactElement
 
