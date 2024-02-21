@@ -1,6 +1,6 @@
 {
   "name": "input-otp",
-  "version": "0.3.12-beta",
+  "version": "0.3.2-beta",
   "author": "Guilherme Rodz <g@rodz.dev>",
   "description": "One-time password input component for React.",
   "license": "MIT",
