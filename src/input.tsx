@@ -74,12 +74,16 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     React.useEffect(() => {
       const el = mutateInputRefAndReturn()
 
+      // if (!document.getElementById('input-otp-style')) {
       const styleEl = document.createElement('style')
+      styleEl.id = 'input-otp-style'
       document.head.appendChild(styleEl)
       const styleSheet = styleEl.sheet
+
       styleSheet.insertRule(
         '[data-input-otp]::selection { background: transparent !important; }',
       )
+      // }
 
       const updateRootHeight = () => {
         if (el) {
@@ -99,7 +103,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       return () => {
         resizeObserver.disconnect()
-        document.head.removeChild(styleEl)
+        // if (document.querySelectorAll('[data-input-otp]').length === 1) {
+        //   document.head.removeChild(document.getElementById('input-otp-style'))
+        // }
       }
     }, [])
 
@@ -461,7 +467,6 @@ const inputStyle = {
   width: '100%',
   height: '100%',
   opacity: '1', // Mandatory for iOS hold-paste
-
   color: 'transparent',
   pointerEvents: 'all',
   background: 'transparent',
