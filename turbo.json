@@ -12,7 +12,8 @@
     "dev": {
       "cache": false
     },
-    "test": {
+    "test#test": {
+      "dependsOn": ["input-otp#build"],
       "cache": false
     },
     "type-check": {

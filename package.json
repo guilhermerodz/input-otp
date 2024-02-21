@@ -10,13 +10,13 @@
   ],
   "scripts": {
     "build": "turbo run build --filter=*",
-    "build:lib": "turbo run build --filter=opt-input...",
+    "build:lib": "turbo run build --filter=input-otp...",
     "build:website": "turbo run build --filter=website...",
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=*",
     "dev:website": "turbo run dev --filter=website...",
     "dev:test": "turbo run dev --filter=test...",
-    "test": "turbo run test --filter=*",
+    "test": "turbo run test --filter=test...",
     "type-check": "turbo run type-check",
     "lint": "turbo run lint",
     "format": "prettier --write ."

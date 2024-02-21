@@ -13,7 +13,6 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install
-      - run: bun run build
       - run: bunx playwright install --with-deps
       - run: bun run test || exit 1
 
