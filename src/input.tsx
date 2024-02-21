@@ -80,6 +80,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       styleSheet.insertRule(
         '[data-input-otp]::selection { background: transparent !important; }',
       )
+      styleSheet.insertRule(`[data-input-otp] { ${inputStyleCss} }`)
+      // }
 
       const updateRootHeight = () => {
         if (el) {
@@ -455,6 +457,9 @@ const rootStyle = (params: { disabled?: boolean }) =>
     WebkitUserSelect: 'none',
   } satisfies React.CSSProperties)
 
+// `inputStyleCss` and `inputStyle` should be the same
+const inputStyleCss =
+  'position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; color: transparent; pointer-events: all; background: transparent; caret-color: transparent; border: 0 solid transparent; outline: 0 solid transparent; line-height: 1; letter-spacing: -.5em; font-size: var(--root-height);'
 const inputStyle = {
   position: 'absolute',
   inset: 0,
@@ -471,18 +476,6 @@ const inputStyle = {
   lineHeight: '1',
   letterSpacing: '-.5em',
   fontSize: 'var(--root-height)',
-  // letterSpacing: '-1em',
-  // transform: 'scale(1.5)',
-  // paddingRight: '100%',
-  // paddingBottom: '100%',
-  // debugging purposes
-  // inset: undefined,
-  // position: undefined,
-  // color: 'black',
-  // background: 'white',
-  // opacity: '.5',
-  // caretColor: 'black',
-  // padding: '0',
 } satisfies React.CSSProperties
 
 function usePrevious<T>(value: T) {
