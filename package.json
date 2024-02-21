@@ -79,7 +79,6 @@
     "react-dom": "^16.8 || ^17.0 || ^18.0"
   },
   "prettier": {
-    "resolveGlobalModules": true,
     "tabWidth": 2,
     "printWidth": 80,
     "useTabs": false,
