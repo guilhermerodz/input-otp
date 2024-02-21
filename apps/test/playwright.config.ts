@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test'
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './test',
+  testDir: '.',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {
@@ -40,9 +40,9 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'npm run dev',
+    command: 'bun run dev',
     url: 'http://localhost:3039',
-    cwd: './test',
+    cwd: './apps/test',
     reuseExistingServer: !process.env.CI,
   },
   /* Configure projects for major browsers */

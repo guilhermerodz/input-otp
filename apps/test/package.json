@@ -1,12 +1,12 @@
 {
   "name": "test",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port=3039",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "playwright test"
   },
   "dependencies": {
     "clsx": "^2.1.0",
@@ -17,6 +17,7 @@
     "input-otp": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
