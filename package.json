@@ -9,12 +9,12 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "clean": "rimraf dist",
-    "dev": "turbo run dev",
+    "build": "turbo run build --filter=*",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev --filter=*",
     "dev:website": "turbo run dev --filter=website...",
     "dev:test": "turbo run dev --filter=test...",
-    "test": "turbo run test",
+    "test": "turbo run test --filter=*",
     "type-check": "turbo run type-check",
     "lint": "turbo run lint",
     "format": "prettier --write ."
@@ -35,70 +35,5 @@
     "tsup": "^8.0.2",
     "turbo": "^1.12.4",
     "typescript": "^5.3.3"
-  },
-  "prettier": {
-    "tabWidth": 2,
-    "printWidth": 80,
-    "useTabs": false,
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "all",
-    "arrowParens": "avoid",
-    "endOfLine": "lf"
-  },
-  "eslintConfig": {
-    "root": true,
-    "reportUnusedDisableDirectives": true,
-    "ignorePatterns": [
-      "**/build",
-      "**/coverage",
-      "**/dist"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "sourceType": "module",
-      "ecmaVersion": 2020
-    },
-    "settings": {
-      "import/parsers": {
-        "@typescript-eslint/parser": [
-          ".ts",
-          ".tsx"
-        ]
-      },
-      "import/resolver": {
-        "typescript": true
-      },
-      "react": {
-        "version": "detect"
-      }
-    },
-    "plugins": [
-      "@typescript-eslint",
-      "import"
-    ],
-    "extends": [
-      "plugin:react/jsx-runtime",
-      "plugin:react-hooks/recommended",
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/stylistic",
-      "plugin:import/recommended",
-      "plugin:import/typescript",
-      "prettier"
-    ],
-    "env": {
-      "browser": true,
-      "es2020": true
-    },
-    "rules": {
-      "react/jsx-key": [
-        "error",
-        {
-          "checkFragmentShorthand": true
-        }
-      ],
-      "react-hooks/exhaustive-deps": "error"
-    }
   }
 }
