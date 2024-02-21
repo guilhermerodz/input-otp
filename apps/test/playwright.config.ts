@@ -40,9 +40,9 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'bun run dev',
+    command: 'npm run dev',
     url: 'http://localhost:3039',
-    cwd: './apps/test',
+    cwd: '.',
     reuseExistingServer: !process.env.CI,
   },
   /* Configure projects for major browsers */
