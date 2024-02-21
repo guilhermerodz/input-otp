@@ -2,27 +2,22 @@
 
 import * as React from 'react'
 
+import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { Metadata, OTPInputProps, SelectionType } from './types'
-import { REGEXP_ONLY_DIGITS } from './regexp'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
       value: uncheckedValue,
       onChange: uncheckedOnChange,
-
       maxLength,
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
       allowNavigation = true,
-
       onComplete,
-
       render,
-
       containerClassName,
-
       ...props
     },
     ref,
@@ -46,13 +41,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const inputRef = React.useRef<
       HTMLInputElement & { __metadata__?: Metadata }
     >(null)
-    React.useImperativeHandle(ref, () => inputRef.current, [allowNavigation])
-
-    function mutateInputRefAndReturn() {
+    React.useImperativeHandle(ref, () => inputRef.current, [])
+    React.useEffect(() => {
       const el = inputRef.current
 
       if (!el) {
-        return el
+        return
       }
 
       const _select = el.select.bind(el)
@@ -68,12 +62,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(el.value.length)
       }
 
-      return el
-    }
-
-    React.useEffect(() => {
-      const el = mutateInputRefAndReturn()
-
       // if (!document.getElementById('input-otp-style')) {
       const styleEl = document.createElement('style')
       styleEl.id = 'input-otp-style'
@@ -84,7 +72,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         '[data-input-otp]::selection { background: transparent !important; }',
       )
       // }
-
       const updateRootHeight = () => {
         if (el) {
           // const rect = el.getBoundingClientRect()
@@ -96,9 +83,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const resizeObserver = new ResizeObserver(updateRootHeight)
       resizeObserver.observe(el)
 
-      _selectListener()
       setTimeout(() => {
-        setIsFocused(document.activeElement === inputRef.current)
+        if (el) {
+          setMirrorSelectionStart(el.selectionStart)
+          setMirrorSelectionEnd(el.selectionEnd)
+          setIsFocused(el === document.activeElement)
+        }
       }, 20)
 
       return () => {
@@ -107,7 +97,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         //   document.head.removeChild(document.getElementById('input-otp-style'))
         // }
       }
-    }, [])
+    }, [allowNavigation])
 
     /** Mirrors for UI rendering purpose only */
     const [isHoveringInput, setIsHoveringInput] = React.useState(false)
@@ -132,7 +122,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       ) {
         onComplete?.(value)
       }
-    }, [maxLength, onComplete, value])
+    }, [maxLength, onComplete, previousValue, value])
 
     // Run improved selection tracking while focused
     React.useEffect(() => {
@@ -145,7 +135,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           setMirrorSelectionStart(inputRef.current.selectionStart)
           setMirrorSelectionEnd(inputRef.current.selectionEnd)
         }
-      }, 5_0)
+      }, 50)
 
       return () => {
         clearInterval(interval)
@@ -169,8 +159,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         if (isSingleCaret && !isInsertMode) {
           const caretPos = _start
 
-          let start: number = -1
-          let end: number = -1
+          let start = -1
+          let end = -1
 
           if (caretPos === 0) {
             start = 0
@@ -322,11 +312,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           _selectListener()
           props.onSelect?.(e)
         }}
-        onMouseOver={(e: any) => {
+        onMouseOver={e => {
           setIsHoveringInput(true)
           props.onMouseOver?.(e)
         }}
-        onMouseLeave={(e: any) => {
+        onMouseLeave={e => {
           setIsHoveringInput(false)
           props.onMouseLeave?.(e)
         }}
@@ -339,7 +329,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         //   if (isFocusing) {
         //     // e.preventDefault()
         //   }
-
         //   props.onTouchStart?.(e)
         // }}
         onTouchEnd={e => {
@@ -472,15 +461,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 )
 OTPInput.displayName = 'Input'
 
-const rootStyle = (params: { disabled?: boolean }) =>
+export const rootStyle = (params: { disabled?: boolean }) =>
   ({
     position: 'relative',
     cursor: params.disabled ? 'default' : 'text',
     userSelect: 'none',
     WebkitUserSelect: 'none',
-  } satisfies React.CSSProperties)
+  }) satisfies React.CSSProperties
 
-const inputStyle = {
+export const inputStyle = {
   position: 'absolute',
   inset: 0,
   width: '100%',
@@ -509,7 +498,7 @@ const inputStyle = {
   // padding: '0',
 } satisfies React.CSSProperties
 
-function usePrevious<T>(value: T) {
+export function usePrevious<T>(value: T) {
   const ref = React.useRef<T>()
   React.useEffect(() => {
     ref.current = value

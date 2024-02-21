@@ -8,14 +8,14 @@ export type OTPInputProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
     value?: string
-    onChange?: (...args: any[]) => unknown
+    onChange?: (...args: unknown[]) => unknown
 
     maxLength: number
 
     allowNavigation?: boolean
     inputMode?: 'numeric' | 'text'
 
-    onComplete?: (...args: any[]) => unknown
+    onComplete?: (...args: unknown[]) => unknown
 
     render: (props: OTPInputRenderProps) => React.ReactElement
 
@@ -27,6 +27,6 @@ export enum SelectionType {
   CHAR = 1,
   MULTI = 2,
 }
-export type Metadata = {
+export interface Metadata {
   lastClickTimestamp: number
 }
