@@ -134,6 +134,24 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
     }, [maxLength, onComplete, value])
 
+    // Run improved selection tracking while focused
+    React.useEffect(() => {
+      if (!isFocused) {
+        return
+      }
+
+      const interval = setInterval(() => {
+        if (inputRef.current && document.activeElement === inputRef.current) {
+          setMirrorSelectionStart(inputRef.current.selectionStart)
+          setMirrorSelectionEnd(inputRef.current.selectionEnd)
+        }
+      }, 5_0)
+
+      return () => {
+        clearInterval(interval)
+      }
+    }, [isFocused, mirrorSelectionStart, mirrorSelectionEnd])
+
     /** Event handlers */
     function _selectListener() {
       if (!inputRef.current) {
