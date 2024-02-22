@@ -13,9 +13,26 @@ import Link from 'next/link'
 import { Showcase } from './_components/showcase'
 import { ExampleCode } from '@/app/(local-pages)/example-playground/code'
 
-const fadeUpClassname = 'lg:motion-safe:opacity-0 lg:motion-safe:animate-fade-up'
+const fadeUpClassname =
+  'lg:motion-safe:opacity-0 lg:motion-safe:animate-fade-up'
 
-export default function IndexPage() {
+async function getRepoStarCount() {
+  const res = await fetch(
+    'https://api.github.com/repos/guilhermerodz/input-otp',
+  )
+  const data = await res.json()
+  const starCount = data.stargazers_count
+  
+  if (starCount > 999) {
+    return (starCount / 1000).toFixed(1) + 'K'
+  }
+  
+  return starCount
+}
+
+export default async function IndexPage() {
+  const starCount = await getRepoStarCount()
+
   return (
     <div className="container relative flex-1 flex flex-col justify-center items-center">
       <PageHeader>
@@ -63,10 +80,17 @@ export default function IndexPage() {
             target="_blank"
             rel="noreferrer"
             href={siteConfig.links.github}
-            className={cn(buttonVariants({ variant: 'outline' }))}
+            className={cn(
+              'relative !py-0 group',
+              buttonVariants({ variant: 'outline' }),
+            )}
           >
             <Icons.gitHub className="mr-2 h-4 w-4" />
-            GitHub
+            <div className="flex items-center h-full">
+              <div className="hidden md:[display:unset]">Github</div>
+              <div className="hidden md:[display:unset] h-full w-px bg-input group-hover:bg-foregrounds mx-4" />
+              <div>{starCount}</div>
+            </div>
           </Link>
         </PageActions>
       </PageHeader>
@@ -75,3 +99,5 @@ export default function IndexPage() {
     </div>
   )
 }
+
+export const revalidate = 3600
