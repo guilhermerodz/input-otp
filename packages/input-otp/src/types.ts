@@ -8,7 +8,7 @@ export type OTPInputProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
     value?: string
-    onChange?: (...args: any[]) => unknown
+    onChange?: (newValue: string) => unknown
 
     maxLength: number
 
