@@ -30,7 +30,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     // Workarounds
     const value = uncheckedValue ?? internalValue
     const previousValue = usePrevious(value)
-    const onChange = uncheckedOnChange ?? setInternalValue
+    const onChange = (newValue: string) => {
+      // Check if input is controlled
+      if (uncheckedValue !== undefined) {
+        uncheckedOnChange?.(newValue)
+      } else {
+        setInternalValue(newValue)
+        uncheckedOnChange?.(newValue)
+      }
+    }
     const regexp = pattern
       ? typeof pattern === 'string'
         ? new RegExp(pattern)
