@@ -8,7 +8,18 @@ https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4
 npm install input-otp
 ```
 
-Then import `<OTPInput maxLength={6} render={()  => ()} />`
+Then import the component.
+
+```diff
++'use client'
++import { OTPInput } from 'input-otp'
+
+function MyForm() {
+  return <form>
++   <OTPInput maxLength={6} render={({slots})  => (...)} />
+  </form>
+}
+```
 
 ## Default example
 
@@ -41,7 +52,11 @@ import { OTPInput } from 'input-otp'
 />
 
 // Feel free to copy. Uses @shadcn/ui tailwind colors.
-function Slot(props: { char: string | null; isActive: boolean }) {
+function Slot(props: {
+  char: string | null;
+  isActive: boolean;
+  hasFakeCaret: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -55,7 +70,7 @@ function Slot(props: { char: string | null; isActive: boolean }) {
       )}
     >
       {props.char !== null && <div>{props.char}</div>}
-      {props.char === null && props.isActive && <FakeCaret />}
+      {props.hasFakeCaret && <FakeCaret />}
     </div>
   )
 }

@@ -27,7 +27,11 @@ import { OTPInput } from 'input-otp'
 />
 
 // Feel free to copy. Uses @shadcn/ui tailwind colors.
-function Slot(props: { char: string | null; isActive: boolean }) {
+function Slot(props: {
+  char: string | null;
+  isActive: boolean;
+  hasFakeCaret: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -41,7 +45,7 @@ function Slot(props: { char: string | null; isActive: boolean }) {
       )}
     >
       {props.char !== null && <div>{props.char}</div>}
-      {props.char === null && props.isActive && <FakeCaret />}
+      {props.hasFakeCaret && <FakeCaret />}
     </div>
   )
 }
