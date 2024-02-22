@@ -8,6 +8,9 @@ node_modules
 
 # testing
 coverage
+/test-results/
+playwright-report/
+playwright/.cache/
 
 # next.js
 .next/
@@ -33,6 +36,3 @@ yarn-error.log*
 
 # turbo
 .turbo
-/test-results/
-/playwright-report/
-/playwright/.cache/
