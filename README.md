@@ -27,7 +27,7 @@ The example below uses `tailwindcss` `@shadcn/ui` `tailwind-merge` `clsx`:
 
 ```tsx
 'use client'
-import { OTPInput } from 'input-otp'
+import { OTPInput, SlotProps } from 'input-otp'
 
 <OTPInput
   maxLength={6}
@@ -52,11 +52,7 @@ import { OTPInput } from 'input-otp'
 />
 
 // Feel free to copy. Uses @shadcn/ui tailwind colors.
-function Slot(props: {
-  char: string | null;
-  isActive: boolean;
-  hasFakeCaret: boolean;
-}) {
+function Slot(props: SlotProps) {
   return (
     <div
       className={cn(
