@@ -19,7 +19,9 @@
     "test": "turbo run test --filter=test...",
     "type-check": "turbo run type-check",
     "lint": "turbo run lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prerelease": "run-p test",
+    "release": "cd ./packages/input-otp && cp ../../README.md . && npm publish && rimraf ./README.md && cd ../.."
   },
   "prettier": {
     "tabWidth": 2,
