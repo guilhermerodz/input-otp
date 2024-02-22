@@ -1,5 +1,10 @@
-export interface OTPInputRenderProps {
-  slots: { isActive: boolean; char: string | null; hasFakeCaret: boolean }[]
+export interface SlotProps {
+  isActive: boolean
+  char: string | null
+  hasFakeCaret: boolean
+}
+export interface RenderProps {
+  slots: SlotProps[]
   isFocused: boolean
   isHovering: boolean
 }
@@ -17,7 +22,7 @@ export type OTPInputProps = OverrideProps<
 
     onComplete?: (...args: any[]) => unknown
 
-    render: (props: OTPInputRenderProps) => React.ReactElement
+    render: (props: RenderProps) => React.ReactElement
 
     containerClassName?: string
   }

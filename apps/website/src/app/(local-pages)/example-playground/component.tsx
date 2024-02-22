@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 
-import { OTPInput } from 'input-otp'
+import { OTPInput, SlotProps } from 'input-otp'
 
 export function ExampleComponent() {
   return (
@@ -31,11 +31,7 @@ export function ExampleComponent() {
 }
 
 // Feel free to copy. Uses @shadcn/ui tailwind colors.
-function Slot(props: {
-  char: string | null
-  isActive: boolean
-  hasFakeCaret: boolean
-}) {
+function Slot(props: SlotProps) {
   return (
     <div
       className={cn(

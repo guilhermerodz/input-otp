@@ -469,7 +469,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 )
 OTPInput.displayName = 'Input'
 
-export const rootStyle = (params: { disabled?: boolean }) =>
+const rootStyle = (params: { disabled?: boolean }) =>
   ({
     position: 'relative',
     cursor: params.disabled ? 'default' : 'text',
@@ -477,7 +477,7 @@ export const rootStyle = (params: { disabled?: boolean }) =>
     WebkitUserSelect: 'none',
   }) satisfies React.CSSProperties
 
-export const inputStyle = {
+const inputStyle = {
   position: 'absolute',
   inset: 0,
   width: '100%',
@@ -508,7 +508,7 @@ export const inputStyle = {
   // padding: '0',
 } satisfies React.CSSProperties
 
-export function usePrevious<T>(value: T) {
+function usePrevious<T>(value: T) {
   const ref = React.useRef<T>()
   React.useEffect(() => {
     ref.current = value
