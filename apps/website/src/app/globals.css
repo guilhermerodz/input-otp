@@ -61,12 +61,12 @@
 .code-example-overlay {
   background-image: linear-gradient(
     to bottom,
-    theme('colors.background') 80%,
+    theme('colors.background') 60%,
     transparent
   );
   transform: translateY(0);
-  animation: move-overlay 2s ease-out forwards;
-  animation-delay: 4s;
+  animation: move-overlay 4s ease-out forwards;
+  animation-delay: 3s;
 }
 @media (prefers-reduced-motion: reduce) {
   .code-example-overlay {
