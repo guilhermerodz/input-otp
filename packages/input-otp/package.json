@@ -48,16 +48,6 @@
     "lint:tsc": "tsc --project tsconfig.json --noEmit",
     "format": "prettier --write ."
   },
-  "prettier": {
-    "tabWidth": 2,
-    "printWidth": 80,
-    "useTabs": false,
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "all",
-    "arrowParens": "avoid",
-    "endOfLine": "lf"
-  },
   "eslintConfig": {
     "root": true,
     "reportUnusedDisableDirectives": true,
