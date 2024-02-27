@@ -3,18 +3,29 @@ import Layout from '@/layouts/Layout.astro'
 
 import { ReactOTPInput } from '@/components/react/otp-input'
 import VueOTPInput from '@/components/vue/otp-input.vue'
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData()
+
+    console.log('react-input', data.get('react-input'))
+    console.log('vue-input', data.get('vue-input'))
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message)
+    }
+  }
+}
 ---
 
-<Layout title="Welcome to Astro.">
-  <div
-    class="container relative flex-1 flex flex-col justify-center items-center"
+<Layout title="@rodz/input-op playground">
+  <form
+    class="container relative flex-1 flex flex-col justify-center items-center gap-2"
+    method="POST"
   >
-    <h1>Hello World</h1>
-    <form>
-      <ReactOTPInput />
-      <VueOTPInput />
-    </form>
-  </div>
-</Layout>
+    <ReactOTPInput client:load />
+    <VueOTPInput client:load />
 
-<style></style>
+    <input hidden type="submit" />
+  </form>
+</Layout>
