@@ -8,6 +8,8 @@ export function ReactOTPInput() {
   // const regexp = /^(?:0|1)+$/
   return (
     <OTPInput
+      name="react-input"
+    
       // Additional props
       // value={value}
       // onChange={v => {

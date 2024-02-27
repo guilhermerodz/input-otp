@@ -3,19 +3,17 @@ import type { CSSProperties } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { REGEXP_ONLY_DIGITS } from '../core/regexp'
-import type { VueOTPInputProps } from '../core/types'
 
 import { changeListener, onMount } from '.'
+import type { VueOTPInputProps } from './types'
 
 defineOptions({
   name: 'OTPInput',
-  inheritAttrs: false,
+  inheritAttrs: true,
 })
 
 const {
   // Props
-  value: uncheckedValue,
-  onChange: uncheckedOnChange,
   maxlength,
   pattern = REGEXP_ONLY_DIGITS,
   inputmode = 'numeric',
@@ -34,20 +32,14 @@ const {
 
 const emit = defineEmits<{
   (event: 'complete', value: string): void
+  (event: 'input', e: Event): void
 }>()
 
-const internalValue = defineModel({ default: '' })
+const value = defineModel({ default: '' })
 
 /** Workarounds */
-// const value = uncheckedValue ?? internalValue
 const onChange = (newValue: string) => {
-  // Check if input is controlled
-  if (uncheckedValue !== undefined) {
-    uncheckedOnChange?.(newValue)
-  } else {
-    internalValue.value = newValue
-    uncheckedOnChange?.(newValue)
-  }
+  value.value = newValue
 }
 const regexp = computed(() =>
   pattern
@@ -96,7 +88,7 @@ onMounted(() => {
 })
 
 watch(
-  [() => maxlength, internalValue],
+  [() => maxlength, value],
   ([maxlength, value], [_, previousValue]) => {
     if (previousValue === undefined) return
 
@@ -121,8 +113,8 @@ const slots = computed(() => {
         (slotIdx >= mirrorSel.value[0] && slotIdx < mirrorSel.value[1]))
 
     const char =
-      internalValue.value[slotIdx] !== undefined
-        ? internalValue.value[slotIdx]
+      value.value[slotIdx] !== undefined
+        ? value.value[slotIdx]
         : null
 
     return {
@@ -139,7 +131,7 @@ const inputStyle = {
   width: '100%',
   height: '100%',
   display: 'flex',
-  textAlign: 'center',
+  textAlign: 'start',
   opacity: '1', // Mandatory for iOS hold-paste
   color: 'transparent',
   pointerEvents: 'all',
@@ -168,14 +160,14 @@ const inputStyle = {
     />
 
     <input
-      :autocomplete="autocomplete"
       v-bind="props"
+      :autocomplete="autocomplete"
       data-input-otp
       ref="inputRef"
       :style="inputStyle"
       :maxlength="maxlength"
-      :value="internalValue"
-      @change="
+      :value="value"
+      @input="
         event => {
           changeListener({
             event: event as any,
@@ -183,6 +175,7 @@ const inputStyle = {
             maxLength: maxlength,
             regexp,
           })
+          emit('input', event)
         }
       "
     />
