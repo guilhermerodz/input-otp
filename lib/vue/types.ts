@@ -2,7 +2,13 @@ import type { InputHTMLAttributes } from 'vue'
 
 interface InputHTMLAttributes_ extends /* @vue-ignore */ InputHTMLAttributes {}
 
-type OverrideProps<T, R> = Omit<T, keyof R> & R
+type OverrideProps<T, R> = Omit<
+  T,
+  // TODO: watch issue https://github.com/vuejs/core/issues/8286=
+  // PS: I hate this line
+  'autocomplete' | 'pattern' | 'disabled' | 'maxlength' | 'inputmode'
+> &
+  R
 
 export type VueOTPInputProps = OverrideProps<
   InputHTMLAttributes_,
