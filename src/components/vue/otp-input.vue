@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { OTPInput } from '../../../lib/vue'
 import Slot from './slot.vue'
+
+const value = ref('')
 </script>
 
 <template>
   <OTPInput
+    name="vue-input"
     v-slot="{ slots }"
+    v-model="value"
+    @complete="value => console.log('completed with value', value)"
     :maxlength="6"
     container-class="group flex items-center has-[:disabled]:opacity-30"
   >
