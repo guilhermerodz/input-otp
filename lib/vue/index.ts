@@ -1,3 +1,3 @@
-export { default as  OTPInput } from './input.vue'
+export { default as OTPInput } from './input.vue'
 
 export * from '../core'

@@ -37,6 +37,7 @@ const emit = defineEmits<{
 }>()
 
 const internalValue = defineModel({ default: '' })
+console.log({ internalValue })
 
 /** Workarounds */
 // const value = uncheckedValue ?? internalValue
@@ -156,6 +157,7 @@ const inputStyle = {
 <template>
   <div
     data-input-otp-container
+    ref="containerRef"
     style="position: relative; user-select: none; -webkit-user-select: none"
     :style="{ cursor: disabled ? 'default' : 'text' }"
     :class="containerClass"
@@ -187,4 +189,3 @@ const inputStyle = {
     />
   </div>
 </template>
-core/src/regexpcore/src/types
