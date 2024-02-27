@@ -37,7 +37,6 @@ const emit = defineEmits<{
 }>()
 
 const internalValue = defineModel({ default: '' })
-console.log({ internalValue })
 
 /** Workarounds */
 // const value = uncheckedValue ?? internalValue
@@ -114,7 +113,7 @@ watch(
 const slots = computed(() => {
   return Array.from({ length: maxlength }).map((_, slotIdx) => {
     const isActive =
-      mirrorFocused &&
+      mirrorFocused.value &&
       mirrorSel.value[0] !== null &&
       mirrorSel.value[1] !== null &&
       ((mirrorSel.value[0] === mirrorSel.value[1] &&
