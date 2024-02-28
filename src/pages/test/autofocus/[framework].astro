@@ -1,0 +1,32 @@
+---
+import Layout from '@/layouts/Layout.astro'
+
+import { ReactOTPInput } from '@/components/react/otp-input'
+import VueOTPInput from '@/components/vue/otp-input.vue'
+import SvelteInput from '@/components/svelte/otp-input.svelte'
+
+type OTPInputSupportedFramework = 'react' | 'vue' | 'svelte'
+export function getStaticPaths() {
+  return [
+    { params: { framework: 'react' as OTPInputSupportedFramework } },
+    { params: { framework: 'vue' as OTPInputSupportedFramework } },
+    { params: { framework: 'svelte' as OTPInputSupportedFramework } },
+  ]
+}
+---
+
+<Layout title="@rodz/input-otp playground">
+  <form
+    class="container relative flex-1 flex flex-col justify-center items-center gap-2"
+    method="POST"
+  >
+    <div class="mt-4">React</div>
+    <ReactOTPInput client:load autoFocus={Astro.params.framework === 'react' ? true : undefined} />
+    <div class="mt-4">Vue</div>
+    <VueOTPInput client:load autofocus={Astro.params.framework === 'vue' ? true : undefined} />
+    <div class="mt-4">Svelte</div>
+    <SvelteInput client:load autofocus={Astro.params.framework === 'svelte'? true : undefined} />
+
+    <input hidden type="submit" />
+  </form>
+</Layout>

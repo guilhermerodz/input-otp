@@ -4,11 +4,9 @@
   import { onBeforeUnmount } from 'vue'
   import {
     REGEXP_ONLY_DIGITS,
-    changeListener,
-    onMount as coreOnMount,
+    onMount as coreOnMount
   } from '../core'
-  import { writable } from 'svelte/store'
-
+  
   interface $$Props extends HTMLInputAttributes {
     value?: string
     oncomplete?: (...args: any[]) => unknown
@@ -81,14 +79,10 @@
     return allPreviousValues[allPreviousValues.length - 1]
   }
 
-  // TODO: oncomplete
-  // let previousValue: string = value
   $: if (value !== getPreviousValue()) {
     if (value.length === maxlength && getPreviousValue().length < maxlength) {
       dispatch('complete', value)
     }
-    // previousValue = value
-    // allPreviousValues.push(value)
   }
 
   /** Fns */
@@ -153,6 +147,7 @@
     bind:this={input}
     on:input={inputHandler}
     pattern={regexp?.source}
+    {disabled}
     {autocomplete}
     {inputmode}
     {maxlength}

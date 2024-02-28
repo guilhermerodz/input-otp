@@ -11,9 +11,10 @@ const value = ref('')
     name="vue-input"
     v-slot="{ slots }"
     v-model="value"
-    @complete="value => console.log('completed with value', value)"
+    @complete="t => console.log('completed with value', t)"
     :maxlength="6"
     container-class="group flex items-center has-[:disabled]:opacity-30"
+    v-bind="{ ...$attrs, value }"
   >
     <div class="flex">
       <Slot v-for="(slot, idx) in slots.slice(0, 3)" v-bind="slot" :key="idx" />

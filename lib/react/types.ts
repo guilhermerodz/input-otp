@@ -12,7 +12,7 @@ export type ReactOTPInputProps = OverrideProps<
 
     inputMode?: 'numeric' | 'text'
 
-    onComplete?: (...args: any[]) => unknown
+    onComplete?: (finalValue: string) => unknown
 
     render: (props: RenderProps) => React.ReactElement
 

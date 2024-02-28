@@ -168,6 +168,8 @@ const inputStyle = {
       data-input-otp
       ref="inputRef"
       :style="inputStyle"
+      :pattern="pattern"
+      :inputmode="inputmode"
       :maxlength="maxlength"
       :value="value"
     />

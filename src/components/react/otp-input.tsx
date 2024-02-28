@@ -4,7 +4,9 @@ import { cn } from '@/lib/utils'
 import { OTPInput, type SlotProps } from '@lib/react'
 import * as React from 'react'
 
-export function ReactOTPInput() {
+export function ReactOTPInput(
+  props: Partial<React.ComponentProps<typeof OTPInput>>,
+) {
   const [value, setValue] = React.useState('')
   // const regexp = /^(?:0|1)+$/
   return (
@@ -18,7 +20,7 @@ export function ReactOTPInput() {
       //   console.log('regex has tested successfully for',v)
       //   setValue(v)
       // }}
-      // onComplete={t => console.log('Completed with', t)}
+      onComplete={t => console.log('completed with value', t)}
       // pattern={regexp.source}
 
       // Mandatory props
@@ -41,6 +43,7 @@ export function ReactOTPInput() {
           </div>
         </>
       )}
+      {...props}
     />
   )
   return (

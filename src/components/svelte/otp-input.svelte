@@ -7,11 +7,12 @@
 
 <OTPInput
   name="svelte-input"
-  bind:value={value}
-  on:complete={value => console.log('completed with value', value)}
+  bind:value
+  on:complete={e => console.log('completed with value', e.detail)}
+  let:slots
   maxlength={6}
   containerClass="group flex items-center has-[:disabled]:opacity-30"
-  let:slots
+  {...$$restProps}
 >
   <div class="flex">
     {#each slots.slice(0, 3) as slot, idx (idx)}
