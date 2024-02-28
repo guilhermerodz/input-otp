@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { REGEXP_ONLY_DIGITS } from '../core/regexp'
 
@@ -69,6 +69,7 @@ onMounted(() => {
     input,
     maxLength: maxlength,
     onChange,
+    onComplete: t => emit('complete', t),
     regexp: regexp.value,
     updateMirror: (k, v) => {
       if (k === 'data-sel' && v !== undefined) {
@@ -88,21 +89,6 @@ onMounted(() => {
     mounted.unmount()
   })
 })
-
-watch(
-  [() => maxlength, value],
-  ([maxlength, value], [_, previousValue]) => {
-    if (previousValue === undefined) return
-
-    if (
-      value !== previousValue &&
-      previousValue.length < maxlength &&
-      value.length === maxlength
-    )
-      emit('complete', value)
-  },
-  { immediate: true },
-)
 
 const slots = computed(() => {
   return Array.from({ length: maxlength }).map((_, slotIdx) => {

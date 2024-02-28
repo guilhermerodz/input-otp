@@ -8,7 +8,7 @@
     type RenderProps,
     type SlotProps,
   } from '../core'
-  import { withPrevious } from './svelte-previous'
+  import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
   interface $$Props extends HTMLInputAttributes {
     value?: string
@@ -65,6 +65,7 @@
       input,
       maxLength: maxlength,
       onChange,
+      onComplete: t => dispatch('complete', t),
       regexp,
       updateMirror: (k, v) => {
         if (k === 'data-sel' && v !== undefined) {
@@ -85,36 +86,21 @@
     mounted.unmount()
   })
 
-  const [currentValue, previousValue] = withPrevious(value)
-  $: $currentValue = value
-
-  // on complete effect
-  $: if (
-    value !== undefined &&
-    value !== null &&
-    value.length === maxlength &&
-    value !== $previousValue &&
-    ($previousValue !== null && $previousValue !== undefined
-      ? $previousValue.length !== maxlength
-      : true)
-  ) {
-    dispatch('complete', value)
-  }
-
   /** Fns */
   function onChange(newValue: string) {
     value = newValue
   }
 
   const inputHandler: FormEventHandler<HTMLInputElement> = e => {
-    const input = e.currentTarget as HTMLInputElement
+    const input = e.currentTarget as HTMLInputElementWithMetadata
     if (!input) {
       return
     }
     const newValue = input.value.slice(0, maxlength)
+    const prev = input.__metadata__?.previousRegisteredValue
     if (newValue.length !== 0 && regexp && !regexp.test(newValue)) {
-      if ($previousValue !== undefined) {
-        value = $previousValue!
+      if (prev !== undefined && prev !== null) {
+        value = prev
       }
     }
   }

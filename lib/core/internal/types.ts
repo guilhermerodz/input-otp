@@ -1,5 +1,6 @@
 export interface Metadata {
   lastClickTimestamp: number
+  previousRegisteredValue?: string
 }
 export type HTMLInputElementWithMetadata = HTMLInputElement & {
   __metadata__?: Metadata

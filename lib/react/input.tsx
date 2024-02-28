@@ -30,7 +30,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
 
     /** Workarounds */
     const value = uncheckedValue ?? internalValue
-    const previousValue = usePrevious(value)
     const onChange = React.useCallback(
       (newValue: string) => {
         // Check if input is controlled
@@ -58,21 +57,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null)
     React.useImperativeHandle(ref, () => inputRef.current!, [])
 
-    /** Effects */
-    React.useEffect(() => {
-      if (previousValue === undefined) {
-        return
-      }
-
-      if (
-        value !== previousValue &&
-        previousValue.length < maxLength &&
-        value.length === maxLength
-      ) {
-        onComplete?.(value)
-      }
-    }, [maxLength, onComplete, previousValue, value])
-
     /** Mirror State for children-rendering-only purpose */
     const [mirrorFocused, setMirrorFocused] = React.useState(false)
     const [mirrorHovering, setMirrorHovering] = React.useState(false)
@@ -92,6 +76,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
         input,
         maxLength,
         onChange,
+        onComplete,
         regexp,
         updateMirror: (k, v) => {
           if (k === 'data-sel' && v !== undefined) {
@@ -215,11 +200,3 @@ const inputStyle = {
   // caretColor: 'black',
   // padding: '0',
 } satisfies React.CSSProperties
-
-function usePrevious<T>(value: T) {
-  const ref = React.useRef<T>()
-  React.useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}

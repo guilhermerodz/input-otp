@@ -1,6 +1,7 @@
 import type {
   EventToListenerMap,
   HTMLInputElementWithMetadata,
+  Metadata,
 } from './internal/types'
 import { SelectionType } from './types'
 import type { ContainerAttributes } from './types'
@@ -10,9 +11,18 @@ type ChangeEvent = Event & {
   preventDefault: () => void
 }
 
+function mutateMetadata(
+  input: HTMLInputElementWithMetadata,
+  objToMerge: Partial<Metadata>,
+) {
+  input.__metadata__ = Object.assign({}, input.__metadata__, objToMerge)
+  return input.__metadata__
+}
+
 function setValue(params: {
   event: ChangeEvent
   onChange: (value: string) => void
+  onComplete?: (value: string) => void
   maxLength: number
   regexp?: RegExp
 }) {
@@ -23,6 +33,27 @@ function setValue(params: {
     return
   }
   params.onChange(newValue)
+
+  const previousValue = input.__metadata__?.previousRegisteredValue
+
+  if (
+    params.onComplete &&
+    newValue.length === params.maxLength &&
+    newValue !== previousValue
+  ) {
+    if (previousValue !== undefined && previousValue !== null) {
+      if (previousValue.length < params.maxLength) {
+        params.onComplete(newValue)
+      }
+    } else {
+      params.onComplete(newValue)
+    }
+  }
+
+  // save previousValue
+  if (newValue !== previousValue) {
+    mutateMetadata(input, { previousRegisteredValue: newValue })
+  }
 }
 
 export function onMount({
@@ -31,12 +62,14 @@ export function onMount({
   maxLength,
   regexp,
   onChange,
+  onComplete,
   updateMirror,
 }: {
   container: HTMLElement
   input: HTMLInputElementWithMetadata
   maxLength: number
   onChange: (value: string) => void
+  onComplete?: (value: string) => void
   regexp?: RegExp
   updateMirror: <
     K extends keyof ContainerAttributes,
@@ -169,9 +202,7 @@ export function onMount({
     syncTimeouts(_selectListener)
   }
   function _clickListener() {
-    input.__metadata__ = Object.assign({}, input.__metadata__, {
-      lastClickTimestamp: Date.now(),
-    })
+    mutateMetadata(input, { lastClickTimestamp: Date.now() })
   }
   function _dblclickListener() {
     const lastClickTimestamp = input.__metadata__?.lastClickTimestamp
@@ -223,6 +254,7 @@ export function onMount({
     setValue({
       event,
       onChange,
+      onComplete,
       regexp,
       maxLength,
     })
@@ -295,11 +327,11 @@ export function onMount({
     styleEl.sheet?.insertRule(
       '[data-input-otp]::selection { background: transparent !important; }',
     )
+    const autofillStyles =
+      'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important;'
+    styleEl.sheet?.insertRule(`[data-input-otp]:autofill { ${autofillStyles} }`)
     styleEl.sheet?.insertRule(
-      '[data-input-otp]:autofill { background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; }',
-    )
-    styleEl.sheet?.insertRule(
-      '[data-input-otp]:-webkit-autofill { background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important }',
+      `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
     )
   }
 
