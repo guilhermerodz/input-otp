@@ -31,6 +31,8 @@
     "vue": "^3.4.20"
   },
   "devDependencies": {
+    "@playwright/test": "^1.42.0",
+    "@types/node": "^20.11.21",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "vite": "^5.1.4"
