@@ -120,7 +120,7 @@ export function cn(...inputs: ClassValue[]) {
 ## How it works
 
 There's currently no native OTP/2FA/MFA input in HTML, which means people are either going with 1. a simple input design or 2. custom designs like this one.
-This library works by rendering an invisible input as a sibling of the slots, contained by a `relative`ly positioned parent (the container root called _OTPInput_).
+This library works by rendering an invisible input as a sibling of the slots, contained by a `relatively` positioned parent (the container root called _OTPInput_).
 
 ## API Reference
 
