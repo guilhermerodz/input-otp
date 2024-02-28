@@ -28,11 +28,15 @@ export function onMount({
   container,
   input,
   maxLength,
+  regexp,
+  onChange,
   updateMirror,
 }: {
   container: HTMLElement
   input: HTMLInputElementWithMetadata
   maxLength: number
+  onChange: (value: string) => void
+  regexp?: RegExp
   updateMirror: <
     K extends keyof ContainerAttributes,
     V extends ContainerAttributes[K],
@@ -52,7 +56,6 @@ export function onMount({
     }
     updateMirror(k, v)
   }
-
   function _selectListener() {
     const _start = input.selectionStart
     const _end = input.selectionEnd
@@ -182,7 +185,49 @@ export function onMount({
       syncTimeouts(_selectListener)
     }
   }
-  function _inputListener() {
+  // Fix iOS pasting
+  function _pasteListener(e: ClipboardEvent) {
+    const start = input.selectionStart
+    const end = input.selectionEnd
+
+    if (!e.clipboardData) {
+      return
+    }
+    if (start === null || end === null) {
+      return
+    }
+
+    const content = e.clipboardData.getData('text/plain')
+    e.preventDefault()
+
+    const isReplacing = start !== end
+
+    const newValueUncapped = isReplacing
+      ? input.value.slice(0, start) + content + input.value.slice(end) // Replacing
+      : input.value.slice(0, start) + content + input.value.slice(start) // Inserting
+    const newValue = newValueUncapped.slice(0, maxLength)
+
+    if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+      return
+    }
+
+    onChange(newValue)
+
+    const _start = Math.min(newValue.length, maxLength - 1)
+    const _end = newValue.length
+    input.setSelectionRange(_start, _end)
+    mutateAttribute('data-sel', String(_start) + ',' + String(_end))
+  }
+  // function _inputListener() {
+  //   syncTimeouts(_selectListener)
+  // }
+  function _inputListener(event: ChangeEvent) {
+    changeListener({
+      event,
+      onChange,
+      regexp,
+      maxLength,
+    })
     syncTimeouts(_selectListener)
   }
   function _focusListener() {
@@ -226,6 +271,8 @@ export function onMount({
     keyup: _keyupListener,
     click: _clickListener,
     dblclick: _dblclickListener,
+    paste: _pasteListener,
+    // @ts-expect-error
     input: _inputListener,
     focus: _focusListener,
     blur: _blurListener,
@@ -234,7 +281,11 @@ export function onMount({
   } satisfies EventToListenerMap
 
   for (const [event, listener] of Object.entries(eventToListenerMap)) {
-    input.addEventListener(event as any, listener as any)
+    input.addEventListener(
+      event as any,
+      listener as any,
+      event === 'input' ? { capture: true } : undefined,
+    )
   }
 
   if (!document.getElementById('input-otp-style')) {
@@ -248,7 +299,7 @@ export function onMount({
 
   const updateRootHeight = () => {
     if (input) {
-      input.style.setProperty('--root-height', `${input.clientHeight}px`)
+      container.style.setProperty('--root-height', `${input.clientHeight}px`)
     }
   }
   updateRootHeight()

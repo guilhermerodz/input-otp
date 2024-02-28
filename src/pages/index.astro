@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro'
 
 import { ReactOTPInput } from '@/components/react/otp-input'
 import VueOTPInput from '@/components/vue/otp-input.vue'
+import SvelteInput from '@/components/svelte/otp-input.svelte'
 
 if (Astro.request.method === 'POST') {
   try {
@@ -10,6 +11,7 @@ if (Astro.request.method === 'POST') {
 
     console.log('react-input', data.get('react-input'))
     console.log('vue-input', data.get('vue-input'))
+    console.log('svelte-input', data.get('svelte-input'))
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message)
@@ -18,13 +20,17 @@ if (Astro.request.method === 'POST') {
 }
 ---
 
-<Layout title="@rodz/input-op playground">
+<Layout title="@rodz/input-otp playground">
   <form
     class="container relative flex-1 flex flex-col justify-center items-center gap-2"
     method="POST"
   >
+    <div class="mt-4">React</div>
     <ReactOTPInput client:load />
+    <div class="mt-4">Vue</div>
     <VueOTPInput client:load />
+    <div class="mt-4">Svelte</div>
+    <SvelteInput client:load />
 
     <input hidden type="submit" />
   </form>

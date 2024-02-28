@@ -7,7 +7,6 @@ defineProps<SlotProps>()
 
 <template>
   <div
-    @click="console.log('clicked')"
     :class="
       cn(
         'relative w-10 h-14 text-[2rem]',

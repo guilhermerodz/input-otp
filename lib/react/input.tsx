@@ -73,7 +73,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
       }
     }, [maxLength, onComplete, previousValue, value])
 
-    /** Mirror Statefor children-rendering-only purpose */
+    /** Mirror State for children-rendering-only purpose */
     const [mirrorFocused, setMirrorFocused] = React.useState(false)
     const [mirrorHovering, setMirrorHovering] = React.useState(false)
     const [mirrorSel, setMirrorSel] = React.useState<[number, number]>([-1, -1])
@@ -91,6 +91,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
         container,
         input,
         maxLength,
+        onChange,
+        regexp,
         updateMirror: (k, v) => {
           if (k === 'data-sel' && v !== undefined) {
             const [s, e] = v.split(',').map(Number)
@@ -115,6 +117,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
       () => (
         <input
           autoComplete={autoComplete}
+          onChange={() => {}}
           {...props}
           data-input-otp
           ref={inputRef}
@@ -123,17 +126,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
           style={inputStyle}
           maxLength={maxLength}
           value={value}
-          onChange={event =>
-            changeListener({
-              event: event as any,
-              onChange,
-              maxLength,
-              regexp,
-            })
-          }
         />
       ),
-      [autoComplete, props, inputMode, regexp, maxLength, value, onChange],
+      [autoComplete, props, inputMode, regexp, maxLength, value],
     )
 
     const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
