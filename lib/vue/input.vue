@@ -4,7 +4,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { REGEXP_ONLY_DIGITS } from '../core/regexp'
 
-import { changeListener, onMount } from '.'
+import { onMount } from '.'
 import type { VueOTPInputProps } from './types'
 
 defineOptions({

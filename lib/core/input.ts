@@ -10,13 +10,14 @@ type ChangeEvent = Event & {
   preventDefault: () => void
 }
 
-export function changeListener(params: {
+function setValue(params: {
   event: ChangeEvent
   onChange: (value: string) => void
   maxLength: number
   regexp?: RegExp
 }) {
-  const newValue = params.event.currentTarget.value.slice(0, params.maxLength)
+  const input = params.event.currentTarget as HTMLInputElementWithMetadata
+  const newValue = input.value.slice(0, params.maxLength)
   if (newValue.length > 0 && params.regexp && !params.regexp?.test(newValue)) {
     params.event.preventDefault()
     return
@@ -222,7 +223,7 @@ export function onMount({
   //   syncTimeouts(_selectListener)
   // }
   function _inputListener(event: ChangeEvent) {
-    changeListener({
+    setValue({
       event,
       onChange,
       regexp,
@@ -296,6 +297,12 @@ export function onMount({
     document.head.appendChild(styleEl)
     styleEl.sheet?.insertRule(
       '[data-input-otp]::selection { background: transparent !important; }',
+    )
+    styleEl.sheet?.insertRule(
+      '[data-input-otp]:autofill { background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; }',
+    )
+    styleEl.sheet?.insertRule(
+      '[data-input-otp]:-webkit-autofill { background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important }',
     )
   }
 

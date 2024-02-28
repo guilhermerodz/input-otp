@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { changeListener, onMount } from '../core/input'
+import { onMount } from '../core/input'
 import { REGEXP_ONLY_DIGITS } from '../core/regexp'
 import type { ReactOTPInputProps } from './types'
 
