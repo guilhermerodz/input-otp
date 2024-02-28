@@ -3,12 +3,17 @@
   import Slot from './slot.svelte'
 
   let value = ''
+  let completedOnce: string | undefined = undefined
 </script>
 
 <OTPInput
   name="svelte-input"
+  data-completed-once={completedOnce}
   bind:value
-  on:complete={e => console.log('completed with value', e.detail)}
+  on:complete={e => {
+    console.count('completing')
+    completedOnce = e.detail
+  }}
   let:slots
   maxlength={6}
   containerClass="group flex items-center has-[:disabled]:opacity-30"

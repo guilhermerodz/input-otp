@@ -4,6 +4,10 @@ import { OTPInput } from '../../../lib/vue'
 import Slot from './slot.vue'
 
 const value = ref('')
+const completedOnce = ref<string | undefined>(undefined)
+const completeOnce = (v: string) => {
+  completedOnce.value = v
+}
 </script>
 
 <template>
@@ -11,7 +15,8 @@ const value = ref('')
     name="vue-input"
     v-slot="{ slots }"
     v-model="value"
-    @complete="t => console.log('completed with value', t)"
+    :data-completed-once="completedOnce"
+    @complete="completeOnce"
     :maxlength="6"
     container-class="group flex items-center has-[:disabled]:opacity-30"
     v-bind="{ ...$attrs, value }"

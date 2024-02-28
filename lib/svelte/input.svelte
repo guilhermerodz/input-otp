@@ -1,12 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte'
-  import type { HTMLInputAttributes } from 'svelte/elements'
+  import type { FormEventHandler, HTMLInputAttributes } from 'svelte/elements'
   import { onBeforeUnmount } from 'vue'
   import {
     REGEXP_ONLY_DIGITS,
-    onMount as coreOnMount
+    onMount as coreOnMount,
+    type RenderProps,
+    type SlotProps,
   } from '../core'
-  
+  import { withPrevious } from './svelte-previous'
+
   interface $$Props extends HTMLInputAttributes {
     value?: string
     oncomplete?: (...args: any[]) => unknown
@@ -19,6 +22,14 @@
     inputmode?: 'numeric' | 'text'
 
     containerClass: string | undefined
+  }
+
+  interface $$Slots {
+    default: {
+      slots: SlotProps[]
+      'is-focused': RenderProps['isFocused']
+      'is-hovering': RenderProps['isHovering']
+    }
   }
 
   let container: HTMLDivElement
@@ -74,15 +85,20 @@
     mounted.unmount()
   })
 
-  let allPreviousValues = [value]
-  function getPreviousValue() {
-    return allPreviousValues[allPreviousValues.length - 1]
-  }
+  const [currentValue, previousValue] = withPrevious(value)
+  $: $currentValue = value
 
-  $: if (value !== getPreviousValue()) {
-    if (value.length === maxlength && getPreviousValue().length < maxlength) {
-      dispatch('complete', value)
-    }
+  // on complete effect
+  $: if (
+    value !== undefined &&
+    value !== null &&
+    value.length === maxlength &&
+    value !== $previousValue &&
+    ($previousValue !== null && $previousValue !== undefined
+      ? $previousValue.length !== maxlength
+      : true)
+  ) {
+    dispatch('complete', value)
   }
 
   /** Fns */
@@ -90,15 +106,17 @@
     value = newValue
   }
 
-  function inputHandler(e: InputEvent) {
+  const inputHandler: FormEventHandler<HTMLInputElement> = e => {
     const input = e.currentTarget as HTMLInputElement
     if (!input) {
       return
     }
-    if (input.value.length !== 0 && regexp && !regexp.test(input.value)) {
-      value = getPreviousValue()
+    const newValue = input.value.slice(0, maxlength)
+    if (newValue.length !== 0 && regexp && !regexp.test(newValue)) {
+      if ($previousValue !== undefined) {
+        value = $previousValue!
+      }
     }
-    allPreviousValues = [...allPreviousValues.slice(-2), value]
   }
 
   const dispatch = createEventDispatcher<{

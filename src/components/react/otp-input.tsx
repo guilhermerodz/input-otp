@@ -8,6 +8,9 @@ export function ReactOTPInput(
   props: Partial<React.ComponentProps<typeof OTPInput>>,
 ) {
   const [value, setValue] = React.useState('')
+  const [completedOnce, setCompletedOnce] = React.useState<string | undefined>(
+    undefined,
+  )
   // const regexp = /^(?:0|1)+$/
   return (
     <OTPInput
@@ -20,7 +23,8 @@ export function ReactOTPInput(
       //   console.log('regex has tested successfully for',v)
       //   setValue(v)
       // }}
-      onComplete={t => console.log('completed with value', t)}
+      data-completed-once={completedOnce}
+      onComplete={(v) => setCompletedOnce(v)}
       // pattern={regexp.source}
 
       // Mandatory props

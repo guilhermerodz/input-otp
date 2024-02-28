@@ -219,9 +219,6 @@ export function onMount({
     input.setSelectionRange(_start, _end)
     mutateAttribute('data-sel', String(_start) + ',' + String(_end))
   }
-  // function _inputListener() {
-  //   syncTimeouts(_selectListener)
-  // }
   function _inputListener(event: ChangeEvent) {
     setValue({
       event,

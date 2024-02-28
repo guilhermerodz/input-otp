@@ -13,13 +13,10 @@ INPUT_NAMES.forEach(inputName => {
         `[data-input-otp-container]:has([name="${inputName}"])`,
       )
       const input = page.locator(`[name=${inputName}]`)
-      
-      await input.focus()
-      const msgPromise = page.waitForEvent('console')
-      await input.pressSequentially('123456')
-      const msg = await msgPromise
 
-      expect(msg.text()).toBe('completed with value 123456')
+      await input.focus()
+      await input.pressSequentially('123456')
+      expect(await input.getAttribute('data-completed-once')).toBe('123456')
     })
   })
 })
