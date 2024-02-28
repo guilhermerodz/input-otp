@@ -84,7 +84,7 @@ export function onMount({
         }
 
         if (start !== -1 && end !== -1) {
-          input.setSelectionRange(start, end)
+          input.setSelectionRange(start, end, 'backward')
         }
       }
     }
