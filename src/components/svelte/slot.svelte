@@ -6,6 +6,8 @@
 </script>
 
 <div
+  data-slot
+  data-test-char={slot.char}
   class={cn(
     'relative w-10 h-14 text-[2rem]',
     'flex items-center justify-center',

@@ -7,6 +7,8 @@ defineProps<SlotProps>()
 
 <template>
   <div
+    data-slot
+    :data-test-char="$props.char"
     :class="
       cn(
         'relative w-10 h-14 text-[2rem]',
