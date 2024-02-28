@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { INPUT_NAMES } from './util/constants'
+import { INPUT_NAMES } from '../util/constants'
 
 test.describe.configure({ mode: 'serial' }) // Important
 INPUT_NAMES.forEach((inputName) => {

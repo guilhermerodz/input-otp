@@ -1,6 +1,6 @@
 import type { BrowserContext, Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
-import { modifier } from './util/modifier'
+import { modifier } from '../util/modifier'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/with-allow-navigation')
