@@ -266,6 +266,8 @@ export function onMount({
   const eventToListenerMap = {
     select: _selectListener,
     mouseover: _mouseOverListener,
+    mouseenter: _mouseOverListener,
+    mouseout: _mouseLeaveListener,
     mouseleave: _mouseLeaveListener,
     keydown: _keydownListener,
     keyup: _keyupListener,

@@ -2,16 +2,18 @@
 
 import { cn } from '@/lib/utils'
 import { OTPInput, type SlotProps } from '@lib/react'
+import * as React from 'react'
 
 export function ReactOTPInput() {
-  // const [value, setValue] = React.useState('')
+  const [value, setValue] = React.useState('')
   // const regexp = /^(?:0|1)+$/
   return (
     <OTPInput
       name="react-input"
     
       // Additional props
-      // value={value}
+      value={value}
+      onChange={setValue}
       // onChange={v => {
       //   if (v.length > 0 && !regexp.test(v)) return
       //   console.log('regex has tested successfully for',v)

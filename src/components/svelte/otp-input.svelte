@@ -2,7 +2,7 @@
   import { OTPInput } from '@lib/svelte'
   import Slot from './slot.svelte'
 
-  let value = '12'
+  let value = ''
 </script>
 
 <OTPInput
