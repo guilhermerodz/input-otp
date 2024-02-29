@@ -11,14 +11,12 @@
     "lib:test:slow": "TEST_SLOW=true playwright test",
     "lib:test": "playwright test",
     "lib:clean": "rimraf ./lib-dist",
-    "lib:vite": "vite build",
     "lib:bundle": "run-p lib:bundle:*",
-    "lib:bundle:core-react-vue": "tsup",
+    "lib:bundle:core-react": "tsup",
     "lib:bundle:svelte": "svelte-package -i ./lib/svelte -o ./lib-dist/svelte --types",
-    "lib:dts": "run-p lib:dts:*",
-    "lib:dts:vue": "vue-tsc -p tsconfig.build.vue.json --declaration --emitDeclarationOnly",
+    "lib:bundle:vue": "vite --config vite.config.vue.ts build",
     "lib:copy-package-json": "cp ./lib/package.json ./lib-dist/package.json",
-    "lib:build": "run-s lib:clean lib:bundle lib:dts"
+    "lib:build": "run-s lib:clean lib:bundle lib:copy-package-json"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",

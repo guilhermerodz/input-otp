@@ -11,10 +11,11 @@ export default defineConfig({
     tsconfigPaths(),
     viteVue(),
     viteDts({
-      include: './lib/**',
+      include: './lib/vue/**',
     }),
   ],
   build: {
+    emptyOutDir: false,
     outDir: path.resolve(__dirname, 'lib-dist'),
     copyPublicDir: false,
     minify: true,
