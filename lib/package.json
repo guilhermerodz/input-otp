@@ -1,1 +1,70 @@
-{}
+{
+  "name": "testing-a-deployment-1",
+  "version": "0.3.4-beta",
+  "author": "Guilherme Rodz <g@rodz.dev>",
+  "description": "One-time password input component for Web.",
+  "license": "MIT",
+  "homepage": "https://input-otp.rodz.dev/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guilhermerodz/input-otp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guilhermerodz/input-otp/issues"
+  },
+  "keywords": [
+    "otp",
+    "input",
+    "accessible",
+    "react",
+    "vue",
+    "svelte"
+  ],
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "./*"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./index.js",
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "default": "./index.js"
+    },
+    "./core": {
+      "types": "./core/index.d.ts",
+      "module": "./core/index.js",
+      "import": "./core/index.js",
+      "require": "./core/index.cjs",
+      "default": "./core/index.js"
+    },
+    "./react": {
+      "types": "./react/index.d.ts",
+      "module": "./react/index.js",
+      "import": "./react/index.js",
+      "require": "./react/index.cjs",
+      "default": "./react/index.js"
+    },
+    "./vue": {
+      "types": "./vue/index.d.ts",
+      "import": "./vue/index.js",
+      "default": "./vue/index.js"
+    },
+    "./svelte": {
+      "types": "./svelte/index.d.ts",
+      "module": "./svelte/index.js",
+      "import": "./svelte/index.js",
+      "default": "./svelte/index.js"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.0",
+    "react-dom": "^18.0",
+    "vue": "^3.2.0",
+    "svelte": "^4.0.0"
+  }
+}

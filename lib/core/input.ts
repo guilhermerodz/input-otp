@@ -30,7 +30,7 @@ function setValue(params: {
   const newValue = input.value.slice(0, params.maxLength)
   if (newValue.length > 0 && params.regexp && !params.regexp?.test(newValue)) {
     params.event.preventDefault()
-    return
+    return true
   }
   params.onChange(newValue)
 
@@ -54,6 +54,8 @@ function setValue(params: {
   if (newValue !== previousValue) {
     mutateMetadata(input, { previousRegisteredValue: newValue })
   }
+
+  return false
 }
 
 export function onMount({
@@ -79,6 +81,27 @@ export function onMount({
     value: V,
   ) => void
 }) {
+  input.__metadata__ = {
+    previousRegisteredValue: input.value,
+    lastClickTimestamp: undefined,
+  }
+
+  // const generateImprovedTrackingInterval = () =>
+  //   setInterval(() => {
+  //     if (input) {
+  //       mutateAttribute(
+  //         'data-sel',
+  //         String(input.selectionStart ?? -1) +
+  //           ',' +
+  //           String(input.selectionEnd ?? -1),
+  //       )
+  //       mutateAttribute(
+  //         'data-is-focused',
+  //         input === document.activeElement ? 'true' : undefined,
+  //       )
+  //     }
+  //   }, 20)
+
   function mutateAttribute<
     K extends keyof ContainerAttributes,
     V extends ContainerAttributes[K],
@@ -251,13 +274,24 @@ export function onMount({
     mutateAttribute('data-sel', String(_start) + ',' + String(_end))
   }
   function _inputListener(event: ChangeEvent) {
-    setValue({
+    const previousValue = input.__metadata__.previousRegisteredValue
+    const hasPreventedDefault = setValue({
       event,
       onChange,
       onComplete,
       regexp,
       maxLength,
     })
+    if (hasPreventedDefault && input.value !== previousValue) {
+      input.addEventListener(
+        'input',
+        () => {
+          onChange(previousValue)
+        },
+        { once: true },
+      )
+    }
+
     syncTimeouts(_selectListener)
   }
   function _focusListener() {
@@ -270,12 +304,16 @@ export function onMount({
     // Run improved selection tracking while focused
     const interval = setInterval(() => {
       if (document.activeElement === input) {
-        mutateAttribute(
-          'data-sel',
-          String(input.selectionStart ?? -1) +
-            ',' +
-            String(input.selectionEnd ?? -1),
-        )
+        // msel is alias for 'mirror selection'
+        if (input.selectionStart === null || input.selectionEnd === null) {
+          mutateAttribute('data-sel', '-1,-1')
+        } else {
+          const msel = [input.selectionStart, input.selectionEnd]
+          msel[0] = Math.min(Math.max(0, msel[0]), maxLength - 1)
+          msel[1] = Math.min(msel[1], maxLength)
+
+          mutateAttribute('data-sel', String(msel[0]) + ',' + String(msel[1]))
+        }
       } else {
         clearInterval(interval)
       }
@@ -343,28 +381,19 @@ export function onMount({
   const resizeObserver = new ResizeObserver(updateRootHeight)
   resizeObserver.observe(input)
 
-  const improvedTrackingTimeout = setTimeout(() => {
-    if (input) {
-      mutateAttribute(
-        'data-sel',
-        String(input.selectionStart ?? -1) +
-          ',' +
-          String(input.selectionEnd ?? -1),
-      )
-      mutateAttribute(
-        'data-is-focused',
-        input === document.activeElement ? 'true' : undefined,
-      )
-    }
-  }, 20)
+  // let improvedTrackingInterval: NodeJS.Timeout | null = null
 
   return {
     unmount: () => {
       for (const [event, listener] of Object.entries(eventToListenerMap)) {
         input.removeEventListener(event as any, listener as any)
       }
+
       resizeObserver.disconnect()
-      clearTimeout(improvedTrackingTimeout)
+
+      // if (improvedTrackingInterval !== null) {
+      //   clearTimeout(improvedTrackingInterval)
+      // }
     },
   }
 }

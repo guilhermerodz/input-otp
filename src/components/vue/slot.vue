@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { cn } from '../../lib/utils'
-import type { SlotProps } from '../../../lib/vue'
+import { cn } from '@/lib/utils';
+import type { SlotProps } from '@lib/core';
 
 defineProps<SlotProps>()
 </script>

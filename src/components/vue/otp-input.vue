@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { OTPInput } from '../../../lib/vue'
+import { OTPInput } from 'lib-dist/vue'
 import Slot from './slot.vue'
 
 const value = ref('')

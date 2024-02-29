@@ -4,6 +4,7 @@ import { onMount } from '@lib/core/input'
 import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
 
 import type { ReactOTPInputProps } from './types'
+import { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
   (
@@ -66,7 +67,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
     /** Mount and Unmount */
     React.useEffect(() => {
       const container = containerRef.current
-      const input = inputRef.current
+      const input = inputRef.current as HTMLInputElementWithMetadata
 
       if (!container || !input) {
         return

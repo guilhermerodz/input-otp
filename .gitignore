@@ -1,6 +1,8 @@
 # build output
 dist/
 lib-dist/
+lib-tmp/
+.vercel/
 
 # generated types
 .astro/

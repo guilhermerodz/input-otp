@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
-  import type { FormEventHandler, HTMLInputAttributes } from 'svelte/elements'
+  import type { HTMLInputAttributes } from 'svelte/elements'
 
   import {
     REGEXP_ONLY_DIGITS,
@@ -8,7 +8,6 @@
     type RenderProps,
     type SlotProps,
   } from '@lib/core'
-  import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
   interface $$Props extends HTMLInputAttributes {
     value?: string
@@ -64,7 +63,9 @@
       container,
       input,
       maxLength: maxlength,
-      onChange,
+      onChange: t => {
+        value = t
+      },
       onComplete: t => dispatch('complete', t),
       regexp,
       updateMirror: (k, v) => {
@@ -84,25 +85,6 @@
   onDestroy(() => {
     mounted !== undefined && mounted.unmount()
   })
-
-  /** Fns */
-  function onChange(newValue: string) {
-    value = newValue
-  }
-
-  const inputHandler: FormEventHandler<HTMLInputElement> = e => {
-    const input = e.currentTarget as HTMLInputElementWithMetadata
-    if (!input) {
-      return
-    }
-    const newValue = input.value.slice(0, maxlength)
-    const prev = input.__metadata__?.previousRegisteredValue
-    if (newValue.length !== 0 && regexp && !regexp.test(newValue)) {
-      if (prev !== undefined && prev !== null) {
-        value = prev
-      }
-    }
-  }
 
   const dispatch = createEventDispatcher<{
     // Native events
@@ -148,7 +130,6 @@
     {...$$restProps}
     bind:value
     bind:this={input}
-    on:input={inputHandler}
     pattern={regexp?.source}
     {disabled}
     {autocomplete}

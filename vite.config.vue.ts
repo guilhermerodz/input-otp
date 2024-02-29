@@ -23,22 +23,29 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'lib/index.ts'),
       name: 'input-otp',
-      formats: ['es', 'cjs'],
+      // formats: ['es', 'cjs'],
     },
     rollupOptions: {
       external: ['vue'],
       input: {
         vue: 'lib/vue/index.ts',
       },
-      output: {
-        entryFileNames: '[name]/index.[format]',
-        // Provide global variables to use in the UMD build
-        // for externalized deps
-        globals: {
-          vue: 'Vue',
+      output: [
+        {
+          format: 'cjs',
+          entryFileNames: '[name]/index.[format]',
+          globals: {
+            vue: 'Vue',
+          },
         },
-      },
+        {
+          format: 'esm',
+          entryFileNames: '[name]/index.js',
+          globals: {
+            vue: 'Vue',
+          },
+        },
+      ],
     },
-    
   },
 })

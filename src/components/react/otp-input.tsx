@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { OTPInput, type SlotProps } from '@lib/react'
+import type { SlotProps } from '@lib/core'
+import { OTPInput } from 'lib-dist'
 import * as React from 'react'
 
 export function ReactOTPInput(
@@ -48,29 +49,6 @@ export function ReactOTPInput(
         </>
       )}
       {...props}
-    />
-  )
-  return (
-    <OTPInput
-      maxLength={6}
-      containerClassName="group flex items-center has-[:disabled]:opacity-30"
-      render={({ slots }) => (
-        <>
-          <div className="flex">
-            {slots.slice(0, 3).map((slot, idx) => (
-              <Slot key={idx} {...slot} />
-            ))}
-          </div>
-
-          <FakeDash />
-
-          <div className="flex">
-            {slots.slice(3).map((slot, idx) => (
-              <Slot key={idx} {...slot} />
-            ))}
-          </div>
-        </>
-      )}
     />
   )
 }
