@@ -1,7 +1,8 @@
 import * as React from 'react'
 
-import { onMount } from '../core/input'
-import { REGEXP_ONLY_DIGITS } from '../core/regexp'
+import { onMount } from '@lib/core/input'
+import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
+
 import type { ReactOTPInputProps } from './types'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(

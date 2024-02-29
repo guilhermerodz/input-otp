@@ -8,8 +8,12 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "playwright test",
-    "test:slow": "TEST_SLOW=true playwright test"
+    "lib:test:slow": "TEST_SLOW=true playwright test",
+    "lib:test": "playwright test",
+    "lib:clean": "rimraf ./lib-dist",
+    "lib:bundle": "vite build",
+    "lib:copy-package-json": "cp package.json lib-dist/package.json",
+    "lib:build": "run-s lib:clean lib:bundle lib:copy-package-json"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",
@@ -37,6 +41,11 @@
     "@types/node": "^20.11.21",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.1.4"
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.5",
+    "tsup": "^8.0.2",
+    "vite": "^5.1.4",
+    "vite-plugin-dts": "^3.7.3",
+    "vite-tsconfig-paths": "^4.3.1"
   }
 }

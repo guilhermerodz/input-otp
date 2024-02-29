@@ -1,12 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import type { FormEventHandler, HTMLInputAttributes } from 'svelte/elements'
+
   import {
     REGEXP_ONLY_DIGITS,
     onMount as coreOnMount,
     type RenderProps,
     type SlotProps,
-  } from '../core'
+  } from '@lib/core'
   import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
   interface $$Props extends HTMLInputAttributes {
