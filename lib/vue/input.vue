@@ -57,6 +57,7 @@ const mirrorHovering = ref(false)
 const mirrorFocused = ref(false)
 const mirrorSel = ref<[number, number]>([-1, -1])
 
+let mounted: ReturnType<typeof onMount>
 onMounted(() => {
   const container = containerRef.value
   const input = inputRef.value
@@ -64,7 +65,7 @@ onMounted(() => {
     return
   }
 
-  const mounted = onMount({
+  mounted = onMount({
     container,
     input,
     maxLength: maxlength,
@@ -84,10 +85,9 @@ onMounted(() => {
       }
     },
   })
-
-  onUnmounted(() => {
-    mounted.unmount()
-  })
+})
+onUnmounted(() => {
+  mounted !== undefined && mounted.unmount()
 })
 
 const slots = computed(() => {

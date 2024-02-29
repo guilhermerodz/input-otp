@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import type { FormEventHandler, HTMLInputAttributes } from 'svelte/elements'
-  import { onBeforeUnmount } from 'vue'
   import {
     REGEXP_ONLY_DIGITS,
     onMount as coreOnMount,
@@ -81,9 +80,8 @@
       },
     })
   })
-
-  onBeforeUnmount(() => {
-    mounted.unmount()
+  onDestroy(() => {
+    mounted !== undefined && mounted.unmount()
   })
 
   /** Fns */

@@ -11,7 +11,6 @@
   data-completed-once={completedOnce}
   bind:value
   on:complete={e => {
-    console.count('completing')
     completedOnce = e.detail
   }}
   let:slots
