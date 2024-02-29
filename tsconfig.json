@@ -7,6 +7,10 @@
       "@/*": ["./src/*"],
       "@lib/*": ["./lib/*"]
     },
+
+    // Needed for lib:build (svelte plugin)
+    "preserveValueImports": false,
+    "verbatimModuleSyntax": false,
   },
   "include": ["./src/**/*","./lib/**/*"]
 }

@@ -1,7 +1,7 @@
 {
-  "name": "spiffy-spiral",
+  "name": "root",
+  "private": true,
   "type": "module",
-  "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -11,9 +11,10 @@
     "lib:test:slow": "TEST_SLOW=true playwright test",
     "lib:test": "playwright test",
     "lib:clean": "rimraf ./lib-dist",
-    "lib:bundle": "vite build",
-    "lib:copy-package-json": "cp package.json lib-dist/package.json",
-    "lib:build": "run-s lib:clean lib:bundle lib:copy-package-json"
+    "lib:bundle:vite": "vite build",
+    "lib:bundle": "tsup",
+    "lib:copy-package-json": "cp ./lib/package.json ./lib-dist/package.json",
+    "lib:build": "run-s lib:clean lib:bundle"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",
@@ -38,11 +39,18 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.42.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@sveltejs/vite-plugin-svelte": "^3.0.2",
     "@types/node": "^20.11.21",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-vue": "^5.0.4",
+    "esbuild-plugin-vue3": "^0.4.2",
+    "esbuild-svelte": "^0.8.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^5.0.5",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-svelte": "^7.1.6",
+    "svelte-preprocess": "^5.1.3",
     "tsup": "^8.0.2",
     "vite": "^5.1.4",
     "vite-plugin-dts": "^3.7.3",

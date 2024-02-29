@@ -304,8 +304,7 @@ export function onMount({
     click: _clickListener,
     dblclick: _dblclickListener,
     paste: _pasteListener,
-    // @ts-expect-error
-    input: _inputListener,
+    input: e => _inputListener(e as ChangeEvent),
     focus: _focusListener,
     blur: _blurListener,
     touchend: _touchMoveOrEndListener,
