@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import type { SlotProps } from '@lib/core'
-import { OTPInput } from 'lib-dist'
+import { OTPInput } from '@lib/react'
 import * as React from 'react'
 
 export function ReactOTPInput(
