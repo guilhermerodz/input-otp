@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "dev:43210": "astro dev --port 43210",
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
