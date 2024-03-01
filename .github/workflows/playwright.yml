@@ -21,6 +21,8 @@ jobs:
         node-version: 18
     - name: Install dependencies
       run: npm install -g pnpm && pnpm install
+    - name: Build linked deps
+      run: pnpm lib:build
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps && pnpm exec playwright install msedge
     - name: Run Playwright tests
