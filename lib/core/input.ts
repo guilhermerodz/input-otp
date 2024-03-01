@@ -86,22 +86,6 @@ export function onMount({
     lastClickTimestamp: undefined,
   }
 
-  // const generateImprovedTrackingInterval = () =>
-  //   setInterval(() => {
-  //     if (input) {
-  //       mutateAttribute(
-  //         'data-sel',
-  //         String(input.selectionStart ?? -1) +
-  //           ',' +
-  //           String(input.selectionEnd ?? -1),
-  //       )
-  //       mutateAttribute(
-  //         'data-is-focused',
-  //         input === document.activeElement ? 'true' : undefined,
-  //       )
-  //     }
-  //   }, 20)
-
   function mutateAttribute<
     K extends keyof ContainerAttributes,
     V extends ContainerAttributes[K],
@@ -381,8 +365,6 @@ export function onMount({
   const resizeObserver = new ResizeObserver(updateRootHeight)
   resizeObserver.observe(input)
 
-  // let improvedTrackingInterval: NodeJS.Timeout | null = null
-
   return {
     unmount: () => {
       for (const [event, listener] of Object.entries(eventToListenerMap)) {
@@ -390,10 +372,6 @@ export function onMount({
       }
 
       resizeObserver.disconnect()
-
-      // if (improvedTrackingInterval !== null) {
-      //   clearTimeout(improvedTrackingInterval)
-      // }
     },
   }
 }
