@@ -1,5 +1,6 @@
 # build output
 dist/
+lib/core/**/*.d.ts
 lib-dist/
 lib-tmp/
 .vercel/

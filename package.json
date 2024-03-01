@@ -14,12 +14,13 @@
     "lib:clean": "rimraf ./lib-dist",
     "lib:bundle": "run-p lib:bundle:*",
     "lib:bundle:core-react": "tsup --config tsup.config.core-react.ts lib/index.ts lib/core lib/react",
-    "lib:bundle:svelte_dirty": "svelte-package -i ./lib/svelte -o ./lib-dist/svelte --types",
+    "lib:bundle:svelte": "run-s lib:bundle:svelte:dirty lib:bundle:svelte:clean",
+    "lib:bundle:svelte:dirty": "svelte-package -i ./lib/svelte -o ./lib-dist/svelte --types",
+    "lib:bundle:svelte:clean": "if test \"$BUILD_SAFE\" = \"true\" ; then rimraf -i ./lib/core/**/*.d.ts ; else rimraf -I ./lib/core/**/*.d.ts ; fi",
     "lib:bundle:vue": "vite --config vite.config.vue.ts build",
     "lib:copy-package-json": "cp ./lib/package.json ./lib-dist/package.json",
-    "lib:build": "run-s lib:before-build lib:clean lib:bundle lib:copy-package-json lib:after-build",
-    "lib:before-build": "cp -r ./lib ./lib-tmp",
-    "lib:after-build": "rimraf ./lib && cp -r ./lib-tmp ./lib && pnpm rimraf ./lib-tmp"
+    "lib:build": "run-s lib:clean lib:bundle lib:copy-package-json",
+    "lib:build:safe": "BUILD_SAFE=true run-s lib:build"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.6",
