@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { onMount } from '@lib/core/input'
+import { onMount } from '@lib/core/internal/input'
 import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
 
 import type { ReactOTPInputProps } from './types'

@@ -1,2 +1,2 @@
 export { OTPInput } from './input'
-export * from '@lib/core/types'
+export * from '@lib/core'

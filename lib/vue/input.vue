@@ -3,8 +3,8 @@ import type { CSSProperties } from 'vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
+import { onMount } from '@lib/core/internal/input';
 
-import { onMount } from '@lib/core'
 import type { VueOTPInputProps } from './types'
 
 defineOptions({

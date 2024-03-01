@@ -2,9 +2,9 @@ import type {
   EventToListenerMap,
   HTMLInputElementWithMetadata,
   Metadata,
-} from './internal/types'
-import { SelectionType } from './types'
-import type { ContainerAttributes } from './types'
+} from './types'
+import { SelectionType } from '../types'
+import type { ContainerAttributes } from '../types'
 
 type ChangeEvent = Event & {
   currentTarget: { value: string }

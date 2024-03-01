@@ -4,10 +4,10 @@
 
   import {
     REGEXP_ONLY_DIGITS,
-    onMount as coreOnMount,
     type RenderProps,
     type SlotProps,
   } from '@lib/core'
+  import { onMount as coreOnMount } from '@lib/core/internal/input'
 
   interface $$Props extends HTMLInputAttributes {
     value?: string
