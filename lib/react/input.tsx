@@ -10,8 +10,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
   (
     {
       // Props
-      value: uncheckedValue,
-      onChange: uncheckedOnChange,
+      value,
+      onChange,
       maxLength,
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
@@ -25,25 +25,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
     },
     ref,
   ) => {
-    // Only used when `value` state is not provided
-    const [internalValue, setInternalValue] = React.useState(
-      typeof props.defaultValue === 'string' ? props.defaultValue : '',
-    )
-
     /** Workarounds */
-    const value = uncheckedValue ?? internalValue
-    const onChange = React.useCallback(
-      (newValue: string) => {
-        // Check if input is controlled
-        if (uncheckedValue !== undefined) {
-          uncheckedOnChange?.(newValue)
-        } else {
-          setInternalValue(newValue)
-          uncheckedOnChange?.(newValue)
-        }
-      },
-      [uncheckedOnChange, uncheckedValue],
-    )
     const regexp = React.useMemo(
       () =>
         pattern
@@ -77,7 +59,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
         container,
         input,
         maxLength,
-        onChange,
+        onChange: t => {
+          onChange?.(t)
+        },
         onComplete,
         regexp,
         updateMirror: (k, v) => {
@@ -128,7 +112,13 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
             ((mirrorSel[0] === mirrorSel[1] && slotIdx === mirrorSel[0]) ||
               (slotIdx >= mirrorSel[0] && slotIdx < mirrorSel[1]))
 
-          const char = value[slotIdx] !== undefined ? value[slotIdx] : null
+          const _value = value || inputRef.current?.value
+          const char =
+            typeof _value === 'string'
+              ? _value[slotIdx] !== undefined
+                ? _value[slotIdx]
+                : null
+              : null
 
           return {
             char,
