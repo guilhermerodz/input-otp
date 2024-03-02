@@ -117,6 +117,20 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
+To add Tailwind autocompelete for `containerClassname` attribute in VS Code add the following setting to `.vscode/settings.json`:
+
+```json
+{
+  "tailwindCSS.classAttributes": ["class", "className", ".*ClassName"]
+}
+```
+
+If you're using shadcn/ui and experiencing a border on input focus, add this class to your input:
+
+```tsx
+<OTPInput className="focus-visible:ring-0" />
+```
+
 ## How it works
 
 There's currently no native OTP/2FA/MFA input in HTML, which means people are either going with 1. a simple input design or 2. custom designs like this one.
