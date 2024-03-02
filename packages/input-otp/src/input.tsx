@@ -457,8 +457,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       <div
         data-input-otp-container
         style={rootStyle({ disabled: props.disabled })}
-        className={containerClassName}
         {...props}
+        className={containerClassName}
         ref={ref}
       >
         {renderedChildren}
