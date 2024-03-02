@@ -3,7 +3,8 @@ import type { CSSProperties } from 'vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { REGEXP_ONLY_DIGITS } from '@lib/core'
-import { onMount } from '@lib/core/internal/input';
+import { onMount } from '@lib/core/internal/input'
+import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
 import type { VueOTPInputProps } from './types'
 
@@ -49,7 +50,7 @@ const regexp = computed(() =>
 
 /** Refs */
 const containerRef = ref<HTMLDivElement | null>(null)
-const inputRef = ref<HTMLInputElement | null>(null)
+const inputRef = ref<HTMLInputElementWithMetadata | null>(null)
 defineExpose({ ref: inputRef })
 
 /** Mirror State for children-rendering-only purpose */
@@ -67,22 +68,24 @@ onMounted(() => {
 
   mounted = onMount({
     container,
-    input,
-    maxLength: maxlength,
-    onChange,
-    onComplete: t => emit('complete', t),
-    regexp: regexp.value,
-    updateMirror: (k, v) => {
-      if (k === 'data-sel' && v !== undefined) {
-        const [s, e] = v.split(',').map(Number)
-        mirrorSel.value = [s, e]
-      }
-      if (k === 'data-is-focused') {
-        mirrorFocused.value = Boolean(v)
-      }
-      if (k === 'data-is-hovering') {
-        mirrorHovering.value = Boolean(v)
-      }
+    input: input,
+    metadata: {
+      maxLength: maxlength,
+      onChange,
+      onComplete: t => emit('complete', t),
+      regexp: regexp.value,
+      updateMirror: (k, v) => {
+        if (k === 'data-sel' && v !== undefined) {
+          const [s, e] = v.split(',').map(Number)
+          mirrorSel.value = [s, e]
+        }
+        if (k === 'data-is-focused') {
+          mirrorFocused.value = Boolean(v)
+        }
+        if (k === 'data-is-hovering') {
+          mirrorHovering.value = Boolean(v)
+        }
+      },
     },
   })
 })

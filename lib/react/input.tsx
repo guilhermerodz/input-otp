@@ -2,9 +2,12 @@ import * as React from 'react'
 
 import { onMount } from '@lib/core/internal/input'
 import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
+import type {
+  HTMLInputElementWithMetadata,
+  UserDefinedMetadata,
+} from '@lib/core/internal/types'
 
 import type { ReactOTPInputProps } from './types'
-import { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
   (
@@ -38,7 +41,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
 
     /** Refs */
     const containerRef = React.useRef<HTMLDivElement>(null)
-    const inputRef = React.useRef<HTMLInputElement>(null)
+    const inputRef = React.useRef<HTMLInputElementWithMetadata>(null)
     React.useImperativeHandle(ref, () => inputRef.current!, [])
 
     /** Mirror State for children-rendering-only purpose */
@@ -49,15 +52,13 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
     /** Mount and Unmount */
     React.useEffect(() => {
       const container = containerRef.current
-      const input = inputRef.current as HTMLInputElementWithMetadata
+      const input = inputRef.current
 
       if (!container || !input) {
         return
       }
 
-      const mounted = onMount({
-        container,
-        input,
+      const m: UserDefinedMetadata = {
         maxLength,
         onChange: t => {
           onChange?.(t)
@@ -76,12 +77,24 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
             setMirrorHovering(Boolean(v))
           }
         },
-      })
+      }
 
-      return () => {
-        mounted.unmount()
+      // mount or update metadata
+      if (input.__metadata__ === undefined) {
+        onMount({
+          container,
+          input,
+          metadata: m,
+        })
+      } else {
+        input.__metadata__ = Object.assign(input.__metadata__, m)
       }
     }, [maxLength, onChange, regexp])
+    React.useEffect(() => {
+      return () => {
+        inputRef.current?.__metadata__?.unmount?.()
+      }
+    }, [])
 
     /** JSX */
     const renderedInput = React.useMemo(

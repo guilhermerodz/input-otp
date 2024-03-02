@@ -1,10 +1,11 @@
+import type { ContainerAttributes } from '../types'
+import { SelectionType } from '../types'
 import type {
   EventToListenerMap,
   HTMLInputElementWithMetadata,
   Metadata,
+  UserDefinedMetadata,
 } from './types'
-import { SelectionType } from '../types'
-import type { ContainerAttributes } from '../types'
 
 type ChangeEvent = Event & {
   currentTarget: { value: string }
@@ -25,63 +26,34 @@ function setValue(params: {
   onComplete?: (value: string) => void
   maxLength: number
   regexp?: RegExp
-}) {
+}): string {
   const input = params.event.currentTarget as HTMLInputElementWithMetadata
+  const previousValue = input.__metadata__?.previousRegisteredValue
   const newValue = input.value.slice(0, params.maxLength)
   if (newValue.length > 0 && params.regexp && !params.regexp?.test(newValue)) {
     params.event.preventDefault()
-    return true
+    return previousValue
   }
   params.onChange(newValue)
-
-  const previousValue = input.__metadata__?.previousRegisteredValue
-
-  if (
-    params.onComplete &&
-    newValue.length === params.maxLength &&
-    newValue !== previousValue
-  ) {
-    if (previousValue !== undefined && previousValue !== null) {
-      if (previousValue.length < params.maxLength) {
-        params.onComplete(newValue)
-      }
-    } else {
-      params.onComplete(newValue)
-    }
-  }
 
   // save previousValue
   if (newValue !== previousValue) {
     mutateMetadata(input, { previousRegisteredValue: newValue })
   }
 
-  return false
+  return newValue
 }
 
-export function onMount({
-  container,
-  input,
-  maxLength,
-  regexp,
-  onChange,
-  onComplete,
-  updateMirror,
-}: {
+interface OnMountArgs {
   container: HTMLElement
   input: HTMLInputElementWithMetadata
-  maxLength: number
-  onChange: (value: string) => void
-  onComplete?: (value: string) => void
-  regexp?: RegExp
-  updateMirror: <
-    K extends keyof ContainerAttributes,
-    V extends ContainerAttributes[K],
-  >(
-    key: K,
-    value: V,
-  ) => void
-}) {
+  metadata: UserDefinedMetadata
+}
+export function onMount({ input, container, metadata }: OnMountArgs) {
   input.__metadata__ = {
+    ...metadata,
+
+    // mount metadata
     previousRegisteredValue: input.value,
     lastClickTimestamp: undefined,
   }
@@ -95,7 +67,7 @@ export function onMount({
     } else {
       container.setAttribute(k, v)
     }
-    updateMirror(k, v)
+    input.__metadata__.updateMirror(k, v)
   }
   function _selectListener() {
     const _start = input.selectionStart
@@ -105,7 +77,8 @@ export function onMount({
     if (input.value.length !== 0 && isSelected) {
       const isSingleCaret = _start === _end
       const isInsertMode =
-        _start === input.value.length && input.value.length < maxLength
+        _start === input.value.length &&
+        input.value.length < input.__metadata__.maxLength
 
       if (isSingleCaret && !isInsertMode) {
         const caretPos = _start
@@ -244,42 +217,65 @@ export function onMount({
     const newValueUncapped = isReplacing
       ? input.value.slice(0, start) + content + input.value.slice(end) // Replacing
       : input.value.slice(0, start) + content + input.value.slice(start) // Inserting
-    const newValue = newValueUncapped.slice(0, maxLength)
+    const newValue = newValueUncapped.slice(0, input.__metadata__.maxLength)
 
-    if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+    if (
+      newValue.length > 0 &&
+      input.__metadata__.regexp &&
+      !input.__metadata__.regexp.test(newValue)
+    ) {
       return
     }
 
-    onChange(newValue)
+    input.__metadata__.onChange(newValue)
 
-    const _start = Math.min(newValue.length, maxLength - 1)
+    const _start = Math.min(newValue.length, input.__metadata__.maxLength - 1)
     const _end = newValue.length
     input.setSelectionRange(_start, _end)
     mutateAttribute('data-sel', String(_start) + ',' + String(_end))
   }
-  function _inputListener(event: ChangeEvent) {
+  function inputListener(event: ChangeEvent) {
+    console.count('calling core.inputlistener')
+
     const previousValue = input.__metadata__.previousRegisteredValue
-    const hasPreventedDefault = setValue({
+    const newValue = setValue({
       event,
-      onChange,
-      onComplete,
-      regexp,
-      maxLength,
+      onChange: input.__metadata__.onChange,
+      onComplete: input.__metadata__.onComplete,
+      regexp: input.__metadata__.regexp,
+      maxLength: input.__metadata__.maxLength,
     })
-    if (hasPreventedDefault && input.value !== previousValue) {
+    if (newValue === previousValue) {
       input.addEventListener(
         'input',
         () => {
-          onChange(previousValue)
+          input.__metadata__.onChange(previousValue)
         },
         { once: true },
       )
+    } else {
+      if (
+        newValue.length === input.__metadata__.maxLength &&
+        newValue !== previousValue
+      ) {
+        if (
+          previousValue !== undefined &&
+          previousValue !== null &&
+          previousValue.length >= input.__metadata__.maxLength
+        ) {
+          // do nothing
+        } else {
+          setTimeout(() => {
+            input.__metadata__.onComplete?.(newValue)
+          }) // Timeout to ensure that the framework/state is updated
+        }
+      }
     }
 
     syncTimeouts(_selectListener)
   }
   function _focusListener() {
-    const start = Math.min(input.value.length, maxLength - 1)
+    const start = Math.min(input.value.length, input.__metadata__.maxLength - 1)
     const end = input.value.length
     input.setSelectionRange(start, end)
     mutateAttribute('data-sel', String(start ?? -1) + ',' + String(end ?? -1))
@@ -293,8 +289,11 @@ export function onMount({
           mutateAttribute('data-sel', '-1,-1')
         } else {
           const msel = [input.selectionStart, input.selectionEnd]
-          msel[0] = Math.min(Math.max(0, msel[0]), maxLength - 1)
-          msel[1] = Math.min(msel[1], maxLength)
+          msel[0] = Math.min(
+            Math.max(0, msel[0]),
+            input.__metadata__.maxLength - 1,
+          )
+          msel[1] = Math.min(msel[1], input.__metadata__.maxLength)
 
           mutateAttribute('data-sel', String(msel[0]) + ',' + String(msel[1]))
         }
@@ -326,7 +325,7 @@ export function onMount({
     click: _clickListener,
     dblclick: _dblclickListener,
     paste: _pasteListener,
-    input: e => _inputListener(e as ChangeEvent),
+    input: e => inputListener(e as ChangeEvent),
     focus: _focusListener,
     blur: _blurListener,
     touchend: _touchMoveOrEndListener,
@@ -365,15 +364,18 @@ export function onMount({
   const resizeObserver = new ResizeObserver(updateRootHeight)
   resizeObserver.observe(input)
 
-  return {
-    unmount: () => {
-      for (const [event, listener] of Object.entries(eventToListenerMap)) {
-        input.removeEventListener(event as any, listener as any)
-      }
+  function unmount() {
+    console.log('running unmount')
 
-      resizeObserver.disconnect()
-    },
+    for (const [event, listener] of Object.entries(eventToListenerMap)) {
+      input.removeEventListener(event as any, listener as any)
+    }
+
+    resizeObserver.disconnect()
   }
+
+  input.__metadata__.unmount = unmount
+  return { unmount }
 }
 
 function syncTimeouts(cb: (...args: any[]) => unknown): number[] {

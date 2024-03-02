@@ -8,6 +8,7 @@
     type SlotProps,
   } from '@lib/core'
   import { onMount as coreOnMount } from '@lib/core/internal/input'
+  import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
 
   interface $$Props extends HTMLInputAttributes {
     value?: string
@@ -61,24 +62,26 @@
   onMount(() => {
     mounted = coreOnMount({
       container,
-      input,
-      maxLength: maxlength,
-      onChange: t => {
-        value = t
-      },
-      onComplete: t => dispatch('complete', t),
-      regexp,
-      updateMirror: (k, v) => {
-        if (k === 'data-sel' && v !== undefined) {
-          const [s, e] = v.split(',').map(Number)
-          mirrorSel = [s, e]
-        }
-        if (k === 'data-is-focused') {
-          mirrorFocused = Boolean(v)
-        }
-        if (k === 'data-is-hovering') {
-          mirrorHovering = Boolean(v)
-        }
+      input: input as HTMLInputElementWithMetadata,
+      metadata: {
+        maxLength: maxlength,
+        onChange: t => {
+          value = t
+        },
+        onComplete: t => dispatch('complete', t),
+        regexp,
+        updateMirror: (k, v) => {
+          if (k === 'data-sel' && v !== undefined) {
+            const [s, e] = v.split(',').map(Number)
+            mirrorSel = [s, e]
+          }
+          if (k === 'data-is-focused') {
+            mirrorFocused = Boolean(v)
+          }
+          if (k === 'data-is-hovering') {
+            mirrorHovering = Boolean(v)
+          }
+        },
       },
     })
   })
