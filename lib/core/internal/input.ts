@@ -235,8 +235,6 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
     mutateAttribute('data-sel', String(_start) + ',' + String(_end))
   }
   function inputListener(event: ChangeEvent) {
-    console.count('calling core.inputlistener')
-
     const previousValue = input.__metadata__.previousRegisteredValue
     const newValue = setValue({
       event,
@@ -365,8 +363,6 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
   resizeObserver.observe(input)
 
   function unmount() {
-    console.log('running unmount')
-
     for (const [event, listener] of Object.entries(eventToListenerMap)) {
       input.removeEventListener(event as any, listener as any)
     }
