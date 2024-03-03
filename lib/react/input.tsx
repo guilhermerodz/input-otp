@@ -49,15 +49,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
     const [mirrorHovering, setMirrorHovering] = React.useState(false)
     const [mirrorSel, setMirrorSel] = React.useState<[number, number]>([-1, -1])
 
-    /** Mount and Unmount */
-    React.useEffect(() => {
-      const container = containerRef.current
-      const input = inputRef.current
-
-      if (!container || !input) {
-        return
-      }
-
+    const m = React.useMemo<UserDefinedMetadata>(() => {
       const m: UserDefinedMetadata = {
         maxLength,
         onChange: t => {
@@ -79,22 +71,40 @@ export const OTPInput = React.forwardRef<HTMLInputElement, ReactOTPInputProps>(
         },
       }
 
-      // mount or update metadata
-      if (input.__metadata__ === undefined) {
-        onMount({
-          container,
-          input,
-          metadata: m,
-        })
-      } else {
-        input.__metadata__ = Object.assign(input.__metadata__, m)
+      // update metadata if needed
+      if (inputRef.current && inputRef.current.__metadata__) {
+        inputRef.current.__metadata__ = Object.assign(
+          inputRef.current.__metadata__,
+          m,
+        )
       }
-    }, [maxLength, onChange, regexp])
+
+      return m
+    }, [maxLength, onChange, onComplete, regexp])
+
+    /** Mount and Unmount */
     React.useEffect(() => {
-      return () => {
-        inputRef.current?.__metadata__?.unmount?.()
+      const container = containerRef.current
+      const input = inputRef.current
+
+      if (!container || !input) {
+        return
       }
-    }, [])
+
+      const mounted = onMount({
+        container,
+        input,
+        metadata: m,
+      })
+
+      return () => {
+        // setTimeout(() => {
+        // if (!inputRef.current) {
+        mounted.unmount()
+        // }
+        // }, 3_000)
+      }
+    }, []) // Important: no deps in here
 
     /** JSX */
     const renderedInput = React.useMemo(

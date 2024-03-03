@@ -50,6 +50,7 @@ interface OnMountArgs {
   metadata: UserDefinedMetadata
 }
 export function onMount({ input, container, metadata }: OnMountArgs) {
+  const hadMetadata = input.__metadata__ !== undefined
   input.__metadata__ = {
     ...metadata,
 
@@ -69,6 +70,68 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
     }
     input.__metadata__.updateMirror(k, v)
   }
+  // This function will run very often, so it's important to keep it as fast as possible
+  function track() {
+    if (
+      document.activeElement !== input ||
+      input.selectionStart === null ||
+      input.selectionEnd === null
+    ) {
+      mutateAttribute('data-sel', '-1,-1')
+    } else {
+      mutateAttribute('data-is-focused', 'true')
+      // msel is alias for 'mirror selection'
+      const msel = [input.selectionStart, input.selectionEnd]
+      msel[0] = Math.min(Math.max(0, msel[0]), input.__metadata__.maxLength - 1)
+      msel[1] = Math.min(msel[1], input.__metadata__.maxLength)
+
+      mutateAttribute('data-sel', `${msel[0]},${msel[1]}`)
+    }
+  }
+  /** Setup */
+  // Update initial state
+  if (!hadMetadata && document.activeElement === input) {
+    const msel = [input.selectionStart, input.selectionEnd] as [number, number]
+    const isSingleCaret = msel[0] === msel[1]
+    if (isSingleCaret) {
+      msel[0] = Math.max(
+        0,
+        input.value.length < input.__metadata__.maxLength
+          ? input.value.length
+          : input.__metadata__.maxLength - 1,
+      )
+      msel[1] = input.value.length
+      input.setSelectionRange(msel[0], msel[1])
+      mutateAttribute('data-sel', `${msel[0]},${msel[1]}`)
+    }
+  }
+  track()
+
+  // Update font size
+  const updateRootHeight = () => {
+    if (input) {
+      container.style.setProperty('--root-height', `${input.clientHeight}px`)
+    }
+  }
+  updateRootHeight()
+  const resizeObserver = new ResizeObserver(updateRootHeight)
+  resizeObserver.observe(input)
+  // Add tricky styles
+  if (!document.getElementById('input-otp-style')) {
+    const styleEl = document.createElement('style')
+    styleEl.id = 'input-otp-style'
+    document.head.appendChild(styleEl)
+    styleEl.sheet?.insertRule(
+      '[data-input-otp]::selection { background: transparent !important; }',
+    )
+    const autofillStyles =
+      'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important;'
+    styleEl.sheet?.insertRule(`[data-input-otp]:autofill { ${autofillStyles} }`)
+    styleEl.sheet?.insertRule(
+      `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
+    )
+  }
+
   function _selectListener() {
     const _start = input.selectionStart
     const _end = input.selectionEnd
@@ -282,19 +345,7 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
     // Run improved selection tracking while focused
     const interval = setInterval(() => {
       if (document.activeElement === input) {
-        // msel is alias for 'mirror selection'
-        if (input.selectionStart === null || input.selectionEnd === null) {
-          mutateAttribute('data-sel', '-1,-1')
-        } else {
-          const msel = [input.selectionStart, input.selectionEnd]
-          msel[0] = Math.min(
-            Math.max(0, msel[0]),
-            input.__metadata__.maxLength - 1,
-          )
-          msel[1] = Math.min(msel[1], input.__metadata__.maxLength)
-
-          mutateAttribute('data-sel', String(msel[0]) + ',' + String(msel[1]))
-        }
+        track()
       } else {
         clearInterval(interval)
       }
@@ -312,6 +363,7 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
     }
   }
 
+  // Add event listeners
   const eventToListenerMap = {
     select: _selectListener,
     mouseover: _mouseOverListener,
@@ -329,47 +381,25 @@ export function onMount({ input, container, metadata }: OnMountArgs) {
     touchend: _touchMoveOrEndListener,
     touchmove: _touchMoveOrEndListener,
   } satisfies EventToListenerMap
-
-  for (const [event, listener] of Object.entries(eventToListenerMap)) {
-    input.addEventListener(
-      event as any,
-      listener as any,
-      event === 'input' ? { capture: true } : undefined,
-    )
-  }
-
-  if (!document.getElementById('input-otp-style')) {
-    const styleEl = document.createElement('style')
-    styleEl.id = 'input-otp-style'
-    document.head.appendChild(styleEl)
-    styleEl.sheet?.insertRule(
-      '[data-input-otp]::selection { background: transparent !important; }',
-    )
-    const autofillStyles =
-      'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important;'
-    styleEl.sheet?.insertRule(`[data-input-otp]:autofill { ${autofillStyles} }`)
-    styleEl.sheet?.insertRule(
-      `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
-    )
-  }
-
-  const updateRootHeight = () => {
-    if (input) {
-      container.style.setProperty('--root-height', `${input.clientHeight}px`)
+  if (!hadMetadata) {
+    for (const [event, listener] of Object.entries(eventToListenerMap)) {
+      input.addEventListener(
+        event as any,
+        listener as any,
+        event === 'input' ? { capture: true } : undefined,
+      )
     }
   }
-  updateRootHeight()
-  const resizeObserver = new ResizeObserver(updateRootHeight)
-  resizeObserver.observe(input)
 
   function unmount() {
-    for (const [event, listener] of Object.entries(eventToListenerMap)) {
-      input.removeEventListener(event as any, listener as any)
-    }
+    // for (const [event, listener] of Object.entries(eventToListenerMap)) {
+    //   input?.removeEventListener(event as any, listener as any)
+    // }
 
     resizeObserver.disconnect()
   }
 
+  // Store an alternative reference to unmount
   input.__metadata__.unmount = unmount
   return { unmount }
 }
