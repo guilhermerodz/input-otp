@@ -38,6 +38,9 @@ dependencies:
   clsx:
     specifier: ^2.1.0
     version: 2.1.0
+  lib-dist:
+    specifier: link:lib-dist
+    version: link:lib-dist
   lucide-react:
     specifier: ^0.341.0
     version: 0.341.0(react@18.2.0)
@@ -59,9 +62,6 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.4.1)
-  testing-a-deployment-1:
-    specifier: link:lib-dist
-    version: link:lib-dist
   typescript:
     specifier: ^5.3.3
     version: 5.3.3

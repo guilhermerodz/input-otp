@@ -1,5 +1,5 @@
 {
-  "name": "testing-a-deployment-1",
+  "name": "input-otp",
   "version": "0.3.4-beta",
   "author": "Guilherme Rodz <g@rodz.dev>",
   "description": "One-time password input component for Web.",
