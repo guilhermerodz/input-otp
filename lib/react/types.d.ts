@@ -1,4 +1,4 @@
-import type { RenderProps } from '@lib/core'
+import type { RenderProps } from '../core'
 
 type OverrideProps<T, R> = Omit<T, keyof R> & R
 

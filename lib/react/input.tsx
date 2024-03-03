@@ -1,11 +1,11 @@
 import * as React from 'react'
 
-import { onMount } from '@lib/core/internal/input'
-import { REGEXP_ONLY_DIGITS } from '@lib/core/regexp'
+import { onMount } from '../core/internal/input'
+import { REGEXP_ONLY_DIGITS } from '../core/regexp'
 import type {
   HTMLInputElementWithMetadata,
   UserDefinedMetadata,
-} from '@lib/core/internal/types'
+} from '../core/internal/types'
 
 import type { ReactOTPInputProps } from './types'
 

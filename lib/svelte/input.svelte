@@ -6,9 +6,9 @@
     REGEXP_ONLY_DIGITS,
     type RenderProps,
     type SlotProps,
-  } from '@lib/core'
-  import { onMount as coreOnMount } from '@lib/core/internal/input'
-  import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
+  } from '../core'
+  import { onMount as coreOnMount } from '../core/internal/input'
+  import type { HTMLInputElementWithMetadata } from '../core/internal/types'
 
   interface $$Props extends HTMLInputAttributes {
     value?: string

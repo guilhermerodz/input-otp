@@ -2,9 +2,9 @@
 import type { CSSProperties } from 'vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-import { REGEXP_ONLY_DIGITS } from '@lib/core'
-import { onMount } from '@lib/core/internal/input'
-import type { HTMLInputElementWithMetadata } from '@lib/core/internal/types'
+import { REGEXP_ONLY_DIGITS } from '../core'
+import { onMount } from '../core/internal/input'
+import type { HTMLInputElementWithMetadata } from '../core/internal/types'
 
 import type { VueOTPInputProps } from './types'
 
