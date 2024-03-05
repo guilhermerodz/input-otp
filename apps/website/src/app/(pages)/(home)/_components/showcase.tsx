@@ -48,10 +48,10 @@ export function Showcase({ className, ...props }: { className?: string }) {
   }, [value.length])
 
   async function onSubmit(e?: React.FormEvent<HTMLFormElement>) {
+    e?.preventDefault?.()
+
     inputRef.current?.select()
     await new Promise(r => setTimeout(r, 1_00))
-
-    e?.preventDefault?.()
 
     if (value === '123456') {
       setHasGuessed(true)

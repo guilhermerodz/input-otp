@@ -1,12 +1,16 @@
 'use client'
 
-import { cn } from '@/lib/utils'
-
+import * as React from 'react'
 import { OTPInput, SlotProps } from 'input-otp'
 
-export function ExampleComponent() {
+import { cn } from '@/lib/utils'
+
+export function ExampleComponent(
+  props: Partial<React.ComponentProps<typeof OTPInput>>,
+) {
   return (
     <OTPInput
+      {...props}
       maxLength={6}
       containerClassName="group flex items-center has-[:disabled]:opacity-30"
       render={({ slots }) => (
