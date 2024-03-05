@@ -14,7 +14,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       maxLength,
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
-      allowNavigation = true,
       onComplete,
       render,
       containerClassName,
@@ -59,11 +58,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       const _select = el.select.bind(el)
       el.select = () => {
-        if (!allowNavigation) {
-          // Cannot select all chars as navigation is disabled
-          return
-        }
-
         _select()
         // Workaround proxy to update UI as native `.select()` does not trigger focus event
         setMirrorSelectionStart(0)
@@ -111,7 +105,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         //   document.head.removeChild(document.getElementById('input-otp-style'))
         // }
       }
-    }, [allowNavigation])
+    }, [])
 
     /** Mirrors for UI rendering purpose only */
     const [isHoveringInput, setIsHoveringInput] = React.useState(false)
@@ -268,9 +262,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         e.key === 'Home' ||
         e.key === 'End'
       ) {
-        if (!allowNavigation) {
-          e.preventDefault()
-        } else {
           if (
             e.key === 'ArrowLeft' &&
             selectionType === SelectionType.CHAR &&
@@ -304,7 +295,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               )
             }
           }
-        }
       }
     }
 

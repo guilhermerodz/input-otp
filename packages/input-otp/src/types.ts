@@ -17,7 +17,6 @@ export type OTPInputProps = OverrideProps<
 
     maxLength: number
 
-    allowNavigation?: boolean
     inputMode?: 'numeric' | 'text'
 
     onComplete?: (...args: any[]) => unknown

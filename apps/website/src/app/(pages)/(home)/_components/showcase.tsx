@@ -106,7 +106,6 @@ export function Showcase({ className, ...props }: { className?: string }) {
           onChange={setValue}
           containerClassName={cn('group flex items-center')}
           maxLength={6}
-          allowNavigation={true}
           pattern={REGEXP_ONLY_DIGITS}
           render={({ slots, isFocused }) => (
             <>
