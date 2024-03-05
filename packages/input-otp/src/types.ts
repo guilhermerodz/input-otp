@@ -17,6 +17,7 @@ export type OTPInputProps = OverrideProps<
 
     maxLength: number
 
+    textAlign?: 'left' | 'center' | 'right'
     inputMode?: 'numeric' | 'text'
 
     onComplete?: (...args: any[]) => unknown

@@ -12,6 +12,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       value: uncheckedValue,
       onChange: uncheckedOnChange,
       maxLength,
+      textAlign = 'left',
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
       onComplete,
@@ -330,7 +331,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         width: '100%',
         height: '100%',
         display: 'flex',
-        textAlign: 'center',
+        textAlign,
         opacity: '1', // Mandatory for iOS hold-paste
         color: 'transparent',
         pointerEvents: 'all',
@@ -354,7 +355,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // caretColor: 'black',
         // padding: '0',
       }),
-      [],
+      [textAlign],
     )
 
     /** Rendering */
