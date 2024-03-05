@@ -29,20 +29,27 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     // Workarounds
     const value = uncheckedValue ?? internalValue
     const previousValue = usePrevious(value)
-    const onChange = (newValue: string) => {
-      // Check if input is controlled
-      if (uncheckedValue !== undefined) {
-        uncheckedOnChange?.(newValue)
-      } else {
-        setInternalValue(newValue)
-        uncheckedOnChange?.(newValue)
-      }
-    }
-    const regexp = pattern
-      ? typeof pattern === 'string'
-        ? new RegExp(pattern)
-        : pattern
-      : null
+    const onChange = React.useCallback(
+      (newValue: string) => {
+        // Check if input is controlled
+        if (uncheckedValue !== undefined) {
+          uncheckedOnChange?.(newValue)
+        } else {
+          setInternalValue(newValue)
+          uncheckedOnChange?.(newValue)
+        }
+      },
+      [uncheckedOnChange, uncheckedValue],
+    )
+    const regexp = React.useMemo(
+      () =>
+        pattern
+          ? typeof pattern === 'string'
+            ? new RegExp(pattern)
+            : pattern
+          : null,
+      [pattern],
+    )
 
     /** useRef */
     const inputRef = React.useRef<
@@ -82,8 +89,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
       const updateRootHeight = () => {
         if (el) {
-          // const rect = el.getBoundingClientRect()
-          // el.style.setProperty('--root-height', `${rect.height}px`)
           el.style.setProperty('--root-height', `${el.clientHeight}px`)
         }
       }
@@ -151,7 +156,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     }, [isFocused, mirrorSelectionStart, mirrorSelectionEnd])
 
     /** Event handlers */
-    function _selectListener() {
+    const _selectListener = React.useCallback(() => {
       if (!inputRef.current) {
         return
       }
@@ -191,77 +196,84 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionStart(inputRef.current?.selectionStart ?? null)
         setMirrorSelectionEnd(inputRef.current?.selectionEnd ?? null)
       })
-    }
+    }, [maxLength, value.length])
 
-    function _changeListener(e: React.ChangeEvent<HTMLInputElement>) {
-      const newValue = e.currentTarget.value.slice(0, maxLength)
-      if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
-        e.preventDefault()
-        return
-      }
-      onChange(newValue)
-    }
+    const _changeListener = React.useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.currentTarget.value.slice(0, maxLength)
+        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+          e.preventDefault()
+          return
+        }
+        onChange(newValue)
+      },
+      [maxLength, onChange, regexp],
+    )
 
     // Fix iOS pasting
-    function _pasteListener(e: React.ClipboardEvent<HTMLInputElement>) {
-      const content = e.clipboardData.getData('text/plain')
-      e.preventDefault()
+    const _pasteListener = React.useCallback(
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        const content = e.clipboardData.getData('text/plain')
+        e.preventDefault()
 
-      const start = inputRef.current?.selectionStart
-      const end = inputRef.current?.selectionEnd
+        const start = inputRef.current?.selectionStart
+        const end = inputRef.current?.selectionEnd
 
-      const isReplacing = start !== end
+        const isReplacing = start !== end
 
-      const newValueUncapped = isReplacing
-        ? value.slice(0, start) + content + value.slice(end) // Replacing
-        : value.slice(0, start) + content + value.slice(start) // Inserting
-      const newValue = newValueUncapped.slice(0, maxLength)
+        const newValueUncapped = isReplacing
+          ? value.slice(0, start) + content + value.slice(end) // Replacing
+          : value.slice(0, start) + content + value.slice(start) // Inserting
+        const newValue = newValueUncapped.slice(0, maxLength)
 
-      if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
-        return
-      }
+        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+          return
+        }
 
-      onChange(newValue)
+        onChange(newValue)
 
-      const _start = Math.min(newValue.length, maxLength - 1)
-      const _end = newValue.length
-      inputRef.current?.setSelectionRange(_start, _end)
-      setMirrorSelectionStart(_start)
-      setMirrorSelectionEnd(_end)
-    }
+        const _start = Math.min(newValue.length, maxLength - 1)
+        const _end = newValue.length
+        inputRef.current?.setSelectionRange(_start, _end)
+        setMirrorSelectionStart(_start)
+        setMirrorSelectionEnd(_end)
+      },
+      [maxLength, onChange, regexp, value],
+    )
 
-    function _keyDownListener(e: React.KeyboardEvent<HTMLInputElement>) {
-      if (!inputRef.current) {
-        return
-      }
+    const _keyDownListener = React.useCallback(
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!inputRef.current) {
+          return
+        }
 
-      const inputSel = [
-        inputRef.current.selectionStart,
-        inputRef.current.selectionEnd,
-      ]
-      if (inputSel[0] === null || inputSel[1] === null) {
-        return
-      }
+        const inputSel = [
+          inputRef.current.selectionStart,
+          inputRef.current.selectionEnd,
+        ]
+        if (inputSel[0] === null || inputSel[1] === null) {
+          return
+        }
 
-      let selectionType: SelectionType
-      if (inputSel[0] === inputSel[1]) {
-        selectionType = SelectionType.CARET
-      } else if (inputSel[1] - inputSel[0] === 1) {
-        selectionType = SelectionType.CHAR
-      } else if (inputSel[1] - inputSel[0] > 1) {
-        selectionType = SelectionType.MULTI
-      } else {
-        throw new Error('Could not determine OTPInput selection type')
-      }
+        let selectionType: SelectionType
+        if (inputSel[0] === inputSel[1]) {
+          selectionType = SelectionType.CARET
+        } else if (inputSel[1] - inputSel[0] === 1) {
+          selectionType = SelectionType.CHAR
+        } else if (inputSel[1] - inputSel[0] > 1) {
+          selectionType = SelectionType.MULTI
+        } else {
+          throw new Error('Could not determine OTPInput selection type')
+        }
 
-      if (
-        e.key === 'ArrowLeft' ||
-        e.key === 'ArrowRight' ||
-        e.key === 'ArrowUp' ||
-        e.key === 'ArrowDown' ||
-        e.key === 'Home' ||
-        e.key === 'End'
-      ) {
+        if (
+          e.key === 'ArrowLeft' ||
+          e.key === 'ArrowRight' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'Home' ||
+          e.key === 'End'
+        ) {
           if (
             e.key === 'ArrowLeft' &&
             selectionType === SelectionType.CHAR &&
@@ -295,125 +307,188 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               )
             }
           }
-      }
-    }
+        }
+      },
+      [value.length],
+    )
+
+    /** Styles */
+    const rootStyle = React.useMemo<React.CSSProperties>(
+      () => ({
+        position: 'relative',
+        cursor: props.disabled ? 'default' : 'text',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+      }),
+      [props.disabled],
+    )
+
+    const inputStyle = React.useMemo<React.CSSProperties>(
+      () => ({
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        textAlign: 'center',
+        opacity: '1', // Mandatory for iOS hold-paste
+        color: 'transparent',
+        pointerEvents: 'all',
+        background: 'transparent',
+        caretColor: 'transparent',
+        border: '0 solid transparent',
+        outline: '0 solid transparent',
+        lineHeight: '1',
+        letterSpacing: '-.5em',
+        fontSize: 'var(--root-height)',
+        // letterSpacing: '-1em',
+        // transform: 'scale(1.5)',
+        // paddingRight: '100%',
+        // paddingBottom: '100%',
+        // debugging purposes
+        // inset: undefined,
+        // position: undefined,
+        // color: 'black',
+        // background: 'white',
+        // opacity: '.5',
+        // caretColor: 'black',
+        // padding: '0',
+      }),
+      [],
+    )
 
     /** Rendering */
-    // TODO: memoize
-    const renderedInput = (
-      <input
-        autoComplete={props.autoComplete || 'one-time-code'}
-        {...props}
-        data-input-otp
-        inputMode={inputMode}
-        pattern={regexp?.source}
-        style={inputStyle}
-        maxLength={maxLength}
-        value={value}
-        ref={inputRef}
-        onChange={_changeListener}
-        onSelect={e => {
-          _selectListener()
-          props.onSelect?.(e)
-        }}
-        onMouseOver={e => {
-          setIsHoveringInput(true)
-          props.onMouseOver?.(e)
-        }}
-        onMouseLeave={e => {
-          setIsHoveringInput(false)
-          props.onMouseLeave?.(e)
-        }}
-        onPaste={e => {
-          _pasteListener(e)
-          props.onPaste?.(e)
-        }}
-        // onTouchStart={e => {
-        //   const isFocusing = document.activeElement === e.currentTarget
-        //   if (isFocusing) {
-        //     // e.preventDefault()
-        //   }
-        //   props.onTouchStart?.(e)
-        // }}
-        onTouchEnd={e => {
-          const isFocusing = document.activeElement === e.currentTarget
-          if (isFocusing) {
-            setTimeout(() => {
-              _selectListener()
-            }, 50)
-          }
+    const renderedInput = React.useMemo(
+      () => (
+        <input
+          autoComplete={props.autoComplete || 'one-time-code'}
+          {...props}
+          data-input-otp
+          inputMode={inputMode}
+          pattern={regexp?.source}
+          style={inputStyle}
+          maxLength={maxLength}
+          value={value}
+          ref={inputRef}
+          onChange={_changeListener}
+          onSelect={e => {
+            _selectListener()
+            props.onSelect?.(e)
+          }}
+          onMouseOver={e => {
+            setIsHoveringInput(true)
+            props.onMouseOver?.(e)
+          }}
+          onMouseLeave={e => {
+            setIsHoveringInput(false)
+            props.onMouseLeave?.(e)
+          }}
+          onPaste={e => {
+            _pasteListener(e)
+            props.onPaste?.(e)
+          }}
+          // onTouchStart={e => {
+          //   const isFocusing = document.activeElement === e.currentTarget
+          //   if (isFocusing) {
+          //     // e.preventDefault()
+          //   }
+          //   props.onTouchStart?.(e)
+          // }}
+          onTouchEnd={e => {
+            const isFocusing = document.activeElement === e.currentTarget
+            if (isFocusing) {
+              setTimeout(() => {
+                _selectListener()
+              }, 50)
+            }
 
-          props.onTouchEnd?.(e)
-        }}
-        onTouchMove={e => {
-          const isFocusing = document.activeElement === e.currentTarget
-          if (isFocusing) {
-            setTimeout(() => {
-              _selectListener()
-            }, 50)
-          }
+            props.onTouchEnd?.(e)
+          }}
+          onTouchMove={e => {
+            const isFocusing = document.activeElement === e.currentTarget
+            if (isFocusing) {
+              setTimeout(() => {
+                _selectListener()
+              }, 50)
+            }
 
-          props.onTouchMove?.(e)
-        }}
-        onClick={e => {
-          inputRef.current.__metadata__ = Object.assign(
-            {},
-            inputRef.current?.__metadata__,
-            { lastClickTimestamp: Date.now() },
-          )
+            props.onTouchMove?.(e)
+          }}
+          onClick={e => {
+            inputRef.current.__metadata__ = Object.assign(
+              {},
+              inputRef.current?.__metadata__,
+              { lastClickTimestamp: Date.now() },
+            )
 
-          props.onClick?.(e)
-        }}
-        onDoubleClick={e => {
-          const lastClickTimestamp =
-            inputRef.current?.__metadata__?.lastClickTimestamp
+            props.onClick?.(e)
+          }}
+          onDoubleClick={e => {
+            const lastClickTimestamp =
+              inputRef.current?.__metadata__?.lastClickTimestamp
 
-          const isFocusing = document.activeElement === e.currentTarget
-          if (
-            lastClickTimestamp !== undefined &&
-            isFocusing &&
-            Date.now() - lastClickTimestamp <= 300 // Fast enough click
-          ) {
-            e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
+            const isFocusing = document.activeElement === e.currentTarget
+            if (
+              lastClickTimestamp !== undefined &&
+              isFocusing &&
+              Date.now() - lastClickTimestamp <= 300 // Fast enough click
+            ) {
+              e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
+              syncTimeouts(_selectListener)
+            }
+
+            props.onDoubleClick?.(e)
+          }}
+          onInput={e => {
             syncTimeouts(_selectListener)
-          }
 
-          props.onDoubleClick?.(e)
-        }}
-        onInput={e => {
-          syncTimeouts(_selectListener)
+            props.onInput?.(e)
+          }}
+          onKeyDown={e => {
+            _keyDownListener(e)
+            syncTimeouts(_selectListener)
 
-          props.onInput?.(e)
-        }}
-        onKeyDown={e => {
-          _keyDownListener(e)
-          syncTimeouts(_selectListener)
+            props.onKeyDown?.(e)
+          }}
+          onKeyUp={e => {
+            syncTimeouts(_selectListener)
 
-          props.onKeyDown?.(e)
-        }}
-        onKeyUp={e => {
-          syncTimeouts(_selectListener)
+            props.onKeyUp?.(e)
+          }}
+          onFocus={e => {
+            if (inputRef.current) {
+              const start = Math.min(
+                inputRef.current.value.length,
+                maxLength - 1,
+              )
+              const end = inputRef.current.value.length
+              inputRef.current?.setSelectionRange(start, end)
+              setMirrorSelectionStart(start)
+              setMirrorSelectionEnd(end)
+            }
+            setIsFocused(true)
 
-          props.onKeyUp?.(e)
-        }}
-        onFocus={e => {
-          if (inputRef.current) {
-            const start = Math.min(inputRef.current.value.length, maxLength - 1)
-            const end = inputRef.current.value.length
-            inputRef.current?.setSelectionRange(start, end)
-            setMirrorSelectionStart(start)
-            setMirrorSelectionEnd(end)
-          }
-          setIsFocused(true)
+            props.onFocus?.(e)
+          }}
+          onBlur={e => {
+            setIsFocused(false)
 
-          props.onFocus?.(e)
-        }}
-        onBlur={e => {
-          setIsFocused(false)
-
-          props.onBlur?.(e)
-        }}
-      />
+            props.onBlur?.(e)
+          }}
+        />
+      ),
+      [
+        _changeListener,
+        _keyDownListener,
+        _pasteListener,
+        _selectListener,
+        inputMode,
+        inputStyle,
+        maxLength,
+        props,
+        regexp?.source,
+        value,
+      ],
     )
 
     const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
@@ -439,20 +514,20 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         isHovering: !props.disabled && isHoveringInput,
       })
     }, [
-      render,
-      maxLength,
       isFocused,
-      props.disabled,
       isHoveringInput,
-      value,
-      mirrorSelectionStart,
+      maxLength,
       mirrorSelectionEnd,
+      mirrorSelectionStart,
+      props.disabled,
+      render,
+      value,
     ])
 
     return (
       <div
         data-input-otp-container
-        style={rootStyle({ disabled: props.disabled })}
+        style={rootStyle}
         {...props}
         className={containerClassName}
         ref={ref}
@@ -464,45 +539,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   },
 )
 OTPInput.displayName = 'Input'
-
-const rootStyle = (params: { disabled?: boolean }) =>
-  ({
-    position: 'relative',
-    cursor: params.disabled ? 'default' : 'text',
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-  }) satisfies React.CSSProperties
-
-const inputStyle = {
-  position: 'absolute',
-  inset: 0,
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  textAlign: 'center',
-  opacity: '1', // Mandatory for iOS hold-paste
-  color: 'transparent',
-  pointerEvents: 'all',
-  background: 'transparent',
-  caretColor: 'transparent',
-  border: '0 solid transparent',
-  outline: '0 solid transparent',
-  lineHeight: '1',
-  letterSpacing: '-.5em',
-  fontSize: 'var(--root-height)',
-  // letterSpacing: '-1em',
-  // transform: 'scale(1.5)',
-  // paddingRight: '100%',
-  // paddingBottom: '100%',
-  // debugging purposes
-  // inset: undefined,
-  // position: undefined,
-  // color: 'black',
-  // background: 'white',
-  // opacity: '.5',
-  // caretColor: 'black',
-  // padding: '0',
-} satisfies React.CSSProperties
 
 function usePrevious<T>(value: T) {
   const ref = React.useRef<T>()
