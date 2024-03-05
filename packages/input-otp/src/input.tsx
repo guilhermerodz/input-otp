@@ -70,16 +70,22 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(el.value.length)
       }
 
-      // if (!document.getElementById('input-otp-style')) {
-      const styleEl = document.createElement('style')
-      styleEl.id = 'input-otp-style'
-      document.head.appendChild(styleEl)
-      const styleSheet = styleEl.sheet
-
-      styleSheet.insertRule(
-        '[data-input-otp]::selection { background: transparent !important; }',
-      )
-      // }
+      if (!document.getElementById('input-otp-style')) {
+        const styleEl = document.createElement('style')
+        styleEl.id = 'input-otp-style'
+        document.head.appendChild(styleEl)
+        styleEl.sheet?.insertRule(
+          '[data-input-otp]::selection { background: transparent !important; }',
+        )
+        const autofillStyles =
+          'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important;'
+        styleEl.sheet?.insertRule(
+          `[data-input-otp]:autofill { ${autofillStyles} }`,
+        )
+        styleEl.sheet?.insertRule(
+          `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
+        )
+      }
       const updateRootHeight = () => {
         if (el) {
           // const rect = el.getBoundingClientRect()
