@@ -116,20 +116,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 ```
 
-To add Tailwind autocompelete for `containerClassname` attribute in VS Code add the following setting to `.vscode/settings.json`:
-
-```json
-{
-  "tailwindCSS.classAttributes": ["class", "className", ".*ClassName"]
-}
-```
-
-If you're using shadcn/ui and experiencing a border on input focus, add this class to your input:
-
-```tsx
-<OTPInput className="focus-visible:ring-0" />
-```
-
 ## How it works
 
 There's currently no native OTP/2FA/MFA input in HTML, which means people are either going with 1. a simple input design or 2. custom designs like this one.
@@ -172,3 +158,87 @@ type OTPInputProps = {
   inputMode?: 'numeric' | 'text'
 }
 ```
+
+## Examples
+
+<details>
+<summary>Automatic form submission on OTP completion</summary>
+
+```tsx
+export default function Page() {
+  const formRef = useRef<HTMLFormElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  return (
+    <form ref={formRef}>
+      <OTPInput
+        // ... automatically submit the form
+        onComplete={() => formRef.current?.submit()}
+        // ... or focus the button like as you wish
+        onComplete={() => buttonRef.current?.focus()}
+      />
+
+      <button ref={buttonRef}>Submit</button>
+    </form>
+  )
+}
+```
+</details>
+
+<details>
+<summary>Automatically focus the input when the page loads</summary>
+
+```tsx
+export default function Page() {
+  return (
+    <form ref={formRef}>
+      <OTPInput
+        autoFocus
+        // Pro tip: accepts all common HTML input props...
+      />
+    </form>
+  )
+}
+```
+</details>
+
+## Caveats
+
+<details>
+<summary>If you're using experiencing an unwanted border on input focus:</summary>
+
+```diff
+<OTPInput
+  // Add class to the input itself
++ className="focus-visible:ring-0"
+  // Not the container
+  containerClassName="..."
+/>
+```
+</details>
+
+<details>
+<summary>If you want to centralize input text/selection, use the `textAlign` prop:</summary>
+
+```diff
+<OTPInput
+  // customizable but not recommended
++ textAlign="center"
+/>
+```
+</details>
+
+<details>
+<summary>Add Tailwind autocomplete for `containerClassname` attribute in VS Code.</summary>
+
+Add the following setting to your `.vscode/settings.json`:
+```diff
+{
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
++   ".*ClassName"
+  ]
+}
+```
+</details>
