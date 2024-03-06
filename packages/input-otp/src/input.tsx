@@ -22,22 +22,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     },
     ref,
   ) => {
-    const isApplePhone = React.useMemo(() => {
-      return (
-        (typeof window !== 'undefined' &&
-          [
-            'iPad',
-            'iPhone Simulator',
-            'iPod Simulator',
-            'iPad',
-            'iPhone',
-            'iPod',
-          ].includes(navigator.platform)) ||
-        // iPad on iOS 13 detection
-        (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
-      )
-    }, [])
-
     // Only used when `value` state is not provided
     const [internalValue, setInternalValue] = React.useState(
       typeof props.defaultValue === 'string' ? props.defaultValue : '',
@@ -127,9 +111,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
       return () => {
         resizeObserver.disconnect()
-        // if (document.querySelectorAll('[data-input-otp]').length === 1) {
-        //   document.head.removeChild(document.getElementById('input-otp-style'))
-        // }
       }
     }, [])
 
@@ -412,13 +393,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             _pasteListener(e)
             props.onPaste?.(e)
           }}
-          // onTouchStart={e => {
-          //   const isFocusing = document.activeElement === e.currentTarget
-          //   if (isFocusing) {
-          //     // e.preventDefault()
-          //   }
-          //   props.onTouchStart?.(e)
-          // }}
           onTouchEnd={e => {
             const isFocusing = document.activeElement === e.currentTarget
             if (isFocusing) {
