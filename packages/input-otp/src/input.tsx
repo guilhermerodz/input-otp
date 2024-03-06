@@ -343,6 +343,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         cursor: props.disabled ? 'default' : 'text',
         userSelect: 'none',
         WebkitUserSelect: 'none',
+        pointerEvents: 'none',
       }),
       [props.disabled],
     )
