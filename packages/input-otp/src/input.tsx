@@ -255,9 +255,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
         const _start = Math.min(newValue.length, maxLength - 1)
         const _end = newValue.length
-        inputRef.current?.setSelectionRange(_start, _end)
-        setMirrorSelectionStart(_start)
-        setMirrorSelectionEnd(_end)
+
+        syncTimeouts(() => {
+          inputRef.current?.setSelectionRange(_start, _end)
+          setMirrorSelectionStart(_start)
+          setMirrorSelectionEnd(_end)
+        })
       },
       [maxLength, onChange, regexp, value],
     )
