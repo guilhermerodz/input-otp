@@ -36,7 +36,8 @@
   },
   "scripts": {
     "type-check": "tsc --noEmit",
-    "build": "run-p build:*",
+    "copy-readme": "cp ../../README.md ./README.md",
+    "build": "run-s build:* copy-readme",
     "build:tsup": "tsup --dts --minify",
     "clean": "rimraf dist",
     "dev": "tsup --watch --dts",

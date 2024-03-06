@@ -36,3 +36,6 @@ yarn-error.log*
 
 # turbo
 .turbo
+
+# post-build
+packages/input-otp/README.md
