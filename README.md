@@ -28,7 +28,6 @@ The example below uses `tailwindcss` `@shadcn/ui` `tailwind-merge` `clsx`:
 ```tsx
 'use client'
 import { OTPInput, SlotProps } from 'input-otp'
-
 <OTPInput
   maxLength={6}
   containerClassName="group flex items-center has-[:disabled]:opacity-30"
@@ -107,13 +106,13 @@ const config = {
 }
 
 // Small utility to merge class names.
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-import type { ClassValue } from "clsx";
+import type { ClassValue } from 'clsx'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 ```
 
@@ -141,3 +140,35 @@ This library works by rendering an invisible input as a sibling of the slots, co
 ### OTPInput
 
 The root container. Define settings for the input via props. Then, use the `render` prop to create the slots.
+
+#### Props
+
+```ts
+type OTPInputProps = {
+  // The number of slots
+  maxLength: number
+
+  // Render function creating the slots
+  render: (props: RenderProps) => React.ReactElement
+
+  // The class name for the root container
+  containerClassName?: string
+
+  // Value state controlling the input
+  value?: string
+  // Setter for the controlled value (or callback for uncontrolled value)
+  onChange?: (newValue: string) => unknown
+
+  // Callback when the input is complete
+  onComplete?: (...args: any[]) => unknown
+
+  // Where is the text located within the input
+  // Affects click-holding or long-press behavior
+  // Default: 'left'
+  textAlign?: 'left' | 'center' | 'right'
+
+  // Virtual keyboard appearance on mobile
+  // Default: 'numeric'
+  inputMode?: 'numeric' | 'text'
+}
+```
