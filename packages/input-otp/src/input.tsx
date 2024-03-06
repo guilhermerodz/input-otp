@@ -188,7 +188,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           }
 
           if (start !== -1 && end !== -1) {
-            inputRef.current.setSelectionRange(start, end)
+            inputRef.current.setSelectionRange(start, end, 'backward')
           }
         }
       }
