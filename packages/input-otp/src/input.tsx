@@ -22,6 +22,22 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     },
     ref,
   ) => {
+    const isApplePhone = React.useMemo(() => {
+      return (
+        (typeof window !== 'undefined' &&
+          [
+            'iPad',
+            'iPhone Simulator',
+            'iPod Simulator',
+            'iPad',
+            'iPhone',
+            'iPod',
+          ].includes(navigator.platform)) ||
+        // iPad on iOS 13 detection
+        (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+      )
+    }, [])
+
     // Only used when `value` state is not provided
     const [internalValue, setInternalValue] = React.useState(
       typeof props.defaultValue === 'string' ? props.defaultValue : '',
@@ -86,6 +102,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         )
         styleEl.sheet?.insertRule(
           `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
+        )
+        // iOS
+        styleEl.sheet?.insertRule(
+          `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
         )
       }
       const updateRootHeight = () => {
