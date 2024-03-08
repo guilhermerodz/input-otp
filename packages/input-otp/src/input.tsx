@@ -34,6 +34,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       (newValue: string) => {
         uncheckedOnChange?.(newValue)
         setInternalValue(newValue)
+        // Forcefully remove :autofill state
+        syncTimeouts(() => inputRef.current?.dispatchEvent(new Event('input')))
       },
       [uncheckedOnChange],
     )
@@ -75,7 +77,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           '[data-input-otp]::selection { background: transparent !important; }',
         )
         const autofillStyles =
-          'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important;'
+          'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; box-shadow: none !important; -webkit-box-shadow: none !important; -webkit-text-fill-color: transparent !important;'
         styleEl.sheet?.insertRule(
           `[data-input-otp]:autofill { ${autofillStyles} }`,
         )
