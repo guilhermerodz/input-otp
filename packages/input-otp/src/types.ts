@@ -34,4 +34,6 @@ export enum SelectionType {
 }
 export interface Metadata {
   lastClickTimestamp: number
+
+  bitwardenLocked?: boolean
 }
