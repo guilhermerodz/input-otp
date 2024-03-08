@@ -17,7 +17,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputMode = 'numeric',
       onComplete,
       render,
-      containerClassName,
+      containerProps,
       ...props
     },
     ref,
@@ -522,8 +522,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       <div
         data-input-otp-container
         style={rootStyle}
-        {...props}
-        className={containerClassName}
+        {...containerProps}
         ref={ref}
       >
         {renderedChildren}

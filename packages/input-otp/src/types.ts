@@ -9,6 +9,7 @@ export interface RenderProps {
   isHovering: boolean
 }
 type OverrideProps<T, R> = Omit<T, keyof R> & R
+type OTPContainerProps = React.ComponentPropsWithoutRef<'div'>
 export type OTPInputProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
@@ -24,7 +25,7 @@ export type OTPInputProps = OverrideProps<
 
     render: (props: RenderProps) => React.ReactElement
 
-    containerClassName?: string
+    containerProps?: OTPContainerProps
   }
 >
 export enum SelectionType {
