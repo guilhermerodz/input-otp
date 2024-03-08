@@ -6,21 +6,6 @@ import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { Metadata, OTPInputProps, SelectionType } from './types'
 
-const PWM_BITWARDEN_SELECTOR = '[style$="2147483647 !important;"]'
-const PASSWORD_MANAGERS_SELECTORS = [
-  '[data-lastpass-icon-root]', // LastPass
-  'com-1password-button', // 1Password
-  '[data-dashlanecreated]', // Dashlane
-  PWM_BITWARDEN_SELECTOR, // Bitwarden
-].join(',')
-
-// TODO:
-// const IGNORE_PASSWORD_MANAGER_ATTRS = {
-//   'data-lpignore': 'true', // LastPass
-//   'data-1p-ignore': 'true', // 1Password
-//   'data-form-type': 'other', // Dashlane
-// }
-
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
@@ -49,12 +34,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       (newValue: string) => {
         uncheckedOnChange?.(newValue)
         setInternalValue(newValue)
-        // Forcefully remove :autofill state
-        syncTimeouts(
-          () =>
-            inputRef.current?.matches('input:autofill') &&
-            inputRef.current?.dispatchEvent(new Event('input')),
-        )
       },
       [uncheckedOnChange],
     )
@@ -107,11 +86,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         styleEl.sheet?.insertRule(
           `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
         )
-        // Password Managers
-        styleEl.sheet?.insertRule(
-          // [style$="2147483647 !important;"] <- Bitwarden
-          `[style$="2147483647 !important;"]:not(#\\9)+[style$="2147483647 !important;"]:not(#\\9) { transform: translateX(40px) !important; opacity: .1 !important; }`,
-        )
       }
       const updateRootHeight = () => {
         if (el) {
@@ -149,42 +123,53 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
      *  and I'll use this state to push them
      *  outside the input */
     const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
+    const willPushPWMBadge = React.useMemo(
+      () => hasPWMBadge && isFocused,
+      [hasPWMBadge, isFocused],
+    )
+
+    // const pwmMetadata = React.useRef({
+    //   locked: false,
+    // })
+    const trackPWMBadge = React.useCallback(() => {
+      const input = inputRef.current
+      if (!input || input?.__metadata__?.bitwardenLocked) return
+
+      // get the right-center point of the input
+      const x = input.getBoundingClientRect().left + input.offsetWidth - 18
+      const y = input.getBoundingClientRect().top + input.offsetHeight / 2
+
+      const el = document.elementFromPoint(x, y)
+      const _hasPWMBadge = el !== input
+
+      if (
+        _hasPWMBadge &&
+        el.matches(
+          // Bitwarden selector
+          '[style$="2147483647 !important;"]',
+        )
+      ) {
+        input.__metadata__ = Object.assign({}, input.__metadata__, {
+          bitwardenLocked: true,
+        })
+        input.blur()
+        input.focus()
+        input.__metadata__ = Object.assign({}, input.__metadata__, {
+          bitwardenLocked: false,
+        })
+      }
+
+      _hasPWMBadge && setHasPWMBadge(_hasPWMBadge)
+    }, [])
 
     /** Effects */
     React.useEffect(() => {
-      if (inputRef.current?.__metadata__?.bitwardenLocked) {
-        return
-      }
-
-      function run() {
-        const input = inputRef.current
-        if (!input) return
-
-        const pmws = document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS)
-        setHasPWMBadge(pmws.length > 0)
-
-        let hasBitwarden = false
-        pmws.forEach(pm => {
-          if (pm.matches(PWM_BITWARDEN_SELECTOR)) {
-            hasBitwarden = true
-          }
-        })
-        if (hasBitwarden && isFocused) {
-          input.__metadata__ = Object.assign({}, input.__metadata__, {
-            bitwardenLocked: true,
-          })
-          input.blur()
-          input.focus()
-          input.__metadata__ = Object.assign({}, input.__metadata__, {
-            bitwardenLocked: false,
-          })
-        }
-      }
-
-      setTimeout(run, 500)
-      syncTimeouts(run)
-    }, [isFocused])
-
+      // Forcefully remove :autofill state
+      syncTimeouts(() => {
+        const e = new Event('input')
+        inputRef.current?.dispatchEvent(e)
+      })
+    }, [value, isFocused])
     React.useEffect(() => {
       if (previousValue === undefined) {
         return
@@ -268,8 +253,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
         onChange(newValue)
+        trackPWMBadge()
       },
-      [maxLength, onChange, regexp],
+      [maxLength, onChange, regexp, trackPWMBadge],
     )
 
     // Fix iOS pasting
@@ -385,16 +371,16 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         userSelect: 'none',
         WebkitUserSelect: 'none',
         pointerEvents: 'none',
-        clipPath: hasPWMBadge ? 'inset(-2px)' : undefined,
+        // clipPath: willPushPWMBadge ? 'inset(-2px)' : undefined,
       }),
-      [props.disabled, hasPWMBadge],
+      [props.disabled],
     )
 
     const inputStyle = React.useMemo<React.CSSProperties>(
       () => ({
         position: 'absolute',
         inset: 0,
-        width: hasPWMBadge ? 'calc(100% + 30px)' : '100%',
+        width: willPushPWMBadge ? 'calc(100% + 30px)' : '100%',
         height: '100%',
         display: 'flex',
         textAlign,
@@ -421,7 +407,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // caretColor: 'black',
         // padding: '0',
       }),
-      [textAlign, hasPWMBadge],
+      [textAlign, willPushPWMBadge],
     )
 
     /** Rendering */
@@ -527,6 +513,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               setMirrorSelectionEnd(end)
             }
             setIsFocused(true)
+            setTimeout(trackPWMBadge, 200)
 
             props.onFocus?.(e)
           }}
@@ -547,6 +534,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         maxLength,
         props,
         regexp?.source,
+        trackPWMBadge,
         value,
       ],
     )
