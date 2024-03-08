@@ -22,6 +22,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
       onComplete,
+      passwordManagerBehavior = 'increase-width',
       render,
       containerClassName,
       ...props
@@ -92,6 +93,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         styleEl.sheet?.insertRule(
           `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
         )
+        // PWM badges
+        styleEl.sheet?.insertRule(
+          `[data-input-otp] + * { pointer-events: all !important; }`,
+        )
       }
       const updateRootHeight = () => {
         if (el) {
@@ -130,8 +135,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
      *  outside the input */
     const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
     const willPushPWMBadge = React.useMemo(
-      () => hasPWMBadge && isFocused,
-      [hasPWMBadge, isFocused],
+      () => hasPWMBadge && passwordManagerBehavior === 'increase-width',
+      [hasPWMBadge, passwordManagerBehavior],
     )
 
     const pwmMetadata = React.useRef({
@@ -139,45 +144,31 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     })
     const trackPWMBadge = React.useCallback(() => {
       const input = inputRef.current
-      if (!input || pwmMetadata.current.locked) return
+      if (!input || passwordManagerBehavior === 'none' || hasPWMBadge) {
+        return
+      }
 
       // get the right-center point of the input
       const x = input.getBoundingClientRect().left + input.offsetWidth - 12
       const y = input.getBoundingClientRect().top + input.offsetHeight / 2
 
       const el = document.elementFromPoint(x, y)
-
       const pmws = document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS)
-
       const _hasPWMBadge = el !== input || pmws.length > 0
 
-      if (
-        _hasPWMBadge &&
-        el.matches(
-          // Bitwarden selector
-          '[style$="2147483647 !important;"]',
-        )
-      ) {
-        pwmMetadata.current.locked = Object.assign(
-          {},
-          pwmMetadata.current.locked,
-          {
-            locked: true,
-          },
-        )
-        input.blur()
-        input.focus()
-        pwmMetadata.current.locked = Object.assign(
-          {},
-          pwmMetadata.current.locked,
-          {
-            locked: false,
-          },
-        )
+      if (!_hasPWMBadge) {
+        return
       }
 
-      _hasPWMBadge && setHasPWMBadge(_hasPWMBadge)
-    }, [])
+      pwmMetadata.current.locked = true
+      const sel = [input.selectionStart, input.selectionEnd]
+      input.blur()
+      input.focus()
+      input.setSelectionRange(sel[0], sel[1])
+      pwmMetadata.current.locked = false
+
+      setHasPWMBadge(true)
+    }, [hasPWMBadge, passwordManagerBehavior])
 
     /** Effects */
     React.useEffect(() => {
@@ -187,6 +178,16 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         inputRef.current?.dispatchEvent(e)
       })
     }, [value, isFocused])
+    React.useEffect(() => {
+      if (passwordManagerBehavior === 'none') {
+        return
+      }
+      setTimeout(trackPWMBadge, 200)
+      setTimeout(trackPWMBadge, 500)
+      setTimeout(trackPWMBadge, 1000)
+      setTimeout(trackPWMBadge, 2000)
+      setTimeout(trackPWMBadge, 5000)
+    }, [passwordManagerBehavior, trackPWMBadge])
     React.useEffect(() => {
       if (previousValue === undefined) {
         return
@@ -278,6 +279,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     // Fix iOS pasting
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
+        if (!e.clipboardData) {
+          return
+        }
+
         const content = e.clipboardData.getData('text/plain')
         e.preventDefault()
 
@@ -397,7 +402,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       () => ({
         position: 'absolute',
         inset: 0,
-        width: willPushPWMBadge ? 'calc(100% + 30px)' : '100%',
+        width: willPushPWMBadge ? 'calc(100% + 1em)' : '100%',
         height: '100%',
         display: 'flex',
         textAlign,
