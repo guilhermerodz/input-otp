@@ -6,6 +6,12 @@ import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { Metadata, OTPInputProps, SelectionType } from './types'
 
+const PASSWORD_MANAGERS_SELECTORS = [
+  '[data-lastpass-icon-root]', // LastPass
+  'com-1password-button', // 1Password
+  '[data-dashlanecreated]', // Dashlane
+].join(',')
+
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
@@ -128,19 +134,22 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       [hasPWMBadge, isFocused],
     )
 
-    // const pwmMetadata = React.useRef({
-    //   locked: false,
-    // })
+    const pwmMetadata = React.useRef({
+      locked: false,
+    })
     const trackPWMBadge = React.useCallback(() => {
       const input = inputRef.current
-      if (!input || input?.__metadata__?.bitwardenLocked) return
+      if (!input || pwmMetadata.current.locked) return
 
       // get the right-center point of the input
-      const x = input.getBoundingClientRect().left + input.offsetWidth - 18
+      const x = input.getBoundingClientRect().left + input.offsetWidth - 12
       const y = input.getBoundingClientRect().top + input.offsetHeight / 2
 
       const el = document.elementFromPoint(x, y)
-      const _hasPWMBadge = el !== input
+
+      const pmws = document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS)
+
+      const _hasPWMBadge = el !== input || pmws.length > 0
 
       if (
         _hasPWMBadge &&
@@ -149,14 +158,22 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           '[style$="2147483647 !important;"]',
         )
       ) {
-        input.__metadata__ = Object.assign({}, input.__metadata__, {
-          bitwardenLocked: true,
-        })
+        pwmMetadata.current.locked = Object.assign(
+          {},
+          pwmMetadata.current.locked,
+          {
+            locked: true,
+          },
+        )
         input.blur()
         input.focus()
-        input.__metadata__ = Object.assign({}, input.__metadata__, {
-          bitwardenLocked: false,
-        })
+        pwmMetadata.current.locked = Object.assign(
+          {},
+          pwmMetadata.current.locked,
+          {
+            locked: false,
+          },
+        )
       }
 
       _hasPWMBadge && setHasPWMBadge(_hasPWMBadge)
