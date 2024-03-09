@@ -71,10 +71,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="[color-scheme:dark]">
+    <html lang="en">
       <body
         className={cn(
-          'min-h-[100dvh] bg-background font-sans antialiased dark',
+          'min-h-[100dvh] bg-background font-sans antialiased',
           fontSans.className,
         )}
       >
