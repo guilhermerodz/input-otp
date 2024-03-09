@@ -16,6 +16,7 @@
     "dev": "turbo run dev --filter=*",
     "dev:website": "turbo run dev --filter=website...",
     "dev:test": "turbo run dev --filter=test...",
+    "storybook": "turbo run storybook",
     "test": "turbo run test --filter=test...",
     "type-check": "turbo run type-check",
     "lint:lib": "turbo run lint --filter=input-otp",
