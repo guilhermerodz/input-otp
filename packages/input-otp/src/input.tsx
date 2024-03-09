@@ -458,7 +458,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         userSelect: 'none',
         WebkitUserSelect: 'none',
         pointerEvents: 'none',
-        background: 'green',
         // clipPath: willPushPWMBadge ? 'inset(-2px)' : undefined,
       }),
       [props.disabled],
@@ -468,11 +467,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       () => ({
         position: 'absolute',
         inset: 0,
-        transition: 'max-width 1s ease-in-out',
         width: willPushPWMBadge
-        ? `calc(100% + ${PWM_BADGE_SPACE_WIDTH})`
-        : '100%',
-        maxWidth: willPushPWMBadge
           ? `calc(100% + ${PWM_BADGE_SPACE_WIDTH})`
           : '100%',
         height: '100%',
@@ -671,7 +666,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         ref={containerRef}
         data-input-otp-container
         style={rootStyle}
-        {...props}
         className={containerClassName}
       >
         <div
@@ -688,7 +682,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         />
 
         {renderedChildren}
-        {renderedInput}
+
+        <div className="absolute inset-0">{renderedInput}</div>
       </div>
     )
   },
