@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+// import { HydrationOverlay } from '@builder.io/react-hydration-overlay'
+
 import { SiteFooter } from '../components/site-footer'
 import { SiteHeader } from '../components/site-header'
 import { siteConfig } from '../config/site'
@@ -80,7 +82,9 @@ export default function RootLayout({
           <div className="relative flex min-h-[100dvh] flex-col bg-background">
             <SiteHeader />
 
-            <main className="flex-1 flex flex-col">{children}</main>
+            {/* <HydrationOverlay> */}
+              <main className="flex-1 flex flex-col">{children}</main>
+            {/* </HydrationOverlay> */}
 
             <SiteFooter />
           </div>
