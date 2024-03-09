@@ -199,7 +199,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       if (
         !input ||
         !pwmArea ||
-        hasPWMBadge ||
+        !hasPWMBadge ||
         passwordManagerBehavior === 'none'
       ) {
         return
@@ -222,7 +222,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       const observer = new IntersectionObserver(
         entries => {
           const entry = entries[0]
-          console.log(entry.intersectionRatio)
           setHasPWMBadgeSpace(entry.intersectionRatio > 0.99)
         },
         { threshold: 1, root: null, rootMargin: '0px' },
