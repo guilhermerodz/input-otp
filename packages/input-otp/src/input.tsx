@@ -537,51 +537,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             _pasteListener(e)
             props.onPaste?.(e)
           }}
-          onTouchEnd={e => {
-            const isFocusing = document.activeElement === e.currentTarget
-            if (isFocusing) {
-              setTimeout(() => {
-                _selectListener()
-              }, 50)
-            }
-
-            props.onTouchEnd?.(e)
-          }}
-          onTouchMove={e => {
-            const isFocusing = document.activeElement === e.currentTarget
-            if (isFocusing) {
-              setTimeout(() => {
-                _selectListener()
-              }, 50)
-            }
-
-            props.onTouchMove?.(e)
-          }}
-          onClick={e => {
-            inputRef.current.__metadata__ = Object.assign(
-              {},
-              inputRef.current?.__metadata__,
-              { lastClickTimestamp: Date.now() },
-            )
-
-            props.onClick?.(e)
-          }}
-          onDoubleClick={e => {
-            const lastClickTimestamp =
-              inputRef.current?.__metadata__?.lastClickTimestamp
-
-            const isFocusing = document.activeElement === e.currentTarget
-            if (
-              lastClickTimestamp !== undefined &&
-              isFocusing &&
-              Date.now() - lastClickTimestamp <= 300 // Fast enough click
-            ) {
-              e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
-              syncTimeouts(_selectListener)
-            }
-
-            props.onDoubleClick?.(e)
-          }}
           onInput={e => {
             syncTimeouts(_selectListener)
 
