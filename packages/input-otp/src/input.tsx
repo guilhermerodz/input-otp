@@ -85,25 +85,34 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         const styleEl = document.createElement('style')
         styleEl.id = 'input-otp-style'
         document.head.appendChild(styleEl)
-        styleEl.sheet?.insertRule(
-          '[data-input-otp]::selection { background: transparent !important; }',
-        )
-        const autofillStyles =
-          'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; box-shadow: none !important; -webkit-box-shadow: none !important; -webkit-text-fill-color: transparent !important;'
-        styleEl.sheet?.insertRule(
-          `[data-input-otp]:autofill { ${autofillStyles} }`,
-        )
-        styleEl.sheet?.insertRule(
-          `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
-        )
-        // iOS
-        styleEl.sheet?.insertRule(
-          `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
-        )
-        // PWM badges
-        styleEl.sheet?.insertRule(
-          `[data-input-otp] + * { pointer-events: all !important; }`,
-        )
+
+        if (styleEl.sheet) {
+          const autofillStyles =
+            'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; box-shadow: none !important; -webkit-box-shadow: none !important; -webkit-text-fill-color: transparent !important;'
+
+          safeInsertRule(
+            styleEl.sheet,
+            '[data-input-otp]::selection { background: transparent !important; }',
+          )
+          safeInsertRule(
+            styleEl.sheet,
+            `[data-input-otp]:autofill { ${autofillStyles} }`,
+          )
+          safeInsertRule(
+            styleEl.sheet,
+            `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
+          )
+          // iOS
+          safeInsertRule(
+            styleEl.sheet,
+            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
+          )
+          // PWM badges
+          safeInsertRule(
+            styleEl.sheet,
+            `[data-input-otp] + * { pointer-events: all !important; }`,
+          )
+        }
       }
       const updateRootHeight = () => {
         if (container) {
@@ -695,4 +704,12 @@ function usePrevious<T>(value: T) {
     ref.current = value
   })
   return ref.current
+}
+
+function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
+  try {
+    sheet.insertRule(rule)
+  } catch {
+    console.error('input-otp could not insert CSS rule:', rule)
+  }
 }
