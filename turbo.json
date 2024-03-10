@@ -19,6 +19,10 @@
       "dependsOn": ["input-otp#build"],
       "cache": false
     },
+    "test:ui": {
+      "dependsOn": ["input-otp#build"],
+      "cache": false
+    },
     "type-check": {
       "cache": false
     },

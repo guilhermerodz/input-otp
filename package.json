@@ -18,6 +18,7 @@
     "dev:test": "turbo run dev --filter=test...",
     "storybook": "turbo run storybook",
     "test": "turbo run test --filter=test...",
+    "test:ui": "turbo run test:ui --filter=test...",
     "type-check": "turbo run type-check",
     "lint:lib": "turbo run lint --filter=input-otp",
     "format": "prettier --write .",
