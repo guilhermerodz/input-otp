@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { OTPInputProps } from './types'
 
 const PWM_BADGE_MARGIN_RIGHT = 18
 const PWM_BADGE_SPACE_WIDTH = '40px'
@@ -13,11 +14,11 @@ const PASSWORD_MANAGERS_SELECTORS = [
 export function usePasswordManagerBadge({
   inputRef,
   pwmAreaRef,
-  passwordManagerBehavior,
+  pushPasswordManagerStrategy,
 }: {
   inputRef: React.RefObject<HTMLInputElement>
   pwmAreaRef: React.RefObject<HTMLDivElement>
-  passwordManagerBehavior: 'none' | 'increase-width'
+  pushPasswordManagerStrategy: OTPInputProps['pushPasswordManagerStrategy']
 }) {
   /** Password managers have a badge
    *  and I'll use this state to push them
@@ -27,10 +28,10 @@ export function usePasswordManagerBadge({
 
   const willPushPWMBadge = React.useMemo(
     () =>
-      passwordManagerBehavior === 'increase-width' &&
-      hasPWMBadge &&
-      hasPWMBadgeSpace,
-    [hasPWMBadge, hasPWMBadgeSpace, passwordManagerBehavior],
+      (pushPasswordManagerStrategy === 'increase-width' &&
+        hasPWMBadge &&
+        hasPWMBadgeSpace),
+    [hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy],
   )
 
   // Metadata for instant updates (not React state)
@@ -43,7 +44,7 @@ export function usePasswordManagerBadge({
     const input = inputRef.current
     if (
       !input ||
-      passwordManagerBehavior === 'none' ||
+      pushPasswordManagerStrategy === 'none' ||
       pwmMetadata.current.done
     ) {
       return
@@ -76,15 +77,15 @@ export function usePasswordManagerBadge({
     // this function won't run anymore.
     pwmMetadata.current.done = true
     setHasPWMBadge(true)
-  }, [inputRef, passwordManagerBehavior])
+  }, [inputRef, pushPasswordManagerStrategy])
 
   React.useEffect(() => {
-    if (passwordManagerBehavior === 'none') {
+    if (pushPasswordManagerStrategy === 'none') {
       return
     }
     setTimeout(trackPWMBadge, 2000)
     setTimeout(trackPWMBadge, 5000)
-  }, [passwordManagerBehavior, trackPWMBadge])
+  }, [pushPasswordManagerStrategy, trackPWMBadge])
 
   React.useEffect(() => {
     const input = inputRef.current
@@ -93,7 +94,7 @@ export function usePasswordManagerBadge({
       !input ||
       !pwmArea ||
       !hasPWMBadge ||
-      passwordManagerBehavior === 'none'
+      pushPasswordManagerStrategy === 'none'
     ) {
       return
     }
@@ -128,7 +129,7 @@ export function usePasswordManagerBadge({
   }, [
     hasPWMBadge,
     inputRef,
-    passwordManagerBehavior,
+    pushPasswordManagerStrategy,
     pwmAreaRef,
     trackPWMBadge,
   ])

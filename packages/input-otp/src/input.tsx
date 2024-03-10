@@ -17,7 +17,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pattern = REGEXP_ONLY_DIGITS,
       inputMode = 'numeric',
       onComplete,
-      passwordManagerBehavior = 'increase-width',
+      pushPasswordManagerStrategy = 'increase-width',
       render,
       containerClassName,
       ...props
@@ -239,7 +239,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const pwmb = usePasswordManagerBadge({
       inputRef,
       pwmAreaRef: pwmAreaRef,
-      passwordManagerBehavior,
+      pushPasswordManagerStrategy,
     })
 
     /** Event handlers */

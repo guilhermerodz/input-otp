@@ -21,7 +21,10 @@ export type OTPInputProps = OverrideProps<
     inputMode?: 'numeric' | 'text'
 
     onComplete?: (...args: any[]) => unknown
-    passwordManagerBehavior?: 'increase-width' | 'none'
+    pushPasswordManagerStrategy?:
+      | 'increase-width'
+      | 'none'
+      // | 'experimental-no-flickering'
 
     render: (props: RenderProps) => React.ReactElement
 
