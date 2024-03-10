@@ -233,9 +233,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // Update the selection state
         const s = inputRef.current?.selectionStart
         const e = inputRef.current?.selectionEnd
+        const dir = inputRef.current?.selectionDirection
         if (s !== null && e !== null) {
           setMirrorSelectionStart(s)
           setMirrorSelectionEnd(e)
+          inputMetadataRef.current.prev = [s, e, dir]
         }
       })
     }, [value, isFocused])
