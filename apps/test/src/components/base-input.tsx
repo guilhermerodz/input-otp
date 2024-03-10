@@ -26,9 +26,6 @@ export function BaseOTPInput(
           className={cn('flex items-center gap-1', {
             'opacity-50': overrideProps.disabled ?? disabled,
           })}
-          style={{
-            direction: 'ltr',
-          }}
           data-testid="input-otp-renderer"
           data-test-render-is-hovering={isHovering ? 'true' : undefined}
           data-test-render-is-focused={isFocused ? 'true' : undefined}

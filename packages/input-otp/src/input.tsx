@@ -532,6 +532,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         {...props}
         className={containerClassName}
         ref={ref}
+        style={{
+          direction: 'ltr',
+        }}
       >
         {renderedChildren}
         {renderedInput}
