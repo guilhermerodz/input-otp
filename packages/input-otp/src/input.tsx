@@ -38,7 +38,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       typeof props.defaultValue === 'string' ? props.defaultValue : '',
     )
 
-    // Workarounds
+    // Definitions
     const value = uncheckedValue ?? internalValue
     const previousValue = usePrevious(value)
     const onChange = React.useCallback(
@@ -64,23 +64,93 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     >(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
     const pmwAreaRef = React.useRef<HTMLDivElement>(null)
+    const initialLoadRef = React.useRef({
+      value,
+      onChange,
+    })
     React.useImperativeHandle(ref, () => inputRef.current, [])
     React.useEffect(() => {
-      const el = inputRef.current
+      const input = inputRef.current
       const container = containerRef.current
 
-      if (!el || !container) {
+      if (!input || !container) {
         return
       }
 
-      const _select = el.select.bind(el)
-      el.select = () => {
-        _select()
-        // Workaround proxy to update UI as native `.select()` does not trigger focus event
-        setMirrorSelectionStart(0)
-        setMirrorSelectionEnd(el.value.length)
+      // Sync input value
+      if (initialLoadRef.current.value !== input.value) {
+        initialLoadRef.current.onChange(input.value)
       }
 
+      // Previous selection
+      let _prev: [
+        number | null,
+        number | null,
+        'none' | 'forward' | 'backward',
+      ] = [input.selectionStart, input.selectionEnd, input.selectionDirection]
+      function onDocumentSelectionChange() {
+        if (document.activeElement !== input) {
+          setMirrorSelectionStart(null)
+          setMirrorSelectionEnd(null)
+          return
+        }
+
+        // Aliases
+        const _s = input.selectionStart
+        const _e = input.selectionEnd
+        const _dir = input.selectionDirection
+        const _ml = input.maxLength
+        const _val = input.value
+
+        // Algorithm
+        let start = -1
+        let end = -1
+        let direction: 'forward' | 'backward' | 'none' = undefined
+        if (_val.length !== 0 && _s !== null && _e !== null) {
+          const isSingleCaret = _s === _e
+          const isInsertMode = _s === _val.length && _val.length < _ml
+
+          if (isSingleCaret && !isInsertMode) {
+            const c = _s
+            if (c === 0) {
+              start = 0
+              end = 1
+              direction = 'forward'
+            } else if (c === _ml) {
+              start = c - 1
+              end = c
+              direction = 'backward'
+            } else if (_ml > 2 && _val.length > 2) {
+              direction = c < _prev[1] ? 'backward' : 'forward'
+              const offset = direction === 'backward' ? -1 : 0
+              start = offset + c
+              end = offset + c + 1
+            }
+          }
+
+          if (start !== -1 && end !== -1 && start !== end) {
+            inputRef.current.setSelectionRange(start, end, direction)
+          }
+        }
+
+        // Finally, update the state
+        const s = start !== -1 ? start : _s
+        const e = end !== -1 ? end : _e
+        const dir = direction ?? _dir
+        setMirrorSelectionStart(s)
+        setMirrorSelectionEnd(e)
+        // Store the previous selection value
+        _prev = [s, e, dir]
+      }
+      document.addEventListener('selectionchange', onDocumentSelectionChange, {
+        capture: true,
+      })
+
+      // Set initial mirror state
+      onDocumentSelectionChange()
+      document.activeElement === input && setIsFocused(true)
+
+      // Apply needed styles
       if (!document.getElementById('input-otp-style')) {
         const styleEl = document.createElement('style')
         styleEl.id = 'input-otp-style'
@@ -114,24 +184,25 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           )
         }
       }
+      // Track root height
       const updateRootHeight = () => {
         if (container) {
-          container.style.setProperty('--root-height', `${el.clientHeight}px`)
+          container.style.setProperty(
+            '--root-height',
+            `${input.clientHeight}px`,
+          )
         }
       }
       updateRootHeight()
       const resizeObserver = new ResizeObserver(updateRootHeight)
-      resizeObserver.observe(el)
-
-      setTimeout(() => {
-        if (el) {
-          setMirrorSelectionStart(el.selectionStart)
-          setMirrorSelectionEnd(el.selectionEnd)
-          setIsFocused(el === document.activeElement)
-        }
-      }, 20)
+      resizeObserver.observe(input)
 
       return () => {
+        document.removeEventListener(
+          'selectionchange',
+          onDocumentSelectionChange,
+          { capture: true },
+        )
         resizeObserver.disconnect()
       }
     }, [])
@@ -245,19 +316,23 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     /** Effects */
     React.useEffect(() => {
-      // Forcefully remove :autofill state
       syncTimeouts(() => {
-        const e = new Event('input')
-        inputRef.current?.dispatchEvent(e)
+        // Forcefully remove :autofill state
+        inputRef.current?.dispatchEvent(new Event('input'))
+
+        // Update the selection state
+        const s = inputRef.current?.selectionStart
+        const e = inputRef.current?.selectionEnd
+        if (s !== null && e !== null) {
+          setMirrorSelectionStart(s)
+          setMirrorSelectionEnd(e)
+        }
       })
     }, [value, isFocused])
     React.useEffect(() => {
       if (passwordManagerBehavior === 'none') {
         return
       }
-      setTimeout(trackPWMBadge, 200)
-      setTimeout(trackPWMBadge, 500)
-      setTimeout(trackPWMBadge, 1000)
       setTimeout(trackPWMBadge, 2000)
       setTimeout(trackPWMBadge, 5000)
     }, [passwordManagerBehavior, trackPWMBadge])
@@ -275,67 +350,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
     }, [maxLength, onComplete, previousValue, value])
 
-    // Run improved selection tracking while focused
-    React.useEffect(() => {
-      if (!isFocused) {
-        return
-      }
-
-      const interval = setInterval(() => {
-        if (inputRef.current && document.activeElement === inputRef.current) {
-          setMirrorSelectionStart(inputRef.current.selectionStart)
-          setMirrorSelectionEnd(inputRef.current.selectionEnd)
-        }
-      }, 50)
-
-      return () => {
-        clearInterval(interval)
-      }
-    }, [isFocused, mirrorSelectionStart, mirrorSelectionEnd])
-
     /** Event handlers */
-    const _selectListener = React.useCallback(() => {
-      if (!inputRef.current) {
-        return
-      }
-
-      const _start = inputRef.current.selectionStart
-      const _end = inputRef.current.selectionEnd
-      const isSelected = _start !== null && _end !== null
-
-      if (value.length !== 0 && isSelected) {
-        const isSingleCaret = _start === _end
-        const isInsertMode = _start === value.length && value.length < maxLength
-
-        if (isSingleCaret && !isInsertMode) {
-          const caretPos = _start
-
-          let start = -1
-          let end = -1
-
-          if (caretPos === 0) {
-            start = 0
-            end = 1
-          } else if (caretPos === value.length) {
-            start = value.length - 1
-            end = value.length
-          } else {
-            start = caretPos
-            end = caretPos + 1
-          }
-
-          if (start !== -1 && end !== -1) {
-            inputRef.current.setSelectionRange(start, end, 'backward')
-          }
-        }
-      }
-
-      syncTimeouts(() => {
-        setMirrorSelectionStart(inputRef.current?.selectionStart ?? null)
-        setMirrorSelectionEnd(inputRef.current?.selectionEnd ?? null)
-      })
-    }, [maxLength, value.length])
-
     const _changeListener = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.currentTarget.value.slice(0, maxLength)
@@ -347,115 +362,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         trackPWMBadge()
       },
       [maxLength, onChange, regexp, trackPWMBadge],
-    )
-
-    // Fix iOS pasting
-    const _pasteListener = React.useCallback(
-      (e: React.ClipboardEvent<HTMLInputElement>) => {
-        if (!e.clipboardData) {
-          return
-        }
-
-        const content = e.clipboardData.getData('text/plain')
-        e.preventDefault()
-
-        const start = inputRef.current?.selectionStart
-        const end = inputRef.current?.selectionEnd
-
-        const isReplacing = start !== end
-
-        const newValueUncapped = isReplacing
-          ? value.slice(0, start) + content + value.slice(end) // Replacing
-          : value.slice(0, start) + content + value.slice(start) // Inserting
-        const newValue = newValueUncapped.slice(0, maxLength)
-
-        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
-          return
-        }
-
-        onChange(newValue)
-
-        const _start = Math.min(newValue.length, maxLength - 1)
-        const _end = newValue.length
-
-        syncTimeouts(() => {
-          inputRef.current?.setSelectionRange(_start, _end)
-          setMirrorSelectionStart(_start)
-          setMirrorSelectionEnd(_end)
-        })
-      },
-      [maxLength, onChange, regexp, value],
-    )
-
-    const _keyDownListener = React.useCallback(
-      (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!inputRef.current) {
-          return
-        }
-
-        const inputSel = [
-          inputRef.current.selectionStart,
-          inputRef.current.selectionEnd,
-        ]
-        if (inputSel[0] === null || inputSel[1] === null) {
-          return
-        }
-
-        let selectionType: SelectionType
-        if (inputSel[0] === inputSel[1]) {
-          selectionType = SelectionType.CARET
-        } else if (inputSel[1] - inputSel[0] === 1) {
-          selectionType = SelectionType.CHAR
-        } else if (inputSel[1] - inputSel[0] > 1) {
-          selectionType = SelectionType.MULTI
-        } else {
-          throw new Error('Could not determine OTPInput selection type')
-        }
-
-        if (
-          e.key === 'ArrowLeft' ||
-          e.key === 'ArrowRight' ||
-          e.key === 'ArrowUp' ||
-          e.key === 'ArrowDown' ||
-          e.key === 'Home' ||
-          e.key === 'End'
-        ) {
-          if (
-            e.key === 'ArrowLeft' &&
-            selectionType === SelectionType.CHAR &&
-            !e.shiftKey &&
-            !e.metaKey &&
-            !e.ctrlKey &&
-            !e.altKey
-          ) {
-            e.preventDefault()
-
-            const start = Math.max(inputSel[0] - 1, 0)
-            const end = Math.max(inputSel[1] - 1, 1)
-
-            inputRef.current.setSelectionRange(start, end)
-          }
-
-          if (
-            e.altKey &&
-            !e.shiftKey &&
-            (e.key === 'ArrowLeft' || e.key === 'ArrowRight')
-          ) {
-            e.preventDefault()
-
-            if (e.key === 'ArrowLeft') {
-              inputRef.current.setSelectionRange(0, Math.min(1, value.length))
-            }
-            if (e.key === 'ArrowRight') {
-              inputRef.current.setSelectionRange(
-                Math.max(0, value.length - 1),
-                value.length,
-              )
-            }
-          }
-        }
-      },
-      [value.length],
     )
 
     /** Styles */
@@ -500,9 +406,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // position: undefined,
         // color: 'black',
         // background: 'white',
-        // opacity: '.5',
+        // opacity: '1',
         // caretColor: 'black',
         // padding: '0',
+        // letterSpacing: 'unset',
       }),
       [textAlign, willPushPWMBadge],
     )
@@ -514,6 +421,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           autoComplete={props.autoComplete || 'one-time-code'}
           {...props}
           data-input-otp
+          data-input-otp-mss={mirrorSelectionStart}
+          data-input-otp-mse={mirrorSelectionEnd}
           inputMode={inputMode}
           pattern={regexp?.source}
           style={inputStyle}
@@ -521,10 +430,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           value={value}
           ref={inputRef}
           onChange={_changeListener}
-          onSelect={e => {
-            _selectListener()
-            props.onSelect?.(e)
-          }}
           onMouseOver={e => {
             setIsHoveringInput(true)
             props.onMouseOver?.(e)
@@ -532,26 +437,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           onMouseLeave={e => {
             setIsHoveringInput(false)
             props.onMouseLeave?.(e)
-          }}
-          onPaste={e => {
-            _pasteListener(e)
-            props.onPaste?.(e)
-          }}
-          onInput={e => {
-            syncTimeouts(_selectListener)
-
-            props.onInput?.(e)
-          }}
-          onKeyDown={e => {
-            _keyDownListener(e)
-            syncTimeouts(_selectListener)
-
-            props.onKeyDown?.(e)
-          }}
-          onKeyUp={e => {
-            syncTimeouts(_selectListener)
-
-            props.onKeyUp?.(e)
           }}
           onFocus={e => {
             if (inputRef.current) {
@@ -578,12 +463,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       ),
       [
         _changeListener,
-        _keyDownListener,
-        _pasteListener,
-        _selectListener,
         inputMode,
         inputStyle,
         maxLength,
+        mirrorSelectionEnd,
+        mirrorSelectionStart,
         props,
         regexp?.source,
         trackPWMBadge,
