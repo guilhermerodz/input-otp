@@ -29,6 +29,8 @@ export type OTPInputProps = OverrideProps<
     render: (props: RenderProps) => React.ReactElement
 
     containerClassName?: string
+
+    noScriptCSSFallback?: string
   }
 >
 export enum SelectionType {

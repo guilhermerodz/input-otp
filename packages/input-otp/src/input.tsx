@@ -20,6 +20,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pushPasswordManagerStrategy = 'increase-width',
       render,
       containerClassName,
+      noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
       ...props
     },
     ref,
@@ -454,7 +455,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         </div>
 
         <noscript>
-          <style>{NOSCRIPT_CSS_FALLBACK}</style>
+          <style>{noScriptCSSFallback}</style>
         </noscript>
       </div>
     )
@@ -489,7 +490,7 @@ const NOSCRIPT_CSS_FALLBACK = `
   --nojs-fg: black !important;
 
   background-color: var(--nojs-bg) !important;
-  color: unset !important;
+  color: var(--nojs-fg) !important;
   caret-color: var(--nojs-fg) !important;
   letter-spacing: .25em !important;
   text-align: center !important;
