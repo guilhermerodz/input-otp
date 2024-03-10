@@ -452,6 +452,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         >
           {renderedInput}
         </div>
+
+        <noscript>
+          <style>{NOSCRIPT_CSS_FALLBACK}</style>
+        </noscript>
       </div>
     )
   },
@@ -473,3 +477,28 @@ function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
     console.error('input-otp could not insert CSS rule:', rule)
   }
 }
+
+// Decided to go with <noscript>
+// instead of `scripting` CSS media query
+// because it's a fallback for initial page load
+// and the <script> tag won't be loaded
+// unless the user has JS disabled.
+const NOSCRIPT_CSS_FALLBACK = `
+[data-input-otp] {
+  --nojs-bg: white !important;
+  --nojs-fg: black !important;
+
+  background-color: var(--nojs-bg) !important;
+  color: unset !important;
+  caret-color: var(--nojs-fg) !important;
+  letter-spacing: .25em !important;
+  text-align: center !important;
+  border: 1px solid var(--nojs-fg) !important;
+  border-radius: 4px !important;
+}
+@media (prefers-color-scheme: dark) {
+  [data-input-otp] {
+    --nojs-bg: black !important;
+    --nojs-fg: white !important;
+  }
+}`
