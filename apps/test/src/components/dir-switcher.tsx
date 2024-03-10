@@ -3,9 +3,7 @@
 import React from 'react'
 
 export function DirSwitcher() {
-  const [dir, setDir] = React.useState<'ltr' | 'rtl'>(
-    document?.dir as 'ltr' | 'rtl',
-  )
+  const [dir, setDir] = React.useState<'ltr' | 'rtl'>()
   const nextDir = dir !== 'rtl' ? 'rtl' : 'ltr'
 
   return (
