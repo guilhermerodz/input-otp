@@ -255,6 +255,17 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       },
       [maxLength, onChange, pwmb, regexp],
     )
+    const _focusListener = React.useCallback(() => {
+      if (inputRef.current) {
+        const start = Math.min(inputRef.current.value.length, maxLength - 1)
+        const end = inputRef.current.value.length
+        inputRef.current?.setSelectionRange(start, end)
+        setMirrorSelectionStart(start)
+        setMirrorSelectionEnd(end)
+      }
+      setIsFocused(true)
+      setTimeout(pwmb.trackPWMBadge, 200)
+    }, [maxLength, pwmb.trackPWMBadge])
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
@@ -332,37 +343,24 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             props.onMouseLeave?.(e)
           }}
           onFocus={e => {
-            if (inputRef.current) {
-              const start = Math.min(
-                inputRef.current.value.length,
-                maxLength - 1,
-              )
-              const end = inputRef.current.value.length
-              inputRef.current?.setSelectionRange(start, end)
-              setMirrorSelectionStart(start)
-              setMirrorSelectionEnd(end)
-            }
-            setIsFocused(true)
-            setTimeout(pwmb.trackPWMBadge, 200)
-
+            _focusListener()
             props.onFocus?.(e)
           }}
           onBlur={e => {
             setIsFocused(false)
-
             props.onBlur?.(e)
           }}
         />
       ),
       [
         _changeListener,
+        _focusListener,
         inputMode,
         inputStyle,
         maxLength,
         mirrorSelectionEnd,
         mirrorSelectionStart,
         props,
-        pwmb.trackPWMBadge,
         regexp?.source,
         value,
       ],
