@@ -11,8 +11,6 @@ export function BaseOTPInput(
 
   return (
     <OTPInput
-      // Test props
-      data-testid="input-otp-wrapper"
       // Normal props
       value={value}
       onChange={setValue}

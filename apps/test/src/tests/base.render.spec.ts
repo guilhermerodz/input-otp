@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Base tests - Render', () => {
   test('should expose focus flags', async ({ page }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
     const renderer = page.getByTestId('input-otp-renderer')
 
     await input.focus()

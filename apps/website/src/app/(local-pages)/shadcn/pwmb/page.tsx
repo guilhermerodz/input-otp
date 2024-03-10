@@ -14,16 +14,22 @@ export default function ShadcnPage() {
 
   return (
     <form className="container relative flex-1 flex flex-col justify-center items-center">
+      <input
+        // test pwmb
+        type="text"
+        autoComplete="username webauthn"
+        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+      />
       <InputOTP
         autoFocus
         // test pwmb
-        type="password"
-        autoComplete="username"
-        passwordManagerBehavior="none"
+        type="text"
+        autoComplete="username webauthn"
+        pushPasswordManagerStrategy="experimental-no-flickering"
         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
         //
-        value={value}
-        onChange={setValue}
+        // value={value}
+        // onChange={setValue}
         maxLength={6}
         render={({ slots }) => (
           <>
@@ -41,6 +47,8 @@ export default function ShadcnPage() {
           </>
         )}
       />
+
+      <input type="submit" hidden />
     </form>
   )
 }
