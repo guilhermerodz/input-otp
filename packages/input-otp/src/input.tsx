@@ -394,6 +394,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         caretColor: 'transparent',
         border: '0 solid transparent',
         outline: '0 solid transparent',
+        boxShadow: 'none',
         lineHeight: '1',
         letterSpacing: '-.5em',
         fontSize: 'var(--root-height)',

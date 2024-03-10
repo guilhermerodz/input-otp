@@ -9,6 +9,10 @@ export default function ShadcnPage() {
   return (
     <div className="container relative flex-1 flex flex-col justify-center items-center">
       <InputOTP
+        autoFocus
+        type="password"
+        autoComplete="username"
+      
         value={value}
         onChange={setValue}
         maxLength={6}
