@@ -57,6 +57,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       value,
       onChange,
     })
+    const inputMetadataRef = React.useRef<{
+      prev: [number | null, number | null, 'none' | 'forward' | 'backward']
+    }>({
+      prev: [
+        inputRef.current?.selectionStart,
+        inputRef.current?.selectionEnd,
+        inputRef.current?.selectionDirection,
+      ],
+    })
     React.useImperativeHandle(ref, () => inputRef.current, [])
     React.useEffect(() => {
       const input = inputRef.current
@@ -72,11 +81,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
 
       // Previous selection
-      let _prev: [
-        number | null,
-        number | null,
-        'none' | 'forward' | 'backward',
-      ] = [input.selectionStart, input.selectionEnd, input.selectionDirection]
+      inputMetadataRef.current.prev = [
+        input.selectionStart,
+        input.selectionEnd,
+        input.selectionDirection,
+      ]
       function onDocumentSelectionChange() {
         if (document.activeElement !== input) {
           setMirrorSelectionStart(null)
@@ -90,6 +99,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         const _dir = input.selectionDirection
         const _ml = input.maxLength
         const _val = input.value
+        const _prev = inputMetadataRef.current.prev
 
         // Algorithm
         let start = -1
@@ -110,8 +120,16 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               end = c
               direction = 'backward'
             } else if (_ml > 2 && _val.length > 2) {
-              direction = c < _prev[1] ? 'backward' : 'forward'
-              const offset = direction === 'backward' ? -1 : 0
+              let offset = 0
+              if (_prev[0] !== null && _prev[1] !== null) {
+                direction = c < _prev[1] ? 'backward' : 'forward'
+                const wasPreviouslyInserting =
+                  _prev[0] === _prev[1] && _prev[0] < _ml
+                if (direction === 'backward' && !wasPreviouslyInserting) {
+                  offset = -1
+                }
+              }
+
               start = offset + c
               end = offset + c + 1
             }
@@ -129,7 +147,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionStart(s)
         setMirrorSelectionEnd(e)
         // Store the previous selection value
-        _prev = [s, e, dir]
+        inputMetadataRef.current.prev = [s, e, dir]
       }
       document.addEventListener('selectionchange', onDocumentSelectionChange, {
         capture: true,
