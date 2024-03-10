@@ -415,6 +415,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             bottom: 0,
             left: '100%',
             pointerEvents: 'none',
+            userSelect:'none',
             background: 'transparent',
           }}
         />

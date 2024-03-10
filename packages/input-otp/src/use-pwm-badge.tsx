@@ -20,41 +20,54 @@ export function usePasswordManagerBadge({
   pwmAreaRef: React.RefObject<HTMLDivElement>
   pushPasswordManagerStrategy: OTPInputProps['pushPasswordManagerStrategy']
 }) {
-  /** Password managers have a badge
-   *  and I'll use this state to push them
-   *  outside the input */
-  const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
-  const [hasPWMBadgeSpace, setHasPWMBadgeSpace] = React.useState(false)
-
-  const willPushPWMBadge = React.useMemo(
-    () =>
-      (pushPasswordManagerStrategy === 'increase-width' &&
-        hasPWMBadge &&
-        hasPWMBadgeSpace),
-    [hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy],
-  )
-
   // Metadata for instant updates (not React state)
   const pwmMetadata = React.useRef({
     done: false,
     refocused: false,
   })
 
+  /** Password managers have a badge
+   *  and I'll use this state to push them
+   *  outside the input */
+  const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
+  const [hasPWMBadgeSpace, setHasPWMBadgeSpace] = React.useState(false)
+
+  const willPushPWMBadge = React.useMemo(() => {
+    const noFlickeringCase =
+      pushPasswordManagerStrategy === 'experimental-no-flickering' &&
+      (!pwmMetadata.current.done || (pwmMetadata.current.done && hasPWMBadgeSpace && hasPWMBadge))
+
+    const increaseWidthCase =
+      pushPasswordManagerStrategy === 'increase-width' &&
+      hasPWMBadge &&
+      hasPWMBadgeSpace
+
+    return increaseWidthCase || noFlickeringCase
+  }, [hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy])
+
   const trackPWMBadge = React.useCallback(() => {
     const input = inputRef.current
+    const pwmArea = pwmAreaRef.current
     if (
       !input ||
+      !pwmArea ||
       pushPasswordManagerStrategy === 'none' ||
       pwmMetadata.current.done
     ) {
       return
     }
 
+    const elementToCompare =
+      pushPasswordManagerStrategy === 'increase-width' ? input : pwmArea
+
     // Get the top right-center point of the input.
     // That is usually where most password managers place their badge.
-    const rightCornerX = input.getBoundingClientRect().left + input.offsetWidth
+    const rightCornerX =
+      elementToCompare.getBoundingClientRect().left +
+      elementToCompare.offsetWidth
     const centereredY =
-      input.getBoundingClientRect().top + input.offsetHeight / 2
+      elementToCompare.getBoundingClientRect().top +
+      elementToCompare.offsetHeight / 2
     const x = rightCornerX - PWM_BADGE_MARGIN_RIGHT
     const y = centereredY
     const maybeBadgeEl = document.elementFromPoint(x, y)
@@ -77,7 +90,7 @@ export function usePasswordManagerBadge({
     // this function won't run anymore.
     pwmMetadata.current.done = true
     setHasPWMBadge(true)
-  }, [inputRef, pushPasswordManagerStrategy])
+  }, [inputRef, pushPasswordManagerStrategy, pwmAreaRef])
 
   React.useEffect(() => {
     if (pushPasswordManagerStrategy === 'none') {
@@ -85,6 +98,9 @@ export function usePasswordManagerBadge({
     }
     setTimeout(trackPWMBadge, 2000)
     setTimeout(trackPWMBadge, 5000)
+    setTimeout(() => {
+      pwmMetadata.current.done = true
+    }, 6000)
   }, [pushPasswordManagerStrategy, trackPWMBadge])
 
   React.useEffect(() => {

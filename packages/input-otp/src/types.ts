@@ -24,7 +24,7 @@ export type OTPInputProps = OverrideProps<
     pushPasswordManagerStrategy?:
       | 'increase-width'
       | 'none'
-      // | 'experimental-no-flickering'
+      | 'experimental-no-flickering'
 
     render: (props: RenderProps) => React.ReactElement
 
