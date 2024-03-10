@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
-import { Metadata, OTPInputProps, SelectionType } from './types'
+import { OTPInputProps } from './types'
 import { usePasswordManagerBadge } from './use-pwm-badge'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
@@ -50,9 +50,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     )
 
     /** useRef */
-    const inputRef = React.useRef<
-      HTMLInputElement & { __metadata__?: Metadata }
-    >(null)
+    const inputRef = React.useRef<HTMLInputElement>(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
     const pwmAreaRef = React.useRef<HTMLDivElement>(null)
     const initialLoadRef = React.useRef({
@@ -356,7 +354,18 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           }}
         />
       ),
-      [_changeListener, inputMode, inputStyle, maxLength, mirrorSelectionEnd, mirrorSelectionStart, props, pwmb.trackPWMBadge, regexp?.source, value],
+      [
+        _changeListener,
+        inputMode,
+        inputStyle,
+        maxLength,
+        mirrorSelectionEnd,
+        mirrorSelectionStart,
+        props,
+        pwmb.trackPWMBadge,
+        regexp?.source,
+        value,
+      ],
     )
 
     const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
