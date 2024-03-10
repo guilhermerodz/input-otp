@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "next dev --port=3039",
     "lint": "next lint",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
   },
   "dependencies": {
     "clsx": "^2.1.0",

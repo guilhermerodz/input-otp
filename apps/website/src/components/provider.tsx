@@ -1,8 +1,19 @@
-// 'use client'
+'use client'
+
+import { ThemeProvider } from 'next-themes'
 
 export function AppProvider({
   children,
   ...props
 }: React.PropsWithChildren<{}>) {
-  return <>{children}</>
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      {children}
+    </ThemeProvider>
+  )
 }

@@ -13,7 +13,7 @@ test.describe('Base tests - Selections', () => {
   test('should replace selected char if another is pressed', async ({
     page,
   }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('123')
     // arrow left on keyboard
@@ -24,7 +24,7 @@ test.describe('Base tests - Selections', () => {
   test('should replace multi-selected chars if another is pressed', async ({
     page,
   }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('123456')
     await page.waitForTimeout(100)
@@ -37,7 +37,7 @@ test.describe('Base tests - Selections', () => {
   test('should replace last char if another one is pressed', async ({
     page,
   }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('1234567')
     await page.waitForTimeout(100)
