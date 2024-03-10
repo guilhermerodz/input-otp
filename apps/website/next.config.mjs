@@ -1,8 +1,12 @@
 import { withHydrationOverlay } from '@builder.io/react-hydration-overlay/next'
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextProdConfig = {}
 
-export default withHydrationOverlay({
+const nextDevConfig = withHydrationOverlay({
   appRootSelector: 'main',
-})(nextConfig)
+})(nextProdConfig)
+
+export default process.env.NODE_ENV === 'development'
+  ? nextDevConfig
+  : nextProdConfig
