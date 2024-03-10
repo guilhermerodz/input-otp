@@ -5,16 +5,7 @@ import * as React from 'react'
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { Metadata, OTPInputProps, SelectionType } from './types'
-
-const PWM_BADGE_MARGIN_RIGHT = 18
-const PWM_BADGE_SPACE_WIDTH = '40px'
-// const PWM_BADGE_SPACE_WIDTH = '0px'
-
-const PASSWORD_MANAGERS_SELECTORS = [
-  '[data-lastpass-icon-root]', // LastPass
-  'com-1password-button', // 1Password
-  '[data-dashlanecreated]', // Dashlane
-].join(',')
+import { usePasswordManagerBadge } from './use-pwm-badge'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
@@ -63,7 +54,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       HTMLInputElement & { __metadata__?: Metadata }
     >(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
-    const pmwAreaRef = React.useRef<HTMLDivElement>(null)
+    const pwmAreaRef = React.useRef<HTMLDivElement>(null)
     const initialLoadRef = React.useRef({
       value,
       onChange,
@@ -217,103 +208,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       number | null
     >(null)
 
-    /** Password managers have a badge
-     *  and I'll use this state to push them
-     *  outside the input */
-    const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
-    const [hasPWMBadgeSpace, setHasPWMBadgeSpace] = React.useState(false)
-    const willPushPWMBadge = React.useMemo(
-      () =>
-        passwordManagerBehavior === 'increase-width' &&
-        hasPWMBadge &&
-        hasPWMBadgeSpace,
-      [hasPWMBadge, hasPWMBadgeSpace, passwordManagerBehavior],
-    )
-
-    const pwmMetadata = React.useRef({
-      done: false,
-      refocused: false,
-    })
-    const trackPWMBadge = React.useCallback(() => {
-      const input = inputRef.current
-      if (
-        !input ||
-        passwordManagerBehavior === 'none' ||
-        pwmMetadata.current.done
-      ) {
-        return
-      }
-
-      // Get the top right-center point of the input.
-      // That is usually where most password managers place their badge.
-      const rightCornerX =
-        input.getBoundingClientRect().left + input.offsetWidth
-      const centereredY =
-        input.getBoundingClientRect().top + input.offsetHeight / 2
-      const x = rightCornerX - PWM_BADGE_MARGIN_RIGHT
-      const y = centereredY
-      const maybeBadgeEl = document.elementFromPoint(x, y)
-
-      // Do an extra search to check for famous password managers
-      const pmws = document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS)
-
-      const maybeHasBadge =
-        pmws.length > 0 ||
-        // If the found element is not the input itself,
-        // then we assume it's a password manager badge.
-        // We are not sure. Most times it'll be.
-        maybeBadgeEl !== input
-
-      if (!maybeHasBadge) {
-        return
-      }
-
-      // Once the PWM badge is detected,
-      // this function won't run anymore.
-      pwmMetadata.current.done = true
-      setHasPWMBadge(true)
-    }, [passwordManagerBehavior])
-    React.useEffect(() => {
-      const input = inputRef.current
-      const pwmArea = pmwAreaRef.current
-      if (
-        !input ||
-        !pwmArea ||
-        !hasPWMBadge ||
-        passwordManagerBehavior === 'none'
-      ) {
-        return
-      }
-
-      // For specific password managers,
-      // the input has to be re-focused
-      // to trigger a re-position of the badge.
-      if (!pwmMetadata.current.refocused && document.activeElement === input) {
-        const sel = [input.selectionStart, input.selectionEnd]
-        input.blur()
-        input.focus()
-        // Recover the previous selection
-        input.setSelectionRange(sel[0], sel[1])
-
-        pwmMetadata.current.refocused = true
-      }
-
-      // Check if the PWM area is 100% visible
-      const observer = new IntersectionObserver(
-        entries => {
-          const entry = entries[0]
-          setHasPWMBadgeSpace(entry.intersectionRatio > 0.99)
-        },
-        { threshold: 1, root: null, rootMargin: '0px' },
-      )
-
-      observer.observe(pwmArea)
-
-      return () => {
-        observer.disconnect()
-      }
-    }, [hasPWMBadge, passwordManagerBehavior])
-
     /** Effects */
     React.useEffect(() => {
       syncTimeouts(() => {
@@ -329,13 +223,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
       })
     }, [value, isFocused])
-    React.useEffect(() => {
-      if (passwordManagerBehavior === 'none') {
-        return
-      }
-      setTimeout(trackPWMBadge, 2000)
-      setTimeout(trackPWMBadge, 5000)
-    }, [passwordManagerBehavior, trackPWMBadge])
+
     React.useEffect(() => {
       if (previousValue === undefined) {
         return
@@ -350,6 +238,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
     }, [maxLength, onComplete, previousValue, value])
 
+    const pwmb = usePasswordManagerBadge({
+      inputRef,
+      pwmAreaRef: pwmAreaRef,
+      passwordManagerBehavior,
+    })
+
     /** Event handlers */
     const _changeListener = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -359,9 +253,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
         onChange(newValue)
-        trackPWMBadge()
+        pwmb.trackPWMBadge()
       },
-      [maxLength, onChange, regexp, trackPWMBadge],
+      [maxLength, onChange, pwmb, regexp],
     )
 
     /** Styles */
@@ -381,8 +275,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       () => ({
         position: 'absolute',
         inset: 0,
-        width: willPushPWMBadge
-          ? `calc(100% + ${PWM_BADGE_SPACE_WIDTH})`
+        width: pwmb.willPushPWMBadge
+          ? `calc(100% + ${pwmb.PWM_BADGE_SPACE_WIDTH})`
           : '100%',
         height: '100%',
         display: 'flex',
@@ -412,7 +306,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // padding: '0',
         // letterSpacing: 'unset',
       }),
-      [textAlign, willPushPWMBadge],
+      [pwmb.PWM_BADGE_SPACE_WIDTH, pwmb.willPushPWMBadge, textAlign],
     )
 
     /** Rendering */
@@ -451,7 +345,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               setMirrorSelectionEnd(end)
             }
             setIsFocused(true)
-            setTimeout(trackPWMBadge, 200)
+            setTimeout(pwmb.trackPWMBadge, 200)
 
             props.onFocus?.(e)
           }}
@@ -462,18 +356,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           }}
         />
       ),
-      [
-        _changeListener,
-        inputMode,
-        inputStyle,
-        maxLength,
-        mirrorSelectionEnd,
-        mirrorSelectionStart,
-        props,
-        regexp?.source,
-        trackPWMBadge,
-        value,
-      ],
+      [_changeListener, inputMode, inputStyle, maxLength, mirrorSelectionEnd, mirrorSelectionStart, props, pwmb.trackPWMBadge, regexp?.source, value],
     )
 
     const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
@@ -517,11 +400,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         className={containerClassName}
       >
         <div
-          ref={pmwAreaRef}
+          ref={pwmAreaRef}
           style={{
             position: 'absolute',
             top: 0,
-            right: `calc(-1 * ${PWM_BADGE_SPACE_WIDTH})`,
+            right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
             bottom: 0,
             left: '100%',
             pointerEvents: 'none',
