@@ -422,7 +422,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
         {renderedChildren}
 
-        <div className="absolute inset-0">{renderedInput}</div>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+          }}
+        >
+          {renderedInput}
+        </div>
       </div>
     )
   },
