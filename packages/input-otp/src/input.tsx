@@ -271,9 +271,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
         onChange(newValue)
-        pwmb.trackPWMBadge()
+        pushPasswordManagerStrategy !== 'none' && pwmb.trackPWMBadge()
       },
-      [maxLength, onChange, pwmb, regexp],
+      [maxLength, onChange, pushPasswordManagerStrategy, pwmb, regexp],
     )
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
@@ -284,8 +284,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(end)
       }
       setIsFocused(true)
-      setTimeout(pwmb.trackPWMBadge, 200)
-    }, [maxLength, pwmb.trackPWMBadge])
+      pushPasswordManagerStrategy !== 'none' &&
+        setTimeout(pwmb.trackPWMBadge, 200)
+    }, [maxLength, pushPasswordManagerStrategy, pwmb.trackPWMBadge])
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
@@ -435,7 +436,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             bottom: 0,
             left: '100%',
             pointerEvents: 'none',
-            userSelect:'none',
+            userSelect: 'none',
             background: 'transparent',
           }}
         />
