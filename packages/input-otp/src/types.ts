@@ -30,7 +30,7 @@ export type OTPInputProps = OverrideProps<
 
     containerClassName?: string
 
-    noScriptCSSFallback?: string
+    noScriptCSSFallback?: string | null
   }
 >
 export enum SelectionType {

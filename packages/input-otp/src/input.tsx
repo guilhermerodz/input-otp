@@ -469,9 +469,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     return (
       <>
-        <noscript>
-          <style>{noScriptCSSFallback}</style>
-        </noscript>
+        {noScriptCSSFallback !== null && (
+          <noscript>
+            <style>{noScriptCSSFallback}</style>
+          </noscript>
+        )}
 
         <div
           ref={containerRef}
