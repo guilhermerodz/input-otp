@@ -4,6 +4,7 @@ import { siteConfig } from "../config/site"
 import { cn } from "../lib/utils"
 import { buttonVariants } from "./ui/button"
 import { Icons } from "./icons"
+import { ModeToggle } from "./mode-toggle"
 
 export function SiteHeader() {
   return (
@@ -52,6 +53,7 @@ export function SiteHeader() {
             </Link>
           </nav>
         </div>
+        <ModeToggle />
       </div>
     </header>
   )

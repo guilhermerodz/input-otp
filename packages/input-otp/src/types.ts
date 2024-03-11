@@ -21,17 +21,20 @@ export type OTPInputProps = OverrideProps<
     inputMode?: 'numeric' | 'text'
 
     onComplete?: (...args: any[]) => unknown
+    pushPasswordManagerStrategy?:
+      | 'increase-width'
+      | 'none'
+      | 'experimental-no-flickering'
 
     render: (props: RenderProps) => React.ReactElement
 
     containerClassName?: string
+
+    noScriptCSSFallback?: string | null
   }
 >
 export enum SelectionType {
   CARET = 0,
   CHAR = 1,
   MULTI = 2,
-}
-export interface Metadata {
-  lastClickTimestamp: number
 }

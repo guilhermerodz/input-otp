@@ -12,7 +12,14 @@
     "dev": {
       "cache": false
     },
+    "storybook": {
+      "cache": false
+    },
     "test#test": {
+      "dependsOn": ["input-otp#build"],
+      "cache": false
+    },
+    "test:ui": {
       "dependsOn": ["input-otp#build"],
       "cache": false
     },

@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Base tests - Slots', () => {
   test('should expose the slot value', async ({ page }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('1')
     await expect(input).toHaveValue('1')

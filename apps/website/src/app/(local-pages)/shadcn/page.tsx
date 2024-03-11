@@ -1,18 +1,18 @@
 'use client'
 
-import React from 'react'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from './shadcn-input'
+} from '@/components/ui/input-otp'
+import React from 'react'
 
 export default function ShadcnPage() {
   const [value, setValue] = React.useState('')
 
   return (
-    <div className="container relative flex-1 flex flex-col justify-center items-center">
+    <form className="container relative flex-1 flex flex-col justify-center items-center">
       <InputOTP
         value={value}
         onChange={setValue}
@@ -33,6 +33,6 @@ export default function ShadcnPage() {
           </>
         )}
       />
-    </div>
+    </form>
   )
 }

@@ -1,7 +1,7 @@
 import { Code } from '@/components/code'
+import { useTheme } from 'next-themes'
 
-const tsx =
-`'use client'
+const tsx = `'use client'
 import { OTPInput, SlotProps } from 'input-otp'
 
 <OTPInput
@@ -92,15 +92,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 `
 
-const code =
-`\`\`\`tsx /maxLength={6}/ /render/ /slots/1 /.map((slot, idx)/1 /Slot/ /props.char/2 /<FakeCaret />/
+const code = `\`\`\`tsx /maxLength={6}/ /render/ /slots/1 /.map((slot, idx)/1 /Slot/2,3,4 /props.char/2 /<FakeCaret />/
 ${tsx}
 \`\`\``
 
 export function ExampleCode() {
   return (
     <div className="relative code-example w-full overflow-hidden lg:opacity-0 lg:animate-fade-in [animation-delay:5000ms] animate-none">
-      <Code code={code} toCopy={tsx} />
+      <div className="w-full">
+        <Code dark={false} code={code} toCopy={tsx} />
+        <Code dark={true} code={code} toCopy={tsx} />
+      </div>
 
       <div className="hidden lg:[display:unset] absolute inset-x-0 top-0 -bottom-full code-example-overlay pointer-events-none z-20 [animation-delay:5000ms]"></div>
 

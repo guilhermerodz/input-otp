@@ -1,4 +1,6 @@
-# OTP Input for React
+# The only accessible & unstyled & full featured Input OTP component in the Web.
+
+### OTP Input for React 🔐 by [@guilhermerodz](https://twitter.com/guilherme_rodz)
 
 https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
 
@@ -123,6 +125,8 @@ This library works by rendering an invisible input as a sibling of the slots, co
 
 ## Features
 
+This is the most complete OTP input on the web. It's fully featured 
+
 <details>
 <summary>Supports iOS + Android copy-paste-cut</summary>
 
@@ -165,6 +169,27 @@ https://github.com/guilhermerodz/input-otp/assets/10366880/185985c0-af64-48eb-92
 
 </details>
 
+<details>
+<summary>Automatically optimizes for password managers</summary>
+
+
+For password managers such as LastPass, 1Password, Dashlane or Bitwarden, `input-otp` will automatically detect them in the page and increase input width by ~40px to trick the password manager's browser extension and prevent the badge from rendering to the last/right slot of the input.
+
+<img width="670" alt="image" src="https://github.com/guilhermerodz/input-otp/assets/10366880/9bb306ca-deff-4803-aa3d-148c594a540c">
+
+- **This feature is optional and it's enabled by default. You can disable this optimization by adding `pushPasswordManagerStrategy="none"`.**
+- **This feature does not cause visible layout shift.**
+
+### Auto tracks if the input has space in the right side for the badge
+
+https://github.com/guilhermerodz/input-otp/assets/10366880/bf01af88-1f82-463e-adf4-54a737a92f59
+
+### Experimental flag
+
+Try `pushPasswordManagerStrategy={experimental-no-flickering}` to initially render the input with extra width so that password manager users won't see their badges flickering.
+After ~6 seconds _onfocus_, the input will return to it's original width if no password manager.
+</details>
+
 ## API Reference
 
 ### OTPInput
@@ -200,6 +225,47 @@ type OTPInputProps = {
   // Virtual keyboard appearance on mobile
   // Default: 'numeric'
   inputMode?: 'numeric' | 'text'
+
+  // Enabled by default, it's an optional
+  // strategy for detecting Password Managers
+  // in the page and then shifting their
+  // badges to the right side, outside the input.
+  // There is also `experimental-no-flickering`
+  // (experimental flag use it on your risk)
+  // which won't cause badge flickering at all.
+  // Default: 'increase-width'
+  pushPasswordManagerStrategy?:
+    | 'increase-width'
+    | 'none'
+    | 'experimental-no-flickering'
+
+  // Enabled by default, it's an optional
+  // fallback for pages without JS.
+  // This is a CSS string. Write your own
+  // rules that will be applied as soon as
+  // <noscript> is parsed for no-js pages.
+  // Use `null` to disable any no-js fallback (not recommended).
+  // Default: `
+  // [data-input-otp] {
+  //   --nojs-bg: white !important;
+  //   --nojs-fg: black !important;
+  // 
+  //   background-color: var(--nojs-bg) !important;
+  //   color: var(--nojs-fg) !important;
+  //   caret-color: var(--nojs-fg) !important;
+  //   letter-spacing: .25em !important;
+  //   text-align: center !important;
+  //   border: 1px solid var(--nojs-fg) !important;
+  //   border-radius: 4px !important;
+  //   width: 100% !important;
+  // }
+  // @media (prefers-color-scheme: dark) {
+  //   [data-input-otp] {
+  //     --nojs-bg: black !important;
+  //     --nojs-fg: white !important;
+  //   }
+  // }`
+  noScriptCSSFallback?: string | null
 }
 ```
 
@@ -249,7 +315,69 @@ export default function Page() {
 ## Caveats
 
 <details>
-<summary>If you're using experiencing an unwanted border on input focus:</summary>
+<summary>[Workaround] If you want to block specific password manager/badges:</summary>
+
+By default, `input-otp` handles password managers for you.
+The password manager badges should be automatically shifted to the right side.
+
+However, if you still want to block password managers, please disable the `pushPasswordManagerStrategy` and then manually block each PWM.
+
+```diff
+<OTPInput
+  // First, disable library's built-in strategy
+  // for shifting badges automatically
+- pushPasswordManagerStrategy="increase-width"
+- pushPasswordManagerStrategy="experimental-no-flickering"
++ pushPasswordManagerStrategy="none"
+  // Then, manually add specifics attributes
+  // your password manager docs
+  // Example: block LastPass
++ data-lpignore="true" 
+  // Example: block 1Password
++ data-1p-ignore="true"
+/>
+```
+</details>
+
+<details>
+<summary>[Setting] If you want to customize the <noscript> CSS fallback</summary>
+
+By default, `input-otp` handles cases where JS is not in the page by applying custom CSS styles.
+If you do not like the fallback design and want to apply it to your own, just pass a prop:
+
+```diff
+// This is the default CSS fallback.
+// Feel free to change it entirely and apply to your design system.
+const NOSCRIPT_CSS_FALLBACK = `
+[data-input-otp] {
+  --nojs-bg: white !important;
+  --nojs-fg: black !important;
+
+  background-color: var(--nojs-bg) !important;
+  color: var(--nojs-fg) !important;
+  caret-color: var(--nojs-fg) !important;
+  letter-spacing: .25em !important;
+  text-align: center !important;
+  border: 1px solid var(--nojs-fg) !important;
+  border-radius: 4px !important;
+  width: 100% !important;
+}
+@media (prefers-color-scheme: dark) {
+  [data-input-otp] {
+    --nojs-bg: black !important;
+    --nojs-fg: white !important;
+  }
+}`
+
+<OTPInput
+  // Pass your own custom styles for when JS is disabled
++ noScriptCSSFallback={NOSCRIPT_CSS_FALLBACK}
+/>
+```
+</details>
+
+<details>
+<summary>[Workaround] If you're experiencing an unwanted border on input focus:</summary>
 
 ```diff
 <OTPInput
@@ -262,7 +390,7 @@ export default function Page() {
 </details>
 
 <details>
-<summary>If you want to centralize input text/selection, use the `textAlign` prop:</summary>
+<summary>[Not Recommended] If you want to centralize input text/selection, use the `textAlign` prop:</summary>
 
 ```diff
 <OTPInput
@@ -271,7 +399,7 @@ export default function Page() {
 />
 ```
 
-NOTE: this also affects the selected caret position after a touch/click
+NOTE: this also affects the selected caret position after a touch/click.
 
 `textAlign="left"`
 <img src="https://github.com/guilhermerodz/input-otp/assets/10366880/685a03df-2b69-4a36-b21c-e453f6098f79" width="300" />
@@ -288,7 +416,7 @@ NOTE: this also affects the selected caret position after a touch/click
 </details>
 
 <details>
-<summary>Add Tailwind autocomplete for `containerClassname` attribute in VS Code.</summary>
+<summary>[DX] Add Tailwind autocomplete for `containerClassname` attribute in VS Code.</summary>
 
 Add the following setting to your `.vscode/settings.json`:
 ```diff

@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Delete words', () => {
   test('should backspace previous word (even if there is not a selected character)', async ({ page }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('1234')
     await expect(input).toHaveValue('1234')
@@ -16,7 +16,7 @@ test.describe('Delete words', () => {
     await expect(input).toHaveValue('')
   })
   test('should backspace selected char', async ({ page }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('123456')
     await expect(input).toHaveValue('123456')
@@ -28,7 +28,7 @@ test.describe('Delete words', () => {
     await expect(input).toHaveValue('12356')
   })
   test('should forward-delete character when pressing delete', async ({ page }) => {
-    const input = page.getByTestId('input-otp-wrapper').getByRole('textbox')
+    const input = page.getByRole('textbox')
 
     await input.pressSequentially('123456')
     await expect(input).toHaveValue('123456')
