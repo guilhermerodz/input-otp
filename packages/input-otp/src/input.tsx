@@ -6,6 +6,7 @@ import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps } from './types'
 import { usePasswordManagerBadge } from './use-pwm-badge'
+import { usePrevious } from './use-previous'
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
@@ -57,7 +58,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const initialLoadRef = React.useRef({
       value,
       onChange,
-      isIOS: typeof window !== 'undefined' && window?.CSS?.supports('-webkit-touch-callout', 'none'),
+      isIOS:
+        typeof window !== 'undefined' &&
+        window?.CSS?.supports('-webkit-touch-callout', 'none'),
     })
     const inputMetadataRef = React.useRef<{
       prev: [number | null, number | null, 'none' | 'forward' | 'backward']
@@ -262,6 +265,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputRef,
       pwmAreaRef: pwmAreaRef,
       pushPasswordManagerStrategy,
+      isFocused,
     })
 
     /** Event handlers */
@@ -273,9 +277,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
         onChange(newValue)
-        pushPasswordManagerStrategy !== 'none' && pwmb.trackPWMBadge()
       },
-      [maxLength, onChange, pushPasswordManagerStrategy, pwmb, regexp],
+      [maxLength, onChange, regexp],
     )
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
@@ -286,13 +289,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(end)
       }
       setIsFocused(true)
-      pushPasswordManagerStrategy !== 'none' &&
-        setTimeout(pwmb.trackPWMBadge, 200)
-    }, [maxLength, pushPasswordManagerStrategy, pwmb.trackPWMBadge])
+    }, [maxLength])
     // Fix iOS pasting
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
-        if (!initialLoadRef.current.isIOS || !e.clipboardData) {
+        const input = inputRef.current
+        if (!initialLoadRef.current.isIOS || !e.clipboardData || !input) {
           return
         }
 
@@ -313,16 +315,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
 
+        input.value = newValue
         onChange(newValue)
 
         const _start = Math.min(newValue.length, maxLength - 1)
         const _end = newValue.length
 
-        syncTimeouts(() => {
-          inputRef.current?.setSelectionRange(_start, _end)
-          setMirrorSelectionStart(_start)
-          setMirrorSelectionEnd(_end)
-        })
+        input.setSelectionRange(_start, _end)
+        setMirrorSelectionStart(_start)
+        setMirrorSelectionEnd(_end)
       },
       [maxLength, onChange, regexp, value],
     )
@@ -507,14 +508,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   },
 )
 OTPInput.displayName = 'Input'
-
-function usePrevious<T>(value: T) {
-  const ref = React.useRef<T>()
-  React.useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
 
 function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
   try {
