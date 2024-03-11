@@ -468,42 +468,44 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     ])
 
     return (
-      <div
-        ref={containerRef}
-        data-input-otp-container
-        style={rootStyle}
-        className={containerClassName}
-      >
-        <div
-          ref={pwmAreaRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
-            bottom: 0,
-            left: '100%',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            background: 'transparent',
-          }}
-        />
-
-        {renderedChildren}
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-          }}
-        >
-          {renderedInput}
-        </div>
-
+      <>
         <noscript>
           <style>{noScriptCSSFallback}</style>
         </noscript>
-      </div>
+
+        <div
+          ref={containerRef}
+          data-input-otp-container
+          style={rootStyle}
+          className={containerClassName}
+        >
+          <div
+            ref={pwmAreaRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
+              bottom: 0,
+              left: '100%',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              background: 'transparent',
+            }}
+          />
+
+          {renderedChildren}
+
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+            }}
+          >
+            {renderedInput}
+          </div>
+        </div>
+      </>
     )
   },
 )
