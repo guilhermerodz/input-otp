@@ -184,7 +184,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           // iOS
           safeInsertRule(
             styleEl.sheet,
-            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; left: -1px !important; } }`,
+            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; left: -1px !important; right: 1px !important; } }`,
           )
           // PWM badges
           safeInsertRule(
