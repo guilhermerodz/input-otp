@@ -36,6 +36,7 @@ export function usePasswordManagerBadge({
    *  outside the input */
   const [hasPWMBadge, setHasPWMBadge] = React.useState(false)
   const [hasPWMBadgeSpace, setHasPWMBadgeSpace] = React.useState(false)
+  const [done, setDone] = React.useState(false)
 
   const willPushPWMBadge = React.useMemo(() => {
     if (pushPasswordManagerStrategy === 'none') {
@@ -44,8 +45,7 @@ export function usePasswordManagerBadge({
 
     const noFlickeringCase =
       pushPasswordManagerStrategy === 'experimental-no-flickering' &&
-      (!pwmMetadata.current.done ||
-        (pwmMetadata.current.done && hasPWMBadgeSpace && hasPWMBadge))
+      (!done || (done && hasPWMBadgeSpace && hasPWMBadge))
 
     const increaseWidthCase =
       pushPasswordManagerStrategy === 'increase-width' &&
@@ -53,12 +53,12 @@ export function usePasswordManagerBadge({
       hasPWMBadgeSpace
 
     return increaseWidthCase || noFlickeringCase
-  }, [hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy])
+  }, [done, hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy])
 
   const trackPWMBadge = React.useCallback(() => {
     const input = inputRef.current
     const pwmArea = pwmAreaRef.current
-    if (!input || !pwmArea || pushPasswordManagerStrategy === 'none') {
+    if (!input || !pwmArea || done || pushPasswordManagerStrategy === 'none') {
       return
     }
 
@@ -92,7 +92,7 @@ export function usePasswordManagerBadge({
     }
 
     setHasPWMBadge(true)
-    pwmMetadata.current.done = true
+    setDone(true)
 
     // For specific password managers,
     // the input has to be re-focused
@@ -106,7 +106,7 @@ export function usePasswordManagerBadge({
 
       pwmMetadata.current.refocused = true
     }
-  }, [inputRef, pushPasswordManagerStrategy, pwmAreaRef])
+  }, [done, inputRef, pushPasswordManagerStrategy, pwmAreaRef])
 
   React.useEffect(() => {
     // Check if the PWM area is 100% visible
@@ -131,17 +131,11 @@ export function usePasswordManagerBadge({
     if (pushPasswordManagerStrategy === 'none' || !_isFocused) {
       return
     }
-    const t1 = setTimeout(() => !pwmMetadata.current.done && trackPWMBadge(), 0)
-    const t2 = setTimeout(
-      () => !pwmMetadata.current.done && trackPWMBadge(),
-      2000,
-    )
-    const t3 = setTimeout(
-      () => !pwmMetadata.current.done && trackPWMBadge(),
-      5000,
-    )
+    const t1 = setTimeout(trackPWMBadge, 0)
+    const t2 = setTimeout(trackPWMBadge, 2000)
+    const t3 = setTimeout(trackPWMBadge, 5000)
     const t4 = setTimeout(() => {
-      pwmMetadata.current.done = true
+      setDone(true)
     }, 6000)
     return () => {
       clearTimeout(t1)
