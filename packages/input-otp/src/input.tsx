@@ -541,6 +541,7 @@ const NOSCRIPT_CSS_FALLBACK = `
   text-align: center !important;
   border: 1px solid var(--nojs-fg) !important;
   border-radius: 4px !important;
+  width: 100% !important;
 }
 @media (prefers-color-scheme: dark) {
   [data-input-otp] {
