@@ -57,6 +57,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const initialLoadRef = React.useRef({
       value,
       onChange,
+      isIOS: window.CSS && window.CSS.supports('-webkit-touch-callout', 'none'),
     })
     const inputMetadataRef = React.useRef<{
       prev: [number | null, number | null, 'none' | 'forward' | 'backward']
@@ -183,7 +184,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           // iOS
           safeInsertRule(
             styleEl.sheet,
-            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; clip-path: inset(5px); } }`,
+            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; left: -1px !important; } }`,
           )
           // PWM badges
           safeInsertRule(
@@ -288,6 +289,43 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pushPasswordManagerStrategy !== 'none' &&
         setTimeout(pwmb.trackPWMBadge, 200)
     }, [maxLength, pushPasswordManagerStrategy, pwmb.trackPWMBadge])
+    // Fix iOS pasting
+    const _pasteListener = React.useCallback(
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        if (!initialLoadRef.current.isIOS || !e.clipboardData) {
+          return
+        }
+
+        const content = e.clipboardData.getData('text/plain')
+        e.preventDefault()
+
+        const start = inputRef.current?.selectionStart
+        const end = inputRef.current?.selectionEnd
+
+        const isReplacing = start !== end
+
+        const newValueUncapped = isReplacing
+          ? value.slice(0, start) + content + value.slice(end) // Replacing
+          : value.slice(0, start) + content + value.slice(start) // Inserting
+        const newValue = newValueUncapped.slice(0, maxLength)
+
+        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+          return
+        }
+
+        onChange(newValue)
+
+        const _start = Math.min(newValue.length, maxLength - 1)
+        const _end = newValue.length
+
+        syncTimeouts(() => {
+          inputRef.current?.setSelectionRange(_start, _end)
+          setMirrorSelectionStart(_start)
+          setMirrorSelectionEnd(_end)
+        })
+      },
+      [maxLength, onChange, regexp, value],
+    )
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
@@ -357,6 +395,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           maxLength={maxLength}
           value={value}
           ref={inputRef}
+          onPaste={e => {
+            _pasteListener(e)
+            props.onPaste?.(e)
+          }}
           onChange={_changeListener}
           onMouseOver={e => {
             setIsHoveringInput(true)
@@ -379,6 +421,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       [
         _changeListener,
         _focusListener,
+        _pasteListener,
         inputMode,
         inputStyle,
         maxLength,
