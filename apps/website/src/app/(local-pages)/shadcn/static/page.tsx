@@ -1,11 +1,9 @@
 'use server'
 
-import { ClientComp } from './client-component'
+import { default as ShadcnPage } from '../page'
 
-export default async function StaticPage() {
+export default async function StaticPage(pageProps: any) {
   return (
-    <>
-      <ClientComp />
-    </>
+    <ShadcnPage {...pageProps} />
   )
 }
