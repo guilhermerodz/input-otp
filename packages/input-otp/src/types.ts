@@ -31,7 +31,7 @@ type OTPInputBaseProps = OverrideProps<
     noScriptCSSFallback?: string | null
   }
 >
-type InputOTPRenderFn = (props: RenderProps) => React.ReactElement
+type InputOTPRenderFn = (props: RenderProps) => React.ReactNode
 export type OTPInputProps = OTPInputBaseProps &
   (
     | {
