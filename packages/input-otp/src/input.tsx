@@ -4,9 +4,11 @@ import * as React from 'react'
 
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
-import { OTPInputProps } from './types'
+import { OTPInputProps, RenderProps } from './types'
 import { usePasswordManagerBadge } from './use-pwm-badge'
 import { usePrevious } from './use-previous'
+
+export const OTPInputContext = React.createContext<RenderProps>({} as RenderProps)
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
@@ -19,9 +21,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputMode = 'numeric',
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
-      render,
       containerClassName,
       noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
+
+      render,
+      children,
+
       ...props
     },
     ref,
@@ -434,8 +439,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       ],
     )
 
-    const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
-      return render({
+    const contextValue = React.useMemo<RenderProps>(() => {
+      return {
         slots: Array.from({ length: maxLength }).map((_, slotIdx) => {
           const isActive =
             isFocused &&
@@ -455,7 +460,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }),
         isFocused,
         isHovering: !props.disabled && isHoveringInput,
-      })
+      }
     }, [
       isFocused,
       isHoveringInput,
@@ -463,9 +468,19 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       mirrorSelectionEnd,
       mirrorSelectionStart,
       props.disabled,
-      render,
       value,
     ])
+
+    const renderedChildren = React.useMemo(() => {
+      if (render) {
+        return render(contextValue)
+      }
+      return (
+        <OTPInputContext.Provider value={contextValue}>
+          {children}
+        </OTPInputContext.Provider>
+      )
+    }, [children, contextValue, render])
 
     return (
       <>

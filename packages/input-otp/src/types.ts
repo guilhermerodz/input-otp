@@ -9,7 +9,7 @@ export interface RenderProps {
   isHovering: boolean
 }
 type OverrideProps<T, R> = Omit<T, keyof R> & R
-export type OTPInputProps = OverrideProps<
+type OTPInputBaseProps = OverrideProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   {
     value?: string
@@ -26,10 +26,20 @@ export type OTPInputProps = OverrideProps<
       | 'none'
       | 'experimental-no-flickering'
 
-    render: (props: RenderProps) => React.ReactElement
-
     containerClassName?: string
 
     noScriptCSSFallback?: string | null
   }
 >
+type InputOTPRenderFn = (props: RenderProps) => React.ReactElement
+export type OTPInputProps = OTPInputBaseProps &
+  (
+    | {
+        render: InputOTPRenderFn
+        children?: never
+      }
+    | {
+        render?: never
+        children: React.ReactNode
+      }
+  )
