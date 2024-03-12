@@ -205,6 +205,9 @@ type OTPInputProps = {
 
   // Render function creating the slots
   render: (props: RenderProps) => React.ReactElement
+  // PS: Render prop is mandatory, except in cases
+  // you'd like to consume the original Context API.
+  // (search for Context in this docs)
 
   // The class name for the root container
   containerClassName?: string
@@ -340,7 +343,7 @@ However, if you still want to block password managers, please disable the `pushP
 </details>
 
 <details>
-<summary>[Setting] If you want to customize the <noscript> CSS fallback</summary>
+<summary>[Setting] If you want to customize the `noscript` CSS fallback</summary>
 
 By default, `input-otp` handles cases where JS is not in the page by applying custom CSS styles.
 If you do not like the fallback design and want to apply it to your own, just pass a prop:
@@ -397,6 +400,44 @@ const NOSCRIPT_CSS_FALLBACK = `
   // customizable but not recommended
 + textAlign="center"
 />
+```
+
+NOTE: this also affects the selected caret position after a touch/click.
+
+`textAlign="left"`
+<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/685a03df-2b69-4a36-b21c-e453f6098f79" width="300" />
+<br>
+
+`textAlign="center"`
+<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/e0f15b97-ceb8-40c8-96b7-fa3a8896379f" width="300" />
+<br>
+
+`textAlign="right"`
+<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/26697579-0e8b-4dad-8b85-3a036102e951" width="300" />
+<br>
+
+</details>
+
+<details>
+<summary>If you want to use Context props:</summary>
+
+```diff
++import { OTPInputContext } from 'input-otp'
+
+function MyForm() {
++ const inputContext = React.useContext(OTPInputContext)
+  return (
+    <OTPInput
+-     // First remove the `render` prop
+-     render={...}
+    >
++     {/* Then consume context */}
++     {inputContext.slots.map((slot, idx) => (
++       <Slot key={idx} {...slot} />
++     ))}
++   </OTPInput>
+  )
+}
 ```
 
 NOTE: this also affects the selected caret position after a touch/click.
