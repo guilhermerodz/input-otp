@@ -119,15 +119,18 @@
 }
 .code-example-light {
 }
-.dark .code-example-light {
-  display: none;
-}
 .code-example-dark {
   display: none;
 }
-.dark .code-example-dark {
-  display: unset;
+@media (prefers-color-scheme: dark) {
+  .code-example-light {
+    display: none;
+  }
+  .code-example-dark {
+    display: unset;
+  }
 }
+
 @media (prefers-reduced-motion: reduce) {
   .code-example-overlay {
     opacity: 0;
