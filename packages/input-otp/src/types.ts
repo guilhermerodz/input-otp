@@ -33,8 +33,3 @@ export type OTPInputProps = OverrideProps<
     noScriptCSSFallback?: string | null
   }
 >
-export enum SelectionType {
-  CARET = 0,
-  CHAR = 1,
-  MULTI = 2,
-}
