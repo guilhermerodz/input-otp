@@ -3,6 +3,7 @@
 import {
   InputOTP,
   InputOTPGroup,
+  InputOTPRenderSlot,
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
@@ -35,13 +36,13 @@ export default function ShadcnPage() {
           <>
             <InputOTPGroup>
               {slots.slice(0, 3).map((slot, index) => (
-                <InputOTPSlot key={index} {...slot} />
-              ))}{' '}
+                <InputOTPRenderSlot key={index} {...slot} />
+              ))}
             </InputOTPGroup>
             <InputOTPSeparator />
             <InputOTPGroup>
               {slots.slice(3).map((slot, index) => (
-                <InputOTPSlot key={index} {...slot} />
+                <InputOTPRenderSlot key={index} {...slot} />
               ))}
             </InputOTPGroup>
           </>
