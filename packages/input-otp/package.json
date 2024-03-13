@@ -1,6 +1,6 @@
 {
   "name": "input-otp",
-  "version": "1.1.0",
+  "version": "1.2.0-beta.1",
   "author": "Guilherme Rodz <g@rodz.dev>",
   "description": "One-time password input component for React.",
   "license": "MIT",
@@ -47,7 +47,9 @@
     "lint:format": "prettier --check \"src/**/*.ts\"",
     "lint:format:fix": "prettier --check \"src/**/*.ts\" --write",
     "lint:tsc": "tsc --project tsconfig.json --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "release": "npm publish",
+    "release:beta": "npm publish --tag beta"
   },
   "eslintConfig": {
     "root": true,

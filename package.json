@@ -23,8 +23,8 @@
     "type-check": "turbo run type-check",
     "lint:lib": "turbo run lint --filter=input-otp",
     "format": "prettier --write .",
-    "prerelease": "run-p test",
-    "release": "cd ./packages/input-otp && cp ../../README.md . && npm publish && rimraf ./README.md && cd ../.."
+    "release": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release && rimraf ./README.md && cd ../..",
+    "release:beta": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../.."
   },
   "prettier": {
     "tabWidth": 2,
