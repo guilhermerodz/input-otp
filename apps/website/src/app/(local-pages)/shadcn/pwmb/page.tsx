@@ -3,6 +3,7 @@
 import {
   InputOTP,
   InputOTPGroup,
+  InputOTPRenderSlot,
   InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
@@ -14,12 +15,12 @@ export default function ShadcnPage() {
 
   return (
     <form className="container relative flex-1 flex flex-col justify-center items-center">
-      <input
+      {/* <input
         // test pwmb
         type="text"
         autoComplete="username webauthn"
         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-      />
+      /> */}
       <InputOTP
         autoFocus
         // test pwmb
@@ -35,13 +36,13 @@ export default function ShadcnPage() {
           <>
             <InputOTPGroup>
               {slots.slice(0, 3).map((slot, index) => (
-                <InputOTPSlot key={index} {...slot} />
-              ))}{' '}
+                <InputOTPRenderSlot key={index} {...slot} />
+              ))}
             </InputOTPGroup>
             <InputOTPSeparator />
             <InputOTPGroup>
               {slots.slice(3).map((slot, index) => (
-                <InputOTPSlot key={index} {...slot} />
+                <InputOTPRenderSlot key={index} {...slot} />
               ))}
             </InputOTPGroup>
           </>

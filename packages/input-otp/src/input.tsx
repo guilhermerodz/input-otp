@@ -4,8 +4,11 @@ import * as React from 'react'
 
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
-import { OTPInputProps } from './types'
+import { OTPInputProps, RenderProps } from './types'
 import { usePasswordManagerBadge } from './use-pwm-badge'
+import { usePrevious } from './use-previous'
+
+export const OTPInputContext = React.createContext<RenderProps>({} as RenderProps)
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
@@ -18,8 +21,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputMode = 'numeric',
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
-      render,
       containerClassName,
+      noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
+
+      render,
+      children,
+
       ...props
     },
     ref,
@@ -56,6 +63,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const initialLoadRef = React.useRef({
       value,
       onChange,
+      isIOS:
+        typeof window !== 'undefined' &&
+        window?.CSS?.supports('-webkit-touch-callout', 'none'),
     })
     const inputMetadataRef = React.useRef<{
       prev: [number | null, number | null, 'none' | 'forward' | 'backward']
@@ -182,7 +192,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           // iOS
           safeInsertRule(
             styleEl.sheet,
-            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; } }`,
+            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; left: -1px !important; right: 1px !important; } }`,
           )
           // PWM badges
           safeInsertRule(
@@ -260,6 +270,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputRef,
       pwmAreaRef: pwmAreaRef,
       pushPasswordManagerStrategy,
+      isFocused,
     })
 
     /** Event handlers */
@@ -271,9 +282,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           return
         }
         onChange(newValue)
-        pushPasswordManagerStrategy !== 'none' && pwmb.trackPWMBadge()
       },
-      [maxLength, onChange, pushPasswordManagerStrategy, pwmb, regexp],
+      [maxLength, onChange, regexp],
     )
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
@@ -284,9 +294,44 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(end)
       }
       setIsFocused(true)
-      pushPasswordManagerStrategy !== 'none' &&
-        setTimeout(pwmb.trackPWMBadge, 200)
-    }, [maxLength, pushPasswordManagerStrategy, pwmb.trackPWMBadge])
+    }, [maxLength])
+    // Fix iOS pasting
+    const _pasteListener = React.useCallback(
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        const input = inputRef.current
+        if (!initialLoadRef.current.isIOS || !e.clipboardData || !input) {
+          return
+        }
+
+        const content = e.clipboardData.getData('text/plain')
+        e.preventDefault()
+
+        const start = inputRef.current?.selectionStart
+        const end = inputRef.current?.selectionEnd
+
+        const isReplacing = start !== end
+
+        const newValueUncapped = isReplacing
+          ? value.slice(0, start) + content + value.slice(end) // Replacing
+          : value.slice(0, start) + content + value.slice(start) // Inserting
+        const newValue = newValueUncapped.slice(0, maxLength)
+
+        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
+          return
+        }
+
+        input.value = newValue
+        onChange(newValue)
+
+        const _start = Math.min(newValue.length, maxLength - 1)
+        const _end = newValue.length
+
+        input.setSelectionRange(_start, _end)
+        setMirrorSelectionStart(_start)
+        setMirrorSelectionEnd(_end)
+      },
+      [maxLength, onChange, regexp, value],
+    )
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
@@ -323,6 +368,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         lineHeight: '1',
         letterSpacing: '-.5em',
         fontSize: 'var(--root-height)',
+        fontFamily: 'monospace',
+        fontVariantNumeric: 'tabular-nums',
         // letterSpacing: '-1em',
         // transform: 'scale(1.5)',
         // paddingRight: '100%',
@@ -355,6 +402,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           maxLength={maxLength}
           value={value}
           ref={inputRef}
+          onPaste={e => {
+            _pasteListener(e)
+            props.onPaste?.(e)
+          }}
           onChange={_changeListener}
           onMouseOver={e => {
             setIsHoveringInput(true)
@@ -377,6 +428,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       [
         _changeListener,
         _focusListener,
+        _pasteListener,
         inputMode,
         inputStyle,
         maxLength,
@@ -388,8 +440,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       ],
     )
 
-    const renderedChildren = React.useMemo<ReturnType<typeof render>>(() => {
-      return render({
+    const contextValue = React.useMemo<RenderProps>(() => {
+      return {
         slots: Array.from({ length: maxLength }).map((_, slotIdx) => {
           const isActive =
             isFocused &&
@@ -409,7 +461,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }),
         isFocused,
         isHovering: !props.disabled && isHoveringInput,
-      })
+      }
     }, [
       isFocused,
       isHoveringInput,
@@ -417,55 +469,65 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       mirrorSelectionEnd,
       mirrorSelectionStart,
       props.disabled,
-      render,
       value,
     ])
 
+    const renderedChildren = React.useMemo(() => {
+      if (render) {
+        return render(contextValue)
+      }
+      return (
+        <OTPInputContext.Provider value={contextValue}>
+          {children}
+        </OTPInputContext.Provider>
+      )
+    }, [children, contextValue, render])
+
     return (
-      <div
-        ref={containerRef}
-        data-input-otp-container
-        style={rootStyle}
-        className={containerClassName}
-      >
-        <div
-          ref={pwmAreaRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
-            bottom: 0,
-            left: '100%',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            background: 'transparent',
-          }}
-        />
-
-        {renderedChildren}
+      <>
+        {noScriptCSSFallback !== null && (
+          <noscript>
+            <style>{noScriptCSSFallback}</style>
+          </noscript>
+        )}
 
         <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-          }}
+          ref={containerRef}
+          data-input-otp-container
+          style={rootStyle}
+          className={containerClassName}
         >
-          {renderedInput}
+          <div
+            ref={pwmAreaRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
+              bottom: 0,
+              left: '100%',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              background: 'transparent',
+            }}
+          />
+
+          {renderedChildren}
+
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+            }}
+          >
+            {renderedInput}
+          </div>
         </div>
-      </div>
+      </>
     )
   },
 )
 OTPInput.displayName = 'Input'
-
-function usePrevious<T>(value: T) {
-  const ref = React.useRef<T>()
-  React.useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
 
 function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
   try {
@@ -474,3 +536,29 @@ function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
     console.error('input-otp could not insert CSS rule:', rule)
   }
 }
+
+// Decided to go with <noscript>
+// instead of `scripting` CSS media query
+// because it's a fallback for initial page load
+// and the <script> tag won't be loaded
+// unless the user has JS disabled.
+const NOSCRIPT_CSS_FALLBACK = `
+[data-input-otp] {
+  --nojs-bg: white !important;
+  --nojs-fg: black !important;
+
+  background-color: var(--nojs-bg) !important;
+  color: var(--nojs-fg) !important;
+  caret-color: var(--nojs-fg) !important;
+  letter-spacing: .25em !important;
+  text-align: center !important;
+  border: 1px solid var(--nojs-fg) !important;
+  border-radius: 4px !important;
+  width: 100% !important;
+}
+@media (prefers-color-scheme: dark) {
+  [data-input-otp] {
+    --nojs-bg: black !important;
+    --nojs-fg: white !important;
+  }
+}`

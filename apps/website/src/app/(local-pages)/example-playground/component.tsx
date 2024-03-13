@@ -6,7 +6,7 @@ import { OTPInput, SlotProps } from 'input-otp'
 import { cn } from '@/lib/utils'
 
 export function ExampleComponent(
-  props: Partial<React.ComponentProps<typeof OTPInput>>,
+  props: Partial<Omit<React.ComponentProps<typeof OTPInput>, 'children'>>,
 ) {
   return (
     <OTPInput
