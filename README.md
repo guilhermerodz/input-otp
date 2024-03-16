@@ -425,19 +425,26 @@ NOTE: this also affects the selected caret position after a touch/click.
 +import { OTPInputContext } from 'input-otp'
 
 function MyForm() {
-+ const inputContext = React.useContext(OTPInputContext)
   return (
     <OTPInput
 -     // First remove the `render` prop
 -     render={...}
     >
-+     {/* Then consume context */}
+      <OTPInputWrapper />
+    </OTPInput>
+  )
+}
+
++function OTPInputWrapper() {
++ const inputContext = React.useContext(OTPInputContext)
++ return (
++   <>
 +     {inputContext.slots.map((slot, idx) => (
 +       <Slot key={idx} {...slot} />
 +     ))}
-+   </OTPInput>
-  )
-}
++   </>
++ )
++}
 ```
 
 NOTE: this also affects the selected caret position after a touch/click.
