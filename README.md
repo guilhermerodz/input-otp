@@ -227,7 +227,7 @@ type OTPInputProps = {
 
   // Virtual keyboard appearance on mobile
   // Default: 'numeric'
-  inputMode?: 'numeric' | 'text'
+  inputMode?: 'numeric' | 'text' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
 
   // Enabled by default, it's an optional
   // strategy for detecting Password Managers
