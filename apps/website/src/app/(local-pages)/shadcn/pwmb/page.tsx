@@ -24,8 +24,8 @@ export default function ShadcnPage() {
       <InputOTP
         autoFocus
         // test pwmb
-        type="text"
-        autoComplete="username webauthn"
+        type="password"
+        autoComplete="password webauthn"
         pushPasswordManagerStrategy="experimental-no-flickering"
         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
         //

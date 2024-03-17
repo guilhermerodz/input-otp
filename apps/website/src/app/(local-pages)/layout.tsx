@@ -18,7 +18,7 @@ export default function RootLayout({
         )}
       >
         <AppProvider>
-          <div className="relative flex min-h-[100dvh] flex-col bg-background">
+          <div className="relative flex min-h-[100dvh] w-full flex-col bg-background">
             {/* <HydrationOverlay> */}
             <main className="flex-1 flex flex-col">{children}</main>
             {/* </HydrationOverlay> */}
