@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 
 // import { HydrationOverlay } from '@builder.io/react-hydration-overlay'
 
-import { SiteFooter } from '../components/site-footer'
-import { SiteHeader } from '../components/site-header'
-import { siteConfig } from '../config/site'
-import { fontSans } from '../lib/fonts'
-import { cn } from '../lib/utils'
-import './globals.css'
-import { AppProvider } from '../components/provider'
+import { SiteFooter } from '../../components/site-footer'
+import { SiteHeader } from '../../components/site-header'
+import { siteConfig } from '../../config/site'
+import { fontSans } from '../../lib/fonts'
+import { cn } from '../../lib/utils'
+import '../globals.css'
+import { AppProvider } from '../../components/provider'
 import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
