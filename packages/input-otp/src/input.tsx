@@ -5,10 +5,12 @@ import * as React from 'react'
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, RenderProps } from './types'
-import { usePasswordManagerBadge } from './use-pwm-badge'
 import { usePrevious } from './use-previous'
+import { usePasswordManagerBadge } from './use-pwm-badge'
 
-export const OTPInputContext = React.createContext<RenderProps>({} as RenderProps)
+export const OTPInputContext = React.createContext<RenderProps>(
+  {} as RenderProps,
+)
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
@@ -59,7 +61,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     /** useRef */
     const inputRef = React.useRef<HTMLInputElement>(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
-    const pwmAreaRef = React.useRef<HTMLDivElement>(null)
     const initialLoadRef = React.useRef({
       value,
       onChange,
@@ -267,8 +268,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     }, [maxLength, onComplete, previousValue, value])
 
     const pwmb = usePasswordManagerBadge({
+      containerRef,
       inputRef,
-      pwmAreaRef: pwmAreaRef,
       pushPasswordManagerStrategy,
       isFocused,
     })
@@ -341,7 +342,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         userSelect: 'none',
         WebkitUserSelect: 'none',
         pointerEvents: 'none',
-        // clipPath: willPushPWMBadge ? 'inset(-2px)' : undefined,
       }),
       [props.disabled],
     )
@@ -353,6 +353,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         width: pwmb.willPushPWMBadge
           ? `calc(100% + ${pwmb.PWM_BADGE_SPACE_WIDTH})`
           : '100%',
+        clipPath: pwmb.willPushPWMBadge
+          ? `inset(0 ${pwmb.PWM_BADGE_SPACE_WIDTH} 0 0)`
+          : undefined,
         height: '100%',
         display: 'flex',
         textAlign,
@@ -496,20 +499,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           style={rootStyle}
           className={containerClassName}
         >
-          <div
-            ref={pwmAreaRef}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: `calc(-1 * ${pwmb.PWM_BADGE_SPACE_WIDTH})`,
-              bottom: 0,
-              left: '100%',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              background: 'transparent',
-            }}
-          />
-
           {renderedChildren}
 
           <div

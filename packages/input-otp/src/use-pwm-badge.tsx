@@ -2,7 +2,8 @@ import * as React from 'react'
 import { OTPInputProps } from './types'
 
 const PWM_BADGE_MARGIN_RIGHT = 18
-const PWM_BADGE_SPACE_WIDTH = '40px'
+const PWM_BADGE_SPACE_WIDTH_PX = 40
+const PWM_BADGE_SPACE_WIDTH = `${PWM_BADGE_SPACE_WIDTH_PX}px` as const
 
 const PASSWORD_MANAGERS_SELECTORS = [
   '[data-lastpass-icon-root]', // LastPass
@@ -12,13 +13,13 @@ const PASSWORD_MANAGERS_SELECTORS = [
 ].join(',')
 
 export function usePasswordManagerBadge({
+  containerRef,
   inputRef,
-  pwmAreaRef,
   pushPasswordManagerStrategy,
   isFocused,
 }: {
+  containerRef: React.RefObject<HTMLDivElement>
   inputRef: React.RefObject<HTMLInputElement>
-  pwmAreaRef: React.RefObject<HTMLDivElement>
   pushPasswordManagerStrategy: OTPInputProps['pushPasswordManagerStrategy']
   isFocused: boolean
 }) {
@@ -43,29 +44,29 @@ export function usePasswordManagerBadge({
       return false
     }
 
-    const noFlickeringCase =
-      pushPasswordManagerStrategy === 'experimental-no-flickering' &&
-      (!done || (done && hasPWMBadgeSpace && hasPWMBadge))
-
     const increaseWidthCase =
       pushPasswordManagerStrategy === 'increase-width' &&
       hasPWMBadge &&
       hasPWMBadgeSpace
 
-    return increaseWidthCase || noFlickeringCase
-  }, [done, hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy])
+    return increaseWidthCase
+  }, [hasPWMBadge, hasPWMBadgeSpace, pushPasswordManagerStrategy])
 
   const trackPWMBadge = React.useCallback(() => {
+    const container = containerRef.current
     const input = inputRef.current
-    const pwmArea = pwmAreaRef.current
-    if (!input || !pwmArea || done || pushPasswordManagerStrategy === 'none') {
+    if (
+      !container ||
+      !input ||
+      done ||
+      pushPasswordManagerStrategy === 'none'
+    ) {
       return
     }
 
-    const elementToCompare =
-      pushPasswordManagerStrategy === 'increase-width' ? input : pwmArea
+    const elementToCompare = container
 
-    // Get the top right-center point of the input.
+    // Get the top right-center point of the container.
     // That is usually where most password managers place their badge.
     const rightCornerX =
       elementToCompare.getBoundingClientRect().left +
@@ -75,20 +76,22 @@ export function usePasswordManagerBadge({
       elementToCompare.offsetHeight / 2
     const x = rightCornerX - PWM_BADGE_MARGIN_RIGHT
     const y = centereredY
-    const maybeBadgeEl = document.elementFromPoint(x, y)
 
     // Do an extra search to check for famous password managers
     const pmws = document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS)
 
-    const maybeHasBadge =
-      pmws.length > 0 ||
-      // If the found element is not the input itself,
-      // then we assume it's a password manager badge.
-      // We are not sure. Most times it'll be.
-      maybeBadgeEl !== input
+    // If no password manager is automatically detect,
+    // we'll try to dispatch document.elementFromPoint
+    // to identify badges
+    if (pmws.length === 0) {
+      const maybeBadgeEl = document.elementFromPoint(x, y)
 
-    if (!maybeHasBadge) {
-      return
+      // If the found element is the input itself,
+      // then we assume it's not a password manager badge.
+      // We are not sure. Most times that means there isn't a badge.
+      if (maybeBadgeEl === container) {
+        return
+      }
     }
 
     setHasPWMBadge(true)
@@ -106,24 +109,29 @@ export function usePasswordManagerBadge({
 
       pwmMetadata.current.refocused = true
     }
-  }, [done, inputRef, pushPasswordManagerStrategy, pwmAreaRef])
+  }, [containerRef, inputRef, done, pushPasswordManagerStrategy])
 
   React.useEffect(() => {
-    // Check if the PWM area is 100% visible
-    const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0]
-        setHasPWMBadgeSpace(entry.intersectionRatio > 0.99)
-      },
-      { threshold: 1, root: null, rootMargin: '0px' },
-    )
+    const container = containerRef.current
+    if (!container || pushPasswordManagerStrategy === 'none') {
+      return
+    }
 
-    pwmAreaRef.current && observer.observe(pwmAreaRef.current)
+    // Check if the PWM area is 100% visible
+    function checkHasSpace() {
+      const viewportWidth = window.innerWidth
+      const distanceToRightEdge =
+        viewportWidth - container.getBoundingClientRect().right
+      setHasPWMBadgeSpace(distanceToRightEdge >= PWM_BADGE_SPACE_WIDTH_PX)
+    }
+
+    checkHasSpace()
+    const interval = setInterval(checkHasSpace, 1000)
 
     return () => {
-      observer.disconnect()
+      clearInterval(interval)
     }
-  }, [pwmAreaRef])
+  }, [containerRef, pushPasswordManagerStrategy])
 
   React.useEffect(() => {
     const _isFocused = isFocused || document.activeElement === inputRef.current
@@ -145,5 +153,5 @@ export function usePasswordManagerBadge({
     }
   }, [inputRef, isFocused, pushPasswordManagerStrategy, trackPWMBadge])
 
-  return { willPushPWMBadge, PWM_BADGE_SPACE_WIDTH }
+  return { hasPWMBadge, willPushPWMBadge, PWM_BADGE_SPACE_WIDTH }
 }

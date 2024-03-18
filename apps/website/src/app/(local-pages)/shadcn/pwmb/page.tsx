@@ -26,7 +26,7 @@ export default function ShadcnPage() {
         // test pwmb
         type="password"
         autoComplete="password webauthn"
-        pushPasswordManagerStrategy="experimental-no-flickering"
+        pushPasswordManagerStrategy="increase-width"
         pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
         //
         // value={value}
