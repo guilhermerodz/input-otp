@@ -176,7 +176,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
         if (styleEl.sheet) {
           const autofillStyles =
-            'background: transparent !important; text: transparent !important; border-color: transparent !important; opacity: 0 !important; box-shadow: none !important; -webkit-box-shadow: none !important; -webkit-text-fill-color: transparent !important;'
+            'background: transparent !important; color: transparent !important; border-color: transparent !important; opacity: 0 !important; box-shadow: none !important; -webkit-box-shadow: none !important; -webkit-text-fill-color: transparent !important;'
 
           safeInsertRule(
             styleEl.sheet,
