@@ -45,7 +45,9 @@ export function usePasswordManagerBadge({
     }
 
     const increaseWidthCase =
-      pushPasswordManagerStrategy === 'increase-width' &&
+      (pushPasswordManagerStrategy === 'increase-width' ||
+        // TODO: remove 'experimental-no-flickering' support in 2.0.0
+        pushPasswordManagerStrategy === 'experimental-no-flickering') &&
       hasPWMBadge &&
       hasPWMBadgeSpace
 
