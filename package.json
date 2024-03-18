@@ -24,7 +24,9 @@
     "lint:lib": "turbo run lint --filter=input-otp",
     "format": "prettier --write .",
     "release": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release && rimraf ./README.md && cd ../..",
-    "release:beta": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../.."
+    "release:bypass": "run-s build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release && rimraf ./README.md && cd ../..",
+    "release:beta": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../..",
+    "release:beta:bypass": "run-s build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../.."
   },
   "prettier": {
     "tabWidth": 2,
