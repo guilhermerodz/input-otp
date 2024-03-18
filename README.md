@@ -184,10 +184,6 @@ For password managers such as LastPass, 1Password, Dashlane or Bitwarden, `input
 
 https://github.com/guilhermerodz/input-otp/assets/10366880/bf01af88-1f82-463e-adf4-54a737a92f59
 
-### Experimental flag
-
-Try `pushPasswordManagerStrategy={experimental-no-flickering}` to initially render the input with extra width so that password manager users won't see their badges flickering.
-After ~6 seconds _onfocus_, the input will return to it's original width if no password manager.
 </details>
 
 ## API Reference
@@ -233,14 +229,9 @@ type OTPInputProps = {
   // strategy for detecting Password Managers
   // in the page and then shifting their
   // badges to the right side, outside the input.
-  // There is also `experimental-no-flickering`
-  // (experimental flag use it on your risk)
-  // which won't cause badge flickering at all.
-  // Default: 'increase-width'
   pushPasswordManagerStrategy?:
     | 'increase-width'
     | 'none'
-    | 'experimental-no-flickering'
 
   // Enabled by default, it's an optional
   // fallback for pages without JS.
@@ -330,7 +321,6 @@ However, if you still want to block password managers, please disable the `pushP
   // First, disable library's built-in strategy
   // for shifting badges automatically
 - pushPasswordManagerStrategy="increase-width"
-- pushPasswordManagerStrategy="experimental-no-flickering"
 + pushPasswordManagerStrategy="none"
   // Then, manually add specifics attributes
   // your password manager docs
