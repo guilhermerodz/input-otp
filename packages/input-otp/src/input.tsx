@@ -180,7 +180,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
           safeInsertRule(
             styleEl.sheet,
-            '[data-input-otp]::selection { background: transparent !important; }',
+            '[data-input-otp]::selection { background: transparent !important; color: transparent !important; }',
           )
           safeInsertRule(
             styleEl.sheet,
