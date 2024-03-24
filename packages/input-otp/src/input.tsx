@@ -66,7 +66,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       onChange,
       isIOS:
         typeof window !== 'undefined' &&
-        window?.CSS?.supports('-webkit-touch-callout', 'none'),
+        window?.CSS?.supports?.('-webkit-touch-callout', 'none'),
     })
     const inputMetadataRef = React.useRef<{
       prev: [number | null, number | null, 'none' | 'forward' | 'backward']
