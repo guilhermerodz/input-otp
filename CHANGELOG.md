@@ -1,10 +1,19 @@
 # Changelog
 
+## [1.2.3]
+
+- fix(input/css): specify `color: transparent !important` for `::selection` modifier
+- fix(input/node-env): check for CSS supports api before calling fn
+
+## [1.2.2]
+
+- chore(input): remove experimental flag `pushPasswordManagerStrategy`
+
 ## [1.2.1]
 
 - fix(input): use `color` not `text` for autofillStyles
 - chore(input): keep support for prop pushPasswordManagerStrategy="experimental-no-flickering"
-- fix(input): prevent layout expansion when password managers aren't there
+- fix(input): prevent layout expansion when password managers aren't there and remove "experimental-no-flickering" strategy
 
 ## [1.2.0]
 
