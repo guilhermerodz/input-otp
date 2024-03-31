@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.4]
+
+- fix(input): prevent single caret selection on deletion/cutting
+
 ## [1.2.3]
 
 - fix(input/css): specify `color: transparent !important` for `::selection` modifier
