@@ -130,7 +130,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               start = c - 1
               end = c
               direction = 'backward'
-            } else if (_ml > 2 && _val.length > 2) {
+            } else if (_ml > 1 && _val.length > 1) {
               let offset = 0
               if (_prev[0] !== null && _prev[1] !== null) {
                 direction = c < _prev[1] ? 'backward' : 'forward'
@@ -282,9 +282,19 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           e.preventDefault()
           return
         }
+        const maybeHasDeleted =
+          typeof previousValue === 'string' &&
+          newValue.length < previousValue.length
+        if (maybeHasDeleted) {
+          // Since cutting/deleting text doesn't trigger
+          // selectionchange event, we'll have to dispatch it manually.
+          // NOTE: The following line also triggers when cmd+A then pasting
+          // a value with smaller length, which is not ideal for performance.
+          document.dispatchEvent(new Event('selectionchange'))
+        }
         onChange(newValue)
       },
-      [maxLength, onChange, regexp],
+      [maxLength, onChange, previousValue, regexp],
     )
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
@@ -385,6 +395,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         // caretColor: 'black',
         // padding: '0',
         // letterSpacing: 'unset',
+        // fontSize: 'unset',
+        // paddingInline: '.5rem',
       }),
       [pwmb.PWM_BADGE_SPACE_WIDTH, pwmb.willPushPWMBadge, textAlign],
     )
