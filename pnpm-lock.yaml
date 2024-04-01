@@ -11,9 +11,6 @@ importers:
       '@playwright/test':
         specifier: ^1.41.2
         version: 1.42.1
-      '@types/mime':
-        specifier: ^4.0.0
-        version: 4.0.0
       '@types/node':
         specifier: ^20
         version: 20.11.25
@@ -4386,13 +4383,6 @@ packages:
 
   /@types/mime@3.0.4:
     resolution: {integrity: sha512-iJt33IQnVRkqeqC7PzBHPTC6fDlRNRW8vjrgqtScAhrmMwe8c4Eo7+fUGTa+XdWrpEgpyKWMYmi2dIwMAYRzPw==}
-    dev: true
-
-  /@types/mime@4.0.0:
-    resolution: {integrity: sha512-5eEkJZ/BLvTE3vXGKkWlyTSUVZuzj23Wj8PoyOq2lt5I3CYbiLBOPb3XmCW6QcuOibIUE6emHXHt9E/F/rCa6w==}
-    deprecated: This is a stub types definition. mime provides its own type definitions, so you do not need this installed.
-    dependencies:
-      mime: 2.6.0
     dev: true
 
   /@types/minimatch@5.1.2:
