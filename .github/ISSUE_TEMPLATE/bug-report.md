@@ -11,6 +11,8 @@ Issue tracker is **ONLY** used for reporting bugs. New features should be discus
 
 <!--- Provide a general summary of the issue in the Title above -->
 
+## Version of the library: 1.x
+
 ## Expected Behavior
 <!--- Tell us what should happen -->
 
