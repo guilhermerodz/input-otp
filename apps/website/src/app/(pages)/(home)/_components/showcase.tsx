@@ -107,6 +107,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
           containerClassName={cn('group flex items-center')}
           maxLength={6}
           pattern={REGEXP_ONLY_DIGITS}
+          aria-label="showcase-otp-input"
           render={({ slots, isFocused }) => (
             <>
               <div className="flex">
