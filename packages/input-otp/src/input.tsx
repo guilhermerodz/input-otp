@@ -48,15 +48,14 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       },
       [uncheckedOnChange],
     )
-    const regexp = React.useMemo(
-      () =>
-        pattern
-          ? typeof pattern === 'string'
-            ? new RegExp(pattern)
-            : pattern
-          : null,
-      [pattern],
-    )
+    const regexps = React.useMemo(() => {
+      // Check if pattern is a string or an array and handle accordingly
+      if (typeof pattern === 'string') {
+        return Array(maxLength).fill(new RegExp(pattern));
+      } else {
+        return pattern.map(p => p.regex);
+      }
+    }, [pattern, maxLength]);
 
     /** useRef */
     const inputRef = React.useRef<HTMLInputElement>(null)
@@ -277,25 +276,41 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     /** Event handlers */
     const _changeListener = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.currentTarget.value.slice(0, maxLength)
-        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
-          e.preventDefault()
-          return
+        const newValue = e.currentTarget.value.slice(0, maxLength);
+        
+        let isValid = true; // Assume the input is valid initially
+    
+        // Validate each character against its corresponding regex if pattern is an array, else use a single regex for all
+        Array.from(newValue).forEach((char, index) => {
+          if (Array.isArray(pattern)) {
+            // pattern is expected to be { regex: RegExp }[]
+            if (pattern[index] && !pattern[index].regex.test(char)) {
+              isValid = false; // invalidate the input as soon as a mismatch is found
+            }
+          } else {
+            // Single regex pattern for all characters
+            const regex = new RegExp(pattern);
+            if (!regex.test(char)) {
+              isValid = false; // invalidate the input as soon as a mismatch is found
+            }
+          }
+        });
+    
+        if (!isValid) {
+          e.preventDefault();
+          return;
         }
-        const maybeHasDeleted =
-          typeof previousValue === 'string' &&
-          newValue.length < previousValue.length
+    
+        const maybeHasDeleted = typeof previousValue === 'string' && newValue.length < previousValue.length;
         if (maybeHasDeleted) {
-          // Since cutting/deleting text doesn't trigger
-          // selectionchange event, we'll have to dispatch it manually.
-          // NOTE: The following line also triggers when cmd+A then pasting
-          // a value with smaller length, which is not ideal for performance.
-          document.dispatchEvent(new Event('selectionchange'))
+          // Manually trigger selection change event for deletions/cuts
+          document.dispatchEvent(new Event('selectionchange'));
         }
-        onChange(newValue)
+    
+        onChange(newValue);
       },
-      [maxLength, onChange, previousValue, regexp],
-    )
+      [maxLength, onChange, previousValue, pattern] // Ensure 'pattern' is included in dependency array
+    );
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
         const start = Math.min(inputRef.current.value.length, maxLength - 1)
@@ -309,40 +324,58 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     // Fix iOS pasting
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
-        const input = inputRef.current
+        const input = inputRef.current;
         if (!initialLoadRef.current.isIOS || !e.clipboardData || !input) {
-          return
+          return;
         }
-
-        const content = e.clipboardData.getData('text/plain')
-        e.preventDefault()
-
-        const start = inputRef.current?.selectionStart
-        const end = inputRef.current?.selectionEnd
-
-        const isReplacing = start !== end
-
+    
+        const content = e.clipboardData.getData('text/plain');
+        e.preventDefault();
+    
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+    
+        const isReplacing = start !== end;
+    
         const newValueUncapped = isReplacing
           ? value.slice(0, start) + content + value.slice(end) // Replacing
-          : value.slice(0, start) + content + value.slice(start) // Inserting
-        const newValue = newValueUncapped.slice(0, maxLength)
-
-        if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
-          return
+          : value.slice(0, start) + content + value.slice(start); // Inserting
+        const newValue = newValueUncapped.slice(0, maxLength);
+    
+        // Validate the new value based on pattern(s)
+        let isValid = true;
+        Array.from(newValue).forEach((char, index) => {
+          if (Array.isArray(pattern)) {
+            // pattern is expected to be { regex: RegExp }[]
+            if (pattern[index] && !pattern[index].regex.test(char)) {
+              isValid = false;
+            }
+          } else {
+            // Single regex pattern for all characters
+            const regex = new RegExp(pattern);
+            if (!regex.test(char)) {
+              isValid = false;
+            }
+          }
+        });
+    
+        if (!isValid) {
+          return;
         }
-
-        input.value = newValue
-        onChange(newValue)
-
-        const _start = Math.min(newValue.length, maxLength - 1)
-        const _end = newValue.length
-
-        input.setSelectionRange(_start, _end)
-        setMirrorSelectionStart(_start)
-        setMirrorSelectionEnd(_end)
+    
+        input.value = newValue; // Only update input value if all characters are valid
+        onChange(newValue);
+    
+        const _start = Math.min(newValue.length, maxLength - 1);
+        const _end = newValue.length;
+    
+        input.setSelectionRange(_start, _end);
+        setMirrorSelectionStart(_start);
+        setMirrorSelectionEnd(_end);
       },
-      [maxLength, onChange, regexp, value],
-    )
+      [maxLength, onChange, pattern, value] // Update dependencies to include pattern
+    );
+    
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
@@ -411,7 +444,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           data-input-otp-mss={mirrorSelectionStart}
           data-input-otp-mse={mirrorSelectionEnd}
           inputMode={inputMode}
-          pattern={regexp?.source}
           style={inputStyle}
           maxLength={maxLength}
           value={value}
@@ -449,7 +481,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         mirrorSelectionEnd,
         mirrorSelectionStart,
         props,
-        regexp?.source,
         value,
       ],
     )

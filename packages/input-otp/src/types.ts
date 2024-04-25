@@ -19,6 +19,8 @@ type OTPInputBaseProps = OverrideProps<
 
     textAlign?: 'left' | 'center' | 'right'
 
+    pattern: string | { regex: RegExp }[]
+
     onComplete?: (...args: any[]) => unknown
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
 
