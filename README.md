@@ -277,7 +277,7 @@ export default function Page() {
     <form ref={formRef}>
       <OTPInput
         // ... automatically submit the form
-        onComplete={() => formRef.current?.submit()}
+        onComplete={() => formRef.current?.requestSubmit()}
         // ... or focus the button like as you wish
         onComplete={() => buttonRef.current?.focus()}
       />
