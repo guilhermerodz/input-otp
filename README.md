@@ -137,7 +137,7 @@ https://github.com/guilhermerodz/input-otp/assets/10366880/bdbdc96a-23da-4e89-bf
 <details>
 <summary>Automatic OTP code retrieval from transport (e.g SMS)</summary>
 
-By default, this input uses `autocomplete='one-timecode'` and it works as it's a single input. 
+By default, this input uses `autocomplete='one-time-code'` and it works as it's a single input. 
 
 https://github.com/guilhermerodz/input-otp/assets/10366880/5705dac6-9159-443b-9c27-b52e93c60ea8
 
