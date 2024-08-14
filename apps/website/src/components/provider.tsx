@@ -8,10 +8,10 @@ export function AppProvider({
 }: React.PropsWithChildren<{}>) {
   return (
     <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      attribute="class"
+      defaultTheme="system"
     >
       {children}
     </ThemeProvider>
