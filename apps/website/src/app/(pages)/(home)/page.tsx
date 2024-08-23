@@ -87,7 +87,7 @@ export default async function IndexPage() {
           >
             <Icons.gitHub className="mr-2 h-4 w-4" />
             <div className="flex items-center h-full">
-              <div className="hidden md:[display:unset]">Github</div>
+              <div className="hidden md:[display:unset]">GitHub</div>
               <div className="hidden md:[display:unset] h-full w-px bg-input group-hover:bg-foregrounds mx-4" />
               <div>{starCount}</div>
             </div>
