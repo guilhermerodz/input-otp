@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.5]
+
+- chore(input): add peer dep for react@19
+
 ## [1.2.4]
 
 - fix(input): prevent single caret selection on deletion/cutting
