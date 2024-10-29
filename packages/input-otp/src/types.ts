@@ -39,3 +39,7 @@ export type OTPInputProps = OTPInputBaseProps &
         children: React.ReactNode
       }
   )
+export type OTPInputMetadata = {
+  prev: [number | null, number | null, 'none' | 'forward' | 'backward']
+  willSyntethicBlur: boolean
+}

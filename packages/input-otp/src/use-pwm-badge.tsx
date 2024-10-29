@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { OTPInputProps } from './types'
+import { OTPInputMetadata, OTPInputProps } from './types'
 
 const PWM_BADGE_MARGIN_RIGHT = 18
 const PWM_BADGE_SPACE_WIDTH_PX = 40
@@ -15,11 +15,13 @@ const PASSWORD_MANAGERS_SELECTORS = [
 export function usePasswordManagerBadge({
   containerRef,
   inputRef,
+  inputMetadataRef,
   pushPasswordManagerStrategy,
   isFocused,
 }: {
   containerRef: React.RefObject<HTMLDivElement>
   inputRef: React.RefObject<HTMLInputElement>
+  inputMetadataRef: React.RefObject<OTPInputMetadata>
   pushPasswordManagerStrategy: OTPInputProps['pushPasswordManagerStrategy']
   isFocused: boolean
 }) {
@@ -104,6 +106,7 @@ export function usePasswordManagerBadge({
     // to trigger a re-position of the badge.
     if (!pwmMetadata.current.refocused && document.activeElement === input) {
       const sel = [input.selectionStart, input.selectionEnd]
+      inputMetadataRef.current.willSyntethicBlur = true
       input.blur()
       input.focus()
       // Recover the previous selection
