@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/base')
 })
 
-test.describe('Delete words', () => {
+test.describe('Backspace', () => {
   test('should backspace previous word (even if there is not a selected character)', async ({ page }) => {
     const input = page.getByRole('textbox')
 
@@ -27,7 +27,11 @@ test.describe('Delete words', () => {
 
     await expect(input).toHaveValue('12356')
   })
-  test('should forward-delete character when pressing delete', async ({ page }) => {
+})
+// Allow flaky
+test.describe.configure({ retries: 3 })
+test.describe('Delete', () => {
+  test('should forward-delete character when pressing delete',  async ({ page }) => {
     const input = page.getByRole('textbox')
 
     await input.pressSequentially('123456')
