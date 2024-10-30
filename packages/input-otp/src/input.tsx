@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
-import { OTPInputMetadata, OTPInputProps, RenderProps } from './types'
+import { OTPInputProps, RenderProps } from './types'
 import { usePrevious } from './use-previous'
 import { usePasswordManagerBadge } from './use-pwm-badge'
 
@@ -68,13 +68,14 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         typeof window !== 'undefined' &&
         window?.CSS?.supports?.('-webkit-touch-callout', 'none'),
     })
-    const inputMetadataRef = React.useRef<OTPInputMetadata>({
+    const inputMetadataRef = React.useRef<{
+      prev: [number | null, number | null, 'none' | 'forward' | 'backward']
+    }>({
       prev: [
         inputRef.current?.selectionStart,
         inputRef.current?.selectionEnd,
         inputRef.current?.selectionDirection,
       ],
-      willSyntethicBlur: false,
     })
     React.useImperativeHandle(ref, () => inputRef.current, [])
     React.useEffect(() => {
@@ -269,7 +270,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const pwmb = usePasswordManagerBadge({
       containerRef,
       inputRef,
-      inputMetadataRef,
       pushPasswordManagerStrategy,
       isFocused,
     })
@@ -434,10 +434,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             props.onFocus?.(e)
           }}
           onBlur={e => {
-            if (inputMetadataRef.current.willSyntethicBlur) {
-              inputMetadataRef.current.willSyntethicBlur = false
-              return
-            }
             setIsFocused(false)
             props.onBlur?.(e)
           }}
