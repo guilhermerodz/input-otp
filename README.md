@@ -315,6 +315,34 @@ export default function Page() {
 ```
 </details>
 
+<details>
+<summary>Usage with react-hook-form</summary>
+Just use it as a regular text input:
+
+```tsx
+const { register, handleSubmit } = useForm();
+// Then register it like a text input
+<InputOTP {...register("otp")} />
+```
+
+You can also use react-hook-form's Controller if needed:
+```tsx
+const { control } = useForm();
+// Then control it like a text input
+<Controller
+  name="customOTP"
+  control={control}
+  defaultValue=""
+  render={({ field }) => (
+    <OTPInput
+      {...field}
+      label="Custom OTP"
+    />
+  )}
+/>
+```
+</details>
+
 ## Caveats
 
 <details>
