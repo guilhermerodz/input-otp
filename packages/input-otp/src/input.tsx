@@ -414,7 +414,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           autoComplete={props.autoComplete || 'one-time-code'}
           {...props}
           data-input-otp
-          data-input-otp-empty={value.length === 0 || undefined}
+          data-input-otp-placeholder-shown={value.length === 0 || undefined}
           data-input-otp-mss={mirrorSelectionStart}
           data-input-otp-mse={mirrorSelectionEnd}
           inputMode={inputMode}

@@ -47,7 +47,7 @@ const InputOTPSlot = React.forwardRef<
       )}
       {...props}
     >
-      <div className="group-has-[input[data-input-otp-empty]]:opacity-20">
+      <div className="group-has-[input[data-input-otp-placeholder-shown]]:opacity-20">
         {slotProps.char ?? slotProps.placeholderChar}
       </div>
       {slotProps.hasFakeCaret && (
@@ -74,7 +74,7 @@ const InputOTPRenderSlot = React.forwardRef<
       )}
       {...props}
     >
-      <div className="group-has-[input[data-input-otp-empty]]:opacity-20">
+      <div className="group-has-[input[data-input-otp-placeholder-shown]]:opacity-20">
         {char ?? placeholderChar}
       </div>
       {hasFakeCaret && (

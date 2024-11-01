@@ -66,7 +66,7 @@ function Slot(props: SlotProps) {
         { 'outline-4 outline-accent-foreground': props.isActive },
       )}
     >
-      <div className="group-has-[input[data-input-otp-empty]]:opacity-20">
+      <div className="group-has-[input[data-input-otp-placeholder-shown]]:opacity-20">
         {props.char ?? props.placeholderChar}
       </div>
       {props.hasFakeCaret && <FakeCaret />}
