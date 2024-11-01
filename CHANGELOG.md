@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0]
+
+- chore(input): stop enforcing only digits regexp by default
+  - Before 1.3.0, the input would take `REGEXP_ONLY_DIGITS` as the default pattern behavior, mistaking mobile users when they couldn't type in or even paste alphanumeric entries.
+- feat(input): add pasteTransformer prop
+  - Allows pasting invalid codes and then transforming them into something that the input's regex/pattern would accept. Example: you can now take "XXX-XXX" as pasted input even though you've determined a pattern of 6 numerical digits; just add a prop to your OTPInput: `pasteTransformer={pasted => pasted.replaceAll('-','')}`.
+- feat(input): add placeholder
+  - Input can now render a placeholder, all you should do is adjust your CSS to render it (look at the default example on README)!
+  - The input's HTML now lives with an attribute `data-input-otp-placeholder-shown` when its content is empty.
+- chore(input): remove re-focus feature for password manager badges
+  - Fixed a bug where the input's `blur` event was triggering even if the user hasn't requested it. The sacrifice was to remove the auto re-focus feature for password manager badges, meaning if the password badge ever disappears, then the user himself has to re-trigger focus by manually clicking or selecting the input.
+
 ## [1.2.5]
 
 - chore(input): add peer dep for react@19
