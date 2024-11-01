@@ -23,15 +23,6 @@ export function usePasswordManagerBadge({
   pushPasswordManagerStrategy: OTPInputProps['pushPasswordManagerStrategy']
   isFocused: boolean
 }) {
-  // Metadata for instant updates (not React state)
-  const pwmMetadata = React.useRef<{
-    done: boolean
-    refocused: boolean
-  }>({
-    done: false,
-    refocused: false,
-  })
-
   /** Password managers have a badge
    *  and I'll use this state to push them
    *  outside the input */
@@ -98,19 +89,6 @@ export function usePasswordManagerBadge({
 
     setHasPWMBadge(true)
     setDone(true)
-
-    // For specific password managers,
-    // the input has to be re-focused
-    // to trigger a re-position of the badge.
-    if (!pwmMetadata.current.refocused && document.activeElement === input) {
-      const sel = [input.selectionStart, input.selectionEnd]
-      input.blur()
-      input.focus()
-      // Recover the previous selection
-      input.setSelectionRange(sel[0], sel[1])
-
-      pwmMetadata.current.refocused = true
-    }
   }, [containerRef, inputRef, done, pushPasswordManagerStrategy])
 
   React.useEffect(() => {
