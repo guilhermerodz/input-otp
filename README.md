@@ -227,10 +227,15 @@ type OTPInputProps = {
   // Default: 'numeric'
   inputMode?: 'numeric' | 'text' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
 
+  // Pro tip: input-otp export some patterns by default such as REGEXP_ONLY_DIGITS which you can import from the same library path
+  // Example: import { REGEXP_ONLY_DIGITS } from 'input-otp';
+  // Then use it as: <OTPInput pattern={REGEXP_ONLY_DIGITS}>
+  pattern?: string
+
   // While rendering the input slot, you can access both the char and the placeholder, if there's one and it's active.
   placeholder?: string
 
-  // Transfomer function that allows pasting, for example, "XXX-XXX" even though the input's regex doesn't allow hyphen and its max length is 6.
+  // Transfomer function that allows pasting, for example, "XXX-XXX" even though the input's regex/pattern doesn't allow hyphen and its max length is 6.
   // Example: (pasted) => pasted.replaceAll('-', '')
   pasteTransformer?: (pastedText: string) => string
 
