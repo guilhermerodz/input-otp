@@ -66,7 +66,9 @@ function Slot(props: SlotProps) {
         { 'outline-4 outline-accent-foreground': props.isActive },
       )}
     >
-      {props.char !== null && <div>{props.char}</div>}
+      <div className="group-has-[input[data-input-otp-empty]]:opacity-20">
+        {props.char ?? props.placeholderChar}
+      </div>
       {props.hasFakeCaret && <FakeCaret />}
     </div>
   )
@@ -224,6 +226,9 @@ type OTPInputProps = {
   // Virtual keyboard appearance on mobile
   // Default: 'numeric'
   inputMode?: 'numeric' | 'text' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
+
+  // While rendering the input slot, you can access both the char and the placeholder, if there's one and it's active.
+  placeholder?: string
 
   // Enabled by default, it's an optional
   // strategy for detecting Password Managers
