@@ -230,6 +230,10 @@ type OTPInputProps = {
   // While rendering the input slot, you can access both the char and the placeholder, if there's one and it's active.
   placeholder?: string
 
+  // Transfomer function that allows pasting, for example, "XXX-XXX" even though the input's regex doesn't allow hyphen and its max length is 6.
+  // Example: (pasted) => pasted.replaceAll('-', '')
+  pasteTransformer?: (pastedText: string) => string
+
   // Enabled by default, it's an optional
   // strategy for detecting Password Managers
   // in the page and then shifting their
