@@ -1,9 +1,11 @@
 # Changelog
 
-## [1.3.0]
+## [1.4.0]
+
+I'm sorry to skip `1.3.0` due to an issue I've had while publishing the NPM package.
 
 - chore(input): stop enforcing only digits regexp by default
-  - Before 1.3.0, the input would take `REGEXP_ONLY_DIGITS` as the default pattern behavior, mistaking mobile users when they couldn't type in or even paste alphanumeric entries.
+  - Before 1.4.0, the input would take `REGEXP_ONLY_DIGITS` as the default pattern behavior, mistaking mobile users when they couldn't type in or even paste alphanumeric entries.
 - feat(input): add pasteTransformer prop
   - Allows pasting invalid codes and then transforming them into something that the input's regex/pattern would accept. Example: you can now take "XXX-XXX" as pasted input even though you've determined a pattern of 6 numerical digits; just add a prop to your OTPInput: `pasteTransformer={pasted => pasted.replaceAll('-','')}`.
 - feat(input): add placeholder
