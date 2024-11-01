@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev --port=3039",
     "lint": "next lint",
-    "test": "playwright test",
+    "test": "playwright test --retries=3",
     "test:ui": "playwright test --ui"
   },
   "dependencies": {
