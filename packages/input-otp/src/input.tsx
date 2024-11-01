@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 
-import { REGEXP_ONLY_DIGITS } from './regexp'
 import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, RenderProps } from './types'
 import { usePrevious } from './use-previous'
@@ -19,7 +18,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       onChange: uncheckedOnChange,
       maxLength,
       textAlign = 'left',
-      pattern = REGEXP_ONLY_DIGITS,
+      pattern,
       placeholder,
       inputMode = 'numeric',
       onComplete,
