@@ -24,6 +24,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       inputMode = 'numeric',
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
+      pasteTransformer,
       containerClassName,
       noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
 
@@ -311,11 +312,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
         const input = inputRef.current
-        if (!initialLoadRef.current.isIOS || !e.clipboardData || !input) {
+        if (!pasteTransformer && (!initialLoadRef.current.isIOS || !e.clipboardData || !input)) {
           return
         }
-
-        const content = e.clipboardData.getData('text/plain')
+        
+        const _content = e.clipboardData.getData('text/plain')
+        const content = pasteTransformer
+          ? pasteTransformer(_content)
+          : _content
+        console.log({_content,content})
         e.preventDefault()
 
         const start = inputRef.current?.selectionStart
