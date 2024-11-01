@@ -20,6 +20,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       maxLength,
       textAlign = 'left',
       pattern = REGEXP_ONLY_DIGITS,
+      placeholder,
       inputMode = 'numeric',
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
@@ -408,10 +409,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           autoComplete={props.autoComplete || 'one-time-code'}
           {...props}
           data-input-otp
+          data-input-otp-empty={value.length === 0 || undefined}
           data-input-otp-mss={mirrorSelectionStart}
           data-input-otp-mse={mirrorSelectionEnd}
           inputMode={inputMode}
           pattern={regexp?.source}
+          aria-placeholder={placeholder}
           style={inputStyle}
           maxLength={maxLength}
           value={value}
@@ -466,9 +469,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               (slotIdx >= mirrorSelectionStart && slotIdx < mirrorSelectionEnd))
 
           const char = value[slotIdx] !== undefined ? value[slotIdx] : null
+          const placeholderChar = value[0] !== undefined ? null : placeholder?.[slotIdx] ?? null
 
           return {
             char,
+            placeholderChar,
             isActive,
             hasFakeCaret: isActive && char === null,
           }
