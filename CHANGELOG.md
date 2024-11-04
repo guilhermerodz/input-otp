@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.1]
+
+- chore(input): add peer dep for react@19-rc
+
 ## [1.4.0]
 
 I'm sorry to skip `1.3.0` due to an issue I've had while publishing the NPM package.
