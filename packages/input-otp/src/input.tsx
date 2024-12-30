@@ -319,7 +319,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         const content = pasteTransformer
           ? pasteTransformer(_content)
           : _content
-        console.log({_content,content})
         e.preventDefault()
 
         const start = inputRef.current?.selectionStart
