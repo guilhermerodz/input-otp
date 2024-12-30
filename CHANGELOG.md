@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.2]
+
+- chore(input): remove unintentional log within internal pasteListener
+
 ## [1.4.1]
 
 - chore(input): add peer dep for react@19-rc
