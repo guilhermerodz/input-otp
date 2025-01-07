@@ -107,41 +107,15 @@
   @apply inline-block min-h-4 w-full py-0.5 px-4;
 }
 
-.code-example-overlay {
-  background-image: linear-gradient(
-    to bottom,
-    theme('colors.background') 60%,
-    transparent
-  );
-  transform: translateY(0);
-  animation: move-overlay 4s ease-out forwards;
-  animation-delay: 3s;
+html[class='light'] .code-example-light {
+  display: unset;
 }
-.code-example-light {
-}
-.code-example-dark {
+html[class='light'] .code-example-dark {
   display: none;
 }
-@media (prefers-color-scheme: dark) {
-  .code-example-light {
-    display: none;
-  }
-  .code-example-dark {
-    display: unset;
-  }
+html[class='dark'] .code-example-dark {
+  display: unset;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .code-example-overlay {
-    opacity: 0;
-    animation: none;
-  }
-}
-@keyframes move-overlay {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-100%);
-  }
+html[class='dark'] .code-example-light {
+  display: none;
 }
