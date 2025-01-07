@@ -18,8 +18,19 @@ const config = {
       },
     },
     extend: {
-      transitionDelay: {
-        1500: '1500ms',
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+
+        'caret-blink': 'caret-blink 1.2s ease-out infinite',
+
+        'fade-in': 'fade-in 0.3s ease-out forwards',
+        'fade-up': 'fade-up 1s ease-out forwards',
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -56,11 +67,6 @@ const config = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
@@ -94,14 +100,12 @@ const config = {
           to: { opacity: '1', transform: 'translateY(0)' },
         },
       },
-      animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-
-        'caret-blink': 'caret-blink 1.2s ease-out infinite',
-        'fade-in': 'fade-in 0.3s ease-out forwards',
-        'fade-up': 'fade-up 1s ease-out forwards',
+      transitionDelay: {
+        1500: '1500ms',
       },
+      transitionTimingFunction: {
+        'default': 'ease-out',
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

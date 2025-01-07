@@ -64,7 +64,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
     }
 
     const anchor = document.querySelector<HTMLInputElement>(
-      '.code-example-anchor',
+      '#code-example-anchor',
     )
 
     window.scrollTo({
@@ -87,7 +87,10 @@ export function Showcase({ className, ...props }: { className?: string }) {
       )}
       {hasGuessed && (
         <div className="fixed inset-0 z-50 pointer-events-none motion-reduce:hidden">
-          <DynamicConfetti />
+          <DynamicConfetti pageCoords={{
+            x: inputRef.current!.getBoundingClientRect().left + (inputRef.current?.getBoundingClientRect().width || 0) * 0.9,
+            y: inputRef.current!.getBoundingClientRect().top + (inputRef.current?.getBoundingClientRect().height || 0) / 2
+          }} />
         </div>
       )}
 
@@ -152,7 +155,7 @@ function Slot(props: {
     <div
       className={cn(
         'relative w-10 md:w-20 h-14 md:h-28 text-[2rem] md:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md transition-all [transition-duration:300ms] outline outline-0 outline-accent-foreground/20',
-        'group-hover:border-accent-foreground/20 group-focus-within:border-accent-foreground/20',
+        'group-hover:border-accent-foreground/20 group-focus-within:!border-accent-foreground/50',
         {
           'outline-4 outline-accent-foreground': props.isActive,
         },
