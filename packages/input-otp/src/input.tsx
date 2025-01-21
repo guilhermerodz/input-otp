@@ -314,7 +314,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         if (!pasteTransformer && (!initialLoadRef.current.isIOS || !e.clipboardData || !input)) {
           return
         }
-        
+
         const _content = e.clipboardData.getData('text/plain')
         const content = pasteTransformer
           ? pasteTransformer(_content)
@@ -422,6 +422,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           maxLength={maxLength}
           value={value}
           ref={inputRef}
+          spellCheck={false}
           onPaste={e => {
             _pasteListener(e)
             props.onPaste?.(e)
