@@ -2,6 +2,16 @@
 
 ### OTP Input for React 🔐 by [@guilhermerodz](https://twitter.com/guilherme_rodz)
 
+<h3 align="center">Hero Sponsors 🎖️</h3>
+<a href="https://resend.com" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 100%; height: 120px; border-radius: 8px;">
+<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white.svg' width="150" style="aspect-ratio: auto;"/>
+</a>
+
+<!-- <h3 align="center">Hero Sponsors</h3>
+<a href="https://resend.com" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
+<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white.svg' width="120px" style="aspect-ratio: auto;"/>
+</a> -->
+
 https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
 
 ## Usage
