@@ -3,9 +3,11 @@
 ### OTP Input for React 🔐 by [@guilhermerodz](https://twitter.com/guilherme_rodz)
 
 <h3 align="center">Hero Sponsors 🎖️</h3>
-<a href="https://resend.com" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 100%; height: 120px; border-radius: 8px;">
-<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white.svg' width="150" style="aspect-ratio: auto;"/>
+<p align="center">
+<a href="https://resend.com" target="_blank">
+<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
 </a>
+</p>
 
 <!-- <h3 align="center">Hero Sponsors</h3>
 <a href="https://resend.com" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
