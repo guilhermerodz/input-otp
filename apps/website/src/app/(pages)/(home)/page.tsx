@@ -96,7 +96,7 @@ export default async function IndexPage() {
 
       <div className="mb-14 md:mb-20 lg:mb-20 lg:opacity-0 lg:animate-fade-up !duration-1000 ![animation-delay:3000ms] animate-none">
         <h3 className="text-center text-xl font-bold">Hero Sponsors</h3>
-        <a className="relative size-[160px] flex items-center justify-center bg-muted/80 dark:bg-muted/20 rounded-xl mt-4 group" href="https://resend.com" target="_blank">
+        <a className="relative size-[160px] flex items-center justify-center bg-muted/80 dark:bg-muted/20 rounded-xl mt-4 group" href="https://go.resend.com/input-otp" target="_blank">
           <div className="relative size-[65%] aspect-square group-hover:scale-110 transition-all duration-300 ease-out">
             <Image
               alt="Resend"

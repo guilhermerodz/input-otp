@@ -4,13 +4,13 @@
 
 <h3 align="center">Hero Sponsors 🎖️</h3>
 <p align="center">
-<a href="https://resend.com" target="_blank">
+<a href="https://go.resend.com/input-otp" target="_blank">
 <img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
 </a>
 </p>
 
 <!-- <h3 align="center">Hero Sponsors</h3>
-<a href="https://resend.com" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
+<a href="https://go.resend.com/input-otp" target="_blank" style="display: flex; justify-content: center; align-items: center; background-color: #000; width: 150px; height: 150px; border-radius: 8px; margin: 0 auto;">
 <img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white.svg' width="120px" style="aspect-ratio: auto;"/>
 </a> -->
 
@@ -356,6 +356,19 @@ const { control } = useForm();
       label="Custom OTP"
     />
   )}
+/>
+```
+</details>
+
+<details>
+<summary>Paste-transformers</summary>
+If you want to allow pasting of "XXX-XXX" even though the input's regex/pattern doesn't allow hyphen and its max length is 6, you can use the `pasteTransformer` prop.
+
+```tsx
+<OTPInput
+  // Transform the pasted text to parse hyphens but remove hyphens,
+  // so it fits into the input's pattern and max length.
+  pasteTransformer={(pasted) => pasted.replaceAll('-', '')}
 />
 ```
 </details>
