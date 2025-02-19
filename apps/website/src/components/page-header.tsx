@@ -8,7 +8,7 @@ function PageHeader({
   return (
     <section
       className={cn(
-        "mx-auto flex max-w-[500px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20",
+        "mx-auto flex max-w-[500px] flex-col items-center gap-2 py-8 md:py-12 lg:pt-24",
         className
       )}
       {...props}
@@ -55,7 +55,7 @@ function PageActions({
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-center space-x-4 py-4 md:pb-10",
+        "flex w-full items-center justify-center space-x-4 py-4 md:pb-6",
         className
       )}
       {...props}

@@ -2,6 +2,16 @@
 
 ### OTP Input for React 🔐 by [@guilhermerodz](https://twitter.com/guilherme_rodz)
 
+<h3 align="center">Hero Sponsors 🎖️</h3>
+<p align="center">
+<a href="https://go.resend.com/input-otp" target="_blank">
+<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
+</a>
+<a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
+<img alt="Evomi" src='https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
+</a>
+</p>
+
 https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
 
 ## Usage
@@ -348,6 +358,19 @@ const { control } = useForm();
 ```
 </details>
 
+<details>
+<summary>Paste-transformers</summary>
+If you want to allow pasting of "XXX-XXX" even though the input's regex/pattern doesn't allow hyphen and its max length is 6, you can use the `pasteTransformer` prop.
+
+```tsx
+<OTPInput
+  // Transform the pasted text to parse hyphens but remove hyphens,
+  // so it fits into the input's pattern and max length.
+  pasteTransformer={(pasted) => pasted.replaceAll('-', '')}
+/>
+```
+</details>
+
 ## Caveats
 
 <details>
@@ -509,3 +532,9 @@ Add the following setting to your `.vscode/settings.json`:
 }
 ```
 </details>
+
+#### Sponsors
+
+> [Resend](https://go.resend.com/input-otp) is email for developers.
+
+> [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) offers Residential Proxies starting from $0.49.
