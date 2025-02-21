@@ -13,8 +13,6 @@ import Link from 'next/link'
 import { Showcase } from './_components/showcase'
 import { ExampleCode } from '@/app/(local-pages)/example-playground/code'
 import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
-import { ChevronRightIcon } from 'lucide-react'
 
 const fadeUpClassname =
   'lg:motion-safe:opacity-0 lg:motion-safe:animate-fade-up'
@@ -37,8 +35,6 @@ export default async function IndexPage() {
   return (
     <div className="container relative flex-1 flex flex-col justify-center items-center">
       <PageHeader>
-        {/* <div className="opacity-0 animate-fade-in [animation-delay:2700ms] [animation-duration:500ms] mb-2"><SponsorBadgeClerk /></div> */}
-
         <PageHeaderHeading className={cn(fadeUpClassname)}>
           Stop wasting time building OTP inputs.
         </PageHeaderHeading>
@@ -96,8 +92,6 @@ export default async function IndexPage() {
             </div>
           </Link>
         </PageActions>
-
-        <div className={cn(fadeUpClassname, "lg:motion-safe:[animation-delay:3000ms] -mt-2 lg:-mt-4")}><SponsorBadgeClerk /></div>
       </PageHeader>
 
       <div className="mb-14 md:mb-20 lg:mb-20 lg:opacity-0 lg:animate-fade-up !duration-1000 ![animation-delay:3000ms] animate-none">
@@ -146,18 +140,3 @@ export default async function IndexPage() {
 }
 
 export const revalidate = 3600
-
-const SponsorBadgeClerk = () => {
-  return (
-    <a href="https://clerk.com">
-      <Badge variant="outline" className="flex flex-col sm:flex-row items-center justify-center sm:justify-between sm:gap-8 h-12 sm:h-10 text-nowrap">
-        <span>Looking for an authentication solution?</span>
-
-        <span className="text-purple-500 flex items-center gap-2">
-          <span>Get Started with Clerk</span>
-          <ChevronRightIcon className="size-3" />
-        </span>
-      </Badge>
-    </a>
-  )
-}
