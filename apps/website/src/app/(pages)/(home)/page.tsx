@@ -150,7 +150,7 @@ export const revalidate = 3600
 const SponsorBadgeClerk = () => {
   return (
     <a href="https://clerk.com">
-      <Badge variant="outline" className="flex flex-col sm:flex-row items-center justify-center sm:justify-between sm:gap-8 h-12 sm:h-10 text-nowrap sm:text-sm hover:bg-accent">
+      <Badge variant="outline" className="flex flex-col sm:flex-row items-center justify-center sm:justify-between sm:gap-8 h-12 sm:h-10 text-nowrap">
         <span>Looking for an authentication solution?</span>
 
         <span className="text-purple-500 flex items-center gap-2">
