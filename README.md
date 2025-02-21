@@ -4,9 +4,6 @@
 
 <h3 align="center">Hero Sponsors 🎖️</h3>
 <p align="center">
-<a href="https://go.clerk.com/input-otp" target="_blank">
-<img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
-</a>
 <a href="https://go.resend.com/input-otp" target="_blank">
 <img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
 </a>
@@ -537,8 +534,6 @@ Add the following setting to your `.vscode/settings.json`:
 </details>
 
 #### Sponsors
-
-> [Clerk](https://go.clerk.com/input-otp) is the easiest way to add authentication to your application.
 
 > [Resend](https://go.resend.com/input-otp) is email for developers.
 
