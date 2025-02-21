@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import ResizeObserver from 'resize-observer-polyfill'
 
 import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, RenderProps } from './types'
@@ -26,10 +27,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pasteTransformer,
       containerClassName,
       noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
-
       render,
       children,
-
       ...props
     },
     ref,
@@ -213,8 +212,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
       }
       updateRootHeight()
-      const resizeObserver = new ResizeObserver(updateRootHeight)
-      resizeObserver.observe(input)
+      
+      const resizeObserver = new ResizeObserver(updateRootHeight);
+      resizeObserver.observe(input);
 
       return () => {
         document.removeEventListener(
@@ -222,7 +222,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           onDocumentSelectionChange,
           { capture: true },
         )
-        resizeObserver.disconnect()
+
+        resizeObserver.disconnect();
       }
     }, [])
 
