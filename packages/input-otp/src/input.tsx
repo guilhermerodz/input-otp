@@ -6,6 +6,7 @@ import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, RenderProps } from './types'
 import { usePrevious } from './use-previous'
 import { usePasswordManagerBadge } from './use-pwm-badge'
+import { REGEXP_ONLY_CHARS, REGEXP_ONLY_DIGITS_AND_CHARS } from './regexp'
 
 export const OTPInputContext = React.createContext<RenderProps>(
   {} as RenderProps,
@@ -20,7 +21,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       textAlign = 'left',
       pattern,
       placeholder,
-      inputMode = 'numeric',
+      inputMode: maybeInputMode,
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
       pasteTransformer,
@@ -347,6 +348,17 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       },
       [maxLength, onChange, regexp, value],
     )
+
+    const inputMode = React.useMemo(() => {
+      if (maybeInputMode) {
+        return maybeInputMode
+      }
+
+      const textPatterns = [REGEXP_ONLY_CHARS, REGEXP_ONLY_DIGITS_AND_CHARS]
+      return pattern && textPatterns.some(p => p === pattern)
+        ? 'text'
+        : 'numeric'
+    }, [maybeInputMode, pattern])
 
     /** Styles */
     const rootStyle = React.useMemo<React.CSSProperties>(
