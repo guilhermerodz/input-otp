@@ -1,12 +1,12 @@
 'use client'
 
 import * as React from 'react'
-import { OTPInput, SlotProps } from 'input-otp'
+import { OTPInput, SlotProps, OTPInputProps } from 'input-otp'
 
 import { cn } from '@/lib/utils'
 
 export function ExampleComponent(
-  props: Partial<Omit<React.ComponentProps<typeof OTPInput>, 'children'>>,
+  props: Partial<Omit<OTPInputProps, 'children'>>,
 ) {
   return (
     <OTPInput
@@ -88,13 +88,3 @@ const config = {
     },
   },
 }
-
-// Small utility to merge class names.
-// import { clsx } from "clsx";
-// import { twMerge } from "tailwind-merge";
-
-// import type { ClassValue } from "clsx";
-
-// export function cn(...inputs: ClassValue[]) {
-//   return twMerge(clsx(inputs));
-// }

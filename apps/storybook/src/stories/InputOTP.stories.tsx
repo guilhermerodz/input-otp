@@ -1,7 +1,8 @@
+import type {Meta, StoryObj} from "@storybook/react"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../components/ui/input-otp"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 
-const meta = {
+const meta: Meta<typeof InputOTP> = {
   title: "ui/InputOTP",
   component: InputOTP,
   tags: ["autodocs"],
@@ -24,6 +25,19 @@ const meta = {
 
 export default meta
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof InputOTP>
 
-export const Default: Story = {}
+export const Default: Story = {
+  args: {
+    value: "123456",
+    render ({ slots }) {
+      return (
+        <InputOTPGroup>
+          {slots.map((slot, index) => (
+            <InputOTPSlot key={index} {...slot} />
+          ))}
+        </InputOTPGroup>
+      )
+    }
+  },
+}
