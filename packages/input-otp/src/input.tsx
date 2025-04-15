@@ -383,7 +383,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         boxShadow: 'none',
         lineHeight: '1',
         letterSpacing: '-.5em',
-        fontSize: 'var(--root-height)',
+        fontSize: 'var(--root-height, 16px)',
         fontFamily: 'monospace',
         fontVariantNumeric: 'tabular-nums',
         // letterSpacing: '-1em',
