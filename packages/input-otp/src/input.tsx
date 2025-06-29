@@ -238,7 +238,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
 
     /** Effects */
     React.useEffect(() => {
-      syncTimeouts(() => {
+      const timeouts = syncTimeouts(() => {
         // Forcefully remove :autofill state
         inputRef.current?.dispatchEvent(new Event('input'))
 
@@ -252,6 +252,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           inputMetadataRef.current.prev = [s, e, dir]
         }
       })
+      return () => {
+        timeouts.forEach(timeout => clearTimeout(timeout))
+      }
     }, [value, isFocused])
 
     React.useEffect(() => {
