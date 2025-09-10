@@ -26,6 +26,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       pasteTransformer,
       containerClassName,
       noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
+      nonce,
 
       render,
       children,
@@ -173,6 +174,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       if (!document.getElementById('input-otp-style')) {
         const styleEl = document.createElement('style')
         styleEl.id = 'input-otp-style'
+        if (nonce) styleEl.setAttribute('nonce', nonce)
         document.head.appendChild(styleEl)
 
         if (styleEl.sheet) {

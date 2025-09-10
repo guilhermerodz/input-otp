@@ -27,6 +27,8 @@ type OTPInputBaseProps = OverrideProps<
     containerClassName?: string
 
     noScriptCSSFallback?: string | null
+
+    nonce?: string
   }
 >
 type InputOTPRenderFn = (props: RenderProps) => React.ReactNode
