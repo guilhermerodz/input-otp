@@ -104,8 +104,8 @@ const config = {
         1500: '1500ms',
       },
       transitionTimingFunction: {
-        'default': 'ease-out',
-      }
+        default: 'ease-out',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
