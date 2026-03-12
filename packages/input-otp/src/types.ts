@@ -24,6 +24,8 @@ type OTPInputBaseProps = OverrideProps<
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
     pasteTransformer?: (pasted: string) => string
 
+    selectOnSlotClick?: boolean
+
     containerClassName?: string
 
     noScriptCSSFallback?: string | null

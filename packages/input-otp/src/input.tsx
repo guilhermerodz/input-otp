@@ -24,6 +24,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       onComplete,
       pushPasswordManagerStrategy = 'increase-width',
       pasteTransformer,
+      selectOnSlotClick,
       containerClassName,
       noScriptCSSFallback = NOSCRIPT_CSS_FALLBACK,
 
@@ -78,6 +79,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         inputRef.current?.selectionDirection,
       ],
     })
+    const pendingClickSlotRef = React.useRef<number | null>(null)
     React.useImperativeHandle(ref, () => inputRef.current, [])
     React.useEffect(() => {
       const input = inputRef.current
@@ -299,14 +301,53 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     )
     const _focusListener = React.useCallback(() => {
       if (inputRef.current) {
-        const start = Math.min(inputRef.current.value.length, maxLength - 1)
-        const end = inputRef.current.value.length
-        inputRef.current?.setSelectionRange(start, end)
-        setMirrorSelectionStart(start)
-        setMirrorSelectionEnd(end)
+        const pendingSlot = pendingClickSlotRef.current
+        pendingClickSlotRef.current = null
+
+        if (pendingSlot !== null && pendingSlot < inputRef.current.value.length) {
+          inputRef.current.setSelectionRange(pendingSlot, pendingSlot + 1)
+          setMirrorSelectionStart(pendingSlot)
+          setMirrorSelectionEnd(pendingSlot + 1)
+        } else {
+          const start = Math.min(inputRef.current.value.length, maxLength - 1)
+          const end = inputRef.current.value.length
+          inputRef.current.setSelectionRange(start, end)
+          setMirrorSelectionStart(start)
+          setMirrorSelectionEnd(end)
+        }
       }
       setIsFocused(true)
     }, [maxLength])
+    const _clickListener = React.useCallback(
+      (e: React.MouseEvent<HTMLInputElement>) => {
+        if (!selectOnSlotClick || !containerRef.current || !inputRef.current) {
+          return
+        }
+
+        const rect = containerRef.current.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const slotIndex = Math.max(
+          0,
+          Math.min(Math.floor((x / rect.width) * maxLength), maxLength - 1),
+        )
+
+        // Only select filled slots; empty slots use default end-of-value behavior
+        if (slotIndex >= inputRef.current.value.length) {
+          return
+        }
+
+        if (document.activeElement === inputRef.current) {
+          // Already focused: set selection directly
+          inputRef.current.setSelectionRange(slotIndex, slotIndex + 1)
+          setMirrorSelectionStart(slotIndex)
+          setMirrorSelectionEnd(slotIndex + 1)
+        } else {
+          // Not yet focused: store for _focusListener to consume
+          pendingClickSlotRef.current = slotIndex
+        }
+      },
+      [selectOnSlotClick, maxLength],
+    )
     // Fix iOS pasting
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -427,6 +468,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             props.onPaste?.(e)
           }}
           onChange={_changeListener}
+          onClick={e => {
+            _clickListener(e)
+            props.onClick?.(e)
+          }}
           onMouseOver={e => {
             setIsHoveringInput(true)
             props.onMouseOver?.(e)
@@ -447,6 +492,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       ),
       [
         _changeListener,
+        _clickListener,
         _focusListener,
         _pasteListener,
         inputMode,
