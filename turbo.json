@@ -12,10 +12,7 @@
     "dev": {
       "cache": false
     },
-    "storybook": {
-      "cache": false
-    },
-    "test#test": {
+    "playground#test": {
       "dependsOn": ["input-otp#build"],
       "cache": false
     },

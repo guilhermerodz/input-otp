@@ -9,9 +9,8 @@ input-otp is a React component library for OTP (One-Time Password) inputs. It us
 ## Monorepo Structure
 
 - **packages/input-otp/** — Core library (published to npm as `input-otp`)
-- **apps/test/** — Playwright E2E tests against a Next.js app on port 3039
+- **apps/playground/** — Next.js app (port 3039) with component showcase and Playwright E2E tests
 - **apps/website/** — Next.js documentation site
-- **apps/storybook/** — Storybook for component stories
 
 Uses pnpm workspaces + Turborepo.
 
@@ -22,6 +21,7 @@ pnpm install              # Install dependencies
 pnpm build                # Build all packages (Turbo)
 pnpm build:lib            # Build only the library (tsup → dist/)
 pnpm dev                  # Dev mode for all packages
+pnpm dev:playground       # Dev mode for playground app only
 pnpm test                 # Run Playwright E2E tests (all browsers)
 pnpm test:ui              # Run Playwright tests with UI
 pnpm lint:lib             # Lint the library
@@ -50,7 +50,7 @@ Library builds with tsup: entry `src/index.ts` → CJS (`dist/index.js`), ESM (`
 
 ## Testing
 
-All tests are Playwright E2E tests in `apps/test/src/tests/`. Test files cover typing, rendering, selections, slot behavior, props, word deletion, autofocus, and onComplete. Tests run across Chromium, Firefox, WebKit, mobile viewports, and Edge.
+All tests are Playwright E2E tests in `apps/playground/src/tests/`. Test files cover typing, rendering, selections, slot behavior, props, word deletion, autofocus, and onComplete. Tests run across Chromium, Firefox, WebKit, mobile viewports, and Edge.
 
 Set `WINDOWED_TESTS=1` to run tests in headed mode with slow-mo.
 

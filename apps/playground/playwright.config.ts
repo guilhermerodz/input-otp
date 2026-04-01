@@ -39,7 +39,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'npm run dev',
+    command: 'pnpm dev',
     url: 'http://localhost:3039',
     cwd: '.',
     reuseExistingServer: !process.env.CI,

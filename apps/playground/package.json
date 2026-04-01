@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "playground",
   "private": true,
   "scripts": {
     "dev": "next dev --port=3039",
