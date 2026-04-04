@@ -7,8 +7,8 @@ test.beforeEach(async ({ page }) => {
 
 /**
  * Set the input selection directly and wait for the component's mirrored
- * selection (mss) to reflect the new position. This avoids the race condition
- * where rapid ArrowLeft/Right presses conflict with the component's
+ * selection (mss/mse) to reflect the new position. This avoids the race
+ * condition where rapid ArrowLeft/Right presses conflict with the component's
  * selectionchange handler calling setSelectionRange.
  */
 async function setSelectionAndWait(
@@ -17,14 +17,12 @@ async function setSelectionAndWait(
   end: number,
 ) {
   const input = page.getByRole('textbox')
-  await input.evaluate(
-    (el: HTMLInputElement, [s, e]) => {
-      el.setSelectionRange(s, e)
-      el.dispatchEvent(new Event('selectionchange', { bubbles: true }))
-    },
-    [start, end] as [number, number],
-  )
+  await input.evaluate((el: HTMLInputElement, [s, e]) => {
+    el.setSelectionRange(s, e)
+    document.dispatchEvent(new Event('selectionchange'))
+  }, [start, end] as [number, number])
   await expect(input).toHaveAttribute('data-input-otp-mss', String(start))
+  await expect(input).toHaveAttribute('data-input-otp-mse', String(end))
 }
 
 test.describe('Backspace', () => {

@@ -5,11 +5,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('Base tests - Selections', () => {
-  test.skip(
-    process.env.CI === 'true',
-    'Breaks in CI as it cannot handle Shift key',
-  )
-
   test('should replace selected char if another is pressed', async ({
     page,
   }) => {
@@ -21,6 +16,24 @@ test.describe('Base tests - Selections', () => {
     await input.pressSequentially('1')
     await expect(input).toHaveValue('121')
   })
+  test('should replace last char if another one is pressed', async ({
+    page,
+  }) => {
+    const input = page.getByRole('textbox')
+
+    await input.pressSequentially('1234567')
+    await page.waitForTimeout(100)
+
+    await expect(input).toHaveValue('123457')
+  })
+})
+
+test.describe('Base tests - Shift Selections', () => {
+  test.skip(
+    process.env.CI === 'true',
+    'Breaks in CI as it cannot handle Shift key',
+  )
+
   test('should replace multi-selected chars if another is pressed', async ({
     page,
   }) => {
@@ -33,15 +46,5 @@ test.describe('Base tests - Selections', () => {
     await page.waitForTimeout(100)
     await input.pressSequentially('1')
     await expect(input).toHaveValue('1231')
-  })
-  test('should replace last char if another one is pressed', async ({
-    page,
-  }) => {
-    const input = page.getByRole('textbox')
-
-    await input.pressSequentially('1234567')
-    await page.waitForTimeout(100)
-
-    await expect(input).toHaveValue('123457')
   })
 })

@@ -50,7 +50,7 @@ Library builds with tsup: entry `src/index.ts` → CJS (`dist/index.js`), ESM (`
 
 ## Testing
 
-All tests are Playwright E2E tests in `apps/playground/src/tests/`. Test files cover typing, rendering, selections, slot behavior, props, word deletion, autofocus, and onComplete. Tests run across Chromium, Firefox, WebKit, mobile viewports, and Edge.
+All tests are Playwright E2E tests in `apps/playground/src/tests/`. Test files cover typing, rendering, selections, slot behavior, props, word deletion, autofocus, and onComplete. Tests run across Chromium, Firefox, WebKit, and mobile viewports.
 
 Set `WINDOWED_TESTS=1` to run tests in headed mode with slow-mo.
 
