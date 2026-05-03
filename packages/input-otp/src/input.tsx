@@ -148,7 +148,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           }
 
           if (start !== -1 && end !== -1 && start !== end) {
-            inputRef.current.setSelectionRange(start, end, direction)
+            input.setSelectionRange(start, end, direction)
           }
         }
 
@@ -314,7 +314,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         if (!pasteTransformer && (!initialLoadRef.current.isIOS || !e.clipboardData || !input)) {
           return
         }
-        
+
         const _content = e.clipboardData.getData('text/plain')
         const content = pasteTransformer
           ? pasteTransformer(_content)
