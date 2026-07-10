@@ -63,14 +63,9 @@ export function Showcase({ className, ...props }: { className?: string }) {
       toast('Try guessing the right password 🤔', { position: 'top-right' })
     }
 
-    const anchor = document.querySelector<HTMLInputElement>(
-      '#code-example-anchor',
-    )
-
-    window.scrollTo({
-      top: anchor?.getBoundingClientRect().top,
-      behavior: 'smooth',
-    })
+    document
+      .querySelector<HTMLElement>('#after-hero-anchor')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
     setValue('')
     setTimeout(() => {
@@ -199,7 +194,7 @@ function Slot(props: {
 function FakeCaret() {
   return (
     <div className="absolute pointer-events-none inset-0 flex items-center justify-center animate-caret-blink [animate-delay:inherit]">
-      <div className="w-px h-8 md:w-0.5 md:h-16 bg-white" />
+      <div className="w-px h-8 md:w-0.5 md:h-16 bg-foreground" />
     </div>
   )
 }

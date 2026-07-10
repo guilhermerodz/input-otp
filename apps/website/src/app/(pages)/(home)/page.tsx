@@ -1,3 +1,6 @@
+import Link from 'next/link'
+import { ChevronRightIcon } from 'lucide-react'
+
 import { CopyNpmCommandButton } from '@/components/copy-button'
 import { Icons } from '@/components/icons'
 import {
@@ -6,39 +9,45 @@ import {
   PageHeaderDescription,
   PageHeaderHeading,
 } from '@/components/page-header'
+import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
-import Link from 'next/link'
-import { Showcase } from './_components/showcase'
 import { ExampleCode } from '@/app/(local-pages)/example-playground/code'
-import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
-import { ChevronRightIcon } from 'lucide-react'
+
+import { Downloads } from './_components/downloads'
+import { Features } from './_components/features'
+import { Showcase } from './_components/showcase'
+import { HeroSponsorStrip, SponsorsSection } from './_components/sponsors'
 
 const fadeUpClassname =
   'lg:motion-safe:opacity-0 lg:motion-safe:animate-fade-up'
 
 async function getRepoStarCount() {
-  const res = await fetch(
-    'https://api.github.com/repos/guilhermerodz/input-otp',
-  )
-  const data = await res.json()
-  const starCount = data.stargazers_count
-  if (starCount > 999) {
-    return (starCount / 1000).toFixed(1) + 'K'
+  try {
+    const res = await fetch(
+      'https://api.github.com/repos/guilhermerodz/input-otp',
+    )
+    const data = await res.json()
+    const starCount = data.stargazers_count
+    if (typeof starCount !== 'number') {
+      return null
+    }
+    if (starCount > 999) {
+      return (starCount / 1000).toFixed(1) + 'K'
+    }
+    return String(starCount)
+  } catch {
+    return null
   }
-  return starCount
 }
 
 export default async function IndexPage() {
   const starCount = await getRepoStarCount()
 
   return (
-    <div className="container relative flex-1 flex flex-col justify-center items-center">
+    <div className="container relative flex flex-1 flex-col items-center justify-center">
       <PageHeader>
-        {/* <div className="opacity-0 animate-fade-in [animation-delay:2700ms] [animation-duration:500ms] mb-2"><SponsorBadgeClerk /></div> */}
-
         <PageHeaderHeading className={cn(fadeUpClassname)}>
           Stop wasting time building OTP inputs.
         </PageHeaderHeading>
@@ -56,8 +65,10 @@ export default async function IndexPage() {
             'lg:motion-safe:[animation-delay:3000ms]',
           )}
         >
-          One-time password input component for React. Accessible. Unstyled.
-          Customizable. Open Source.
+          One-time password input for React. Accessible. Unstyled. Customizable.{' '}
+          <span className="whitespace-nowrap">
+            Downloaded 700 million times.
+          </span>
         </PageHeaderDescription>
 
         <PageActions
@@ -67,7 +78,7 @@ export default async function IndexPage() {
           )}
         >
           <div className={buttonVariants({ variant: 'outline' })}>
-            <div className="text-muted-foreground pr-1">
+            <div className="pr-1 text-muted-foreground">
               <span className="text-foreground">npm</span> install input-otp
             </div>
             <CopyNpmCommandButton
@@ -84,63 +95,60 @@ export default async function IndexPage() {
             rel="noreferrer"
             href={siteConfig.links.github}
             className={cn(
-              'relative !py-0 group',
+              'group relative !py-0',
               buttonVariants({ variant: 'outline' }),
             )}
           >
             <Icons.gitHub className="mr-2 h-4 w-4" />
-            <div className="flex items-center h-full">
+            <div className="flex h-full items-center">
               <div className="hidden md:[display:unset]">GitHub</div>
-              <div className="hidden md:[display:unset] h-full w-px bg-input group-hover:bg-foregrounds mx-4" />
-              <div>{starCount}</div>
+              {starCount !== null && (
+                <>
+                  <div className="mx-4 hidden h-full w-px bg-input md:[display:unset]" />
+                  <div>{starCount}</div>
+                </>
+              )}
             </div>
           </Link>
         </PageActions>
 
-        <div className={cn(fadeUpClassname, "lg:motion-safe:[animation-delay:3000ms] -mt-2 lg:-mt-4")}><SponsorBadgeClerk /></div>
-      </PageHeader>
-
-      <div className="mb-14 md:mb-20 lg:mb-20 lg:opacity-0 lg:animate-fade-up !duration-1000 ![animation-delay:3000ms] animate-none">
-        <h3 className="text-center text-xl font-bold">Hero Sponsors</h3>
-        <div className="flex items-center gap-4">
-          <a className="relative size-[160px] flex items-center justify-center bg-muted/80 dark:bg-muted/20 rounded-xl mt-4 group" href="https://go.resend.com/input-otp" target="_blank">
-            <div className="relative size-[65%] aspect-square group-hover:scale-110 transition-all duration-300 ease-out">
-              <Image
-                alt="Resend"
-                src="./sponsors/resend-wordmark-white.svg"
-                fill
-                className="aspect-auto hidden dark:block"
-              />
-              <Image
-                alt="Resend"
-                src="./sponsors/resend-wordmark-black.svg"
-                fill
-                className="aspect-auto block dark:hidden"
-              />
-            </div>
-          </a>
-          <a className="relative size-[160px] flex items-center justify-center bg-muted/80 dark:bg-muted/20 rounded-xl mt-4 group" href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
-            <div className="relative size-[65%] aspect-square group-hover:scale-110 transition-all duration-300 ease-out">
-              <Image
-                alt="Evomi"
-                src="./sponsors/evomi-wordmark-white.svg"
-                fill
-                className="aspect-auto hidden dark:block"
-              />
-              <Image
-                alt="Evomi"
-                src="./sponsors/evomi-wordmark-black.svg"
-                fill
-                className="aspect-auto block dark:hidden"
-              />
-            </div>
-          </a>
+        <div
+          className={cn(
+            fadeUpClassname,
+            '-mt-2 lg:-mt-4 lg:motion-safe:[animation-delay:3000ms]',
+          )}
+        >
+          <SponsorBadgeClerk />
         </div>
 
+        <HeroSponsorStrip
+          className={cn(
+            fadeUpClassname,
+            'mt-10 lg:motion-safe:[animation-delay:3400ms]',
+          )}
+        />
+      </PageHeader>
+
+      <Downloads className="mt-16 md:mt-28 lg:mt-36" />
+
+      <Features className="mt-28 md:mt-40 lg:mt-48" />
+
+      <div className="mt-28 w-full md:mt-40 lg:mt-48">
+        <div className="mx-auto max-w-[560px] px-6 text-center">
+          <h2 className="text-balance text-2xl font-bold leading-tight tracking-tight md:text-4xl">
+            Copy, paste, make it yours.
+          </h2>
+          <p className="mt-4 text-pretty text-base text-muted-foreground md:text-lg">
+            The exact input at the top of this page — one render prop, styled
+            with Tailwind. Swap in your own design system whenever you like.
+          </p>
+        </div>
+        <div className="mt-10">
+          <ExampleCode />
+        </div>
       </div>
 
-
-      <ExampleCode />
+      <SponsorsSection className="mb-24 mt-28 md:mt-40 lg:mb-32 lg:mt-48" />
     </div>
   )
 }
@@ -149,12 +157,15 @@ export const revalidate = 3600
 
 const SponsorBadgeClerk = () => {
   return (
-    <a href="https://go.clerk.com/input-otp" target="_blank">
-      <Badge variant="outline" className="flex flex-col sm:flex-row items-center justify-center sm:justify-between sm:gap-8 h-12 sm:h-10 text-nowrap sm:text-sm hover:bg-accent">
+    <a href="https://go.clerk.com/input-otp" target="_blank" rel="noreferrer">
+      <Badge
+        variant="outline"
+        className="flex h-12 flex-col items-center justify-center text-nowrap hover:bg-accent sm:h-10 sm:flex-row sm:justify-between sm:gap-8 sm:text-sm"
+      >
         <span>Looking for an authentication solution?</span>
 
-        <span className="text-purple-500 flex items-center gap-2">
-          <span>Get Started with Clerk</span>
+        <span className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+          <span>Get started with Clerk</span>
           <ChevronRightIcon className="size-3" />
         </span>
       </Badge>

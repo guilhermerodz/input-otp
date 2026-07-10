@@ -105,9 +105,6 @@ export function ExampleCode() {
       </div>
 
       <div className="hidden lg:[display:unset] absolute inset-x-0 top-0 -bottom-full pointer-events-none z-20 [animation-delay:5000ms]"></div>
-
-      {/* Anchor */}
-      <div id="code-example-anchor" className="absolute pointer-events-none w-px h-px -top-[5.5rem]" />
     </div>
   )
 }

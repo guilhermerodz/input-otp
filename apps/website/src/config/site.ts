@@ -3,7 +3,7 @@ export const siteConfig = {
   url: 'https://input-otp.rodz.dev',
   ogImage: 'https://input-otp.rodz.dev/og.jpg',
   description:
-    'One-time password input component for React. Accessible. Unstyled. Customizable. Open Source. Build your own OTP form effortlessly.',
+    'One-time password input component for React. Accessible. Unstyled. Customizable. Open Source. Downloaded 700 million times on npm.',
   links: {
     twitter: 'https://twitter.com/guilherme_rodz',
     github: 'https://github.com/guilhermerodz/input-otp',
