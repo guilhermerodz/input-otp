@@ -111,7 +111,7 @@ export function SponsorsSection({ className }: { className?: string }) {
           href={SPONSORS.clerk.href}
           target="_blank"
           rel="noreferrer sponsored"
-          className="group mt-10 flex flex-col gap-8 rounded-xl border border-border p-8 transition-colors duration-300 hover:border-foreground/25 sm:flex-row sm:items-center sm:justify-between md:p-10"
+          className="group mt-10 flex flex-col gap-8 rounded-xl border border-border p-8 transition-colors duration-300 hover:border-[#6C47FF]/50 sm:flex-row sm:items-center sm:justify-between md:p-10"
         >
           <div className="max-w-[24rem]">
             <Wordmark sponsor={SPONSORS.clerk} className="h-7" />

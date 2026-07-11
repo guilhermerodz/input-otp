@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { XRay } from './xray'
 
 const FEATURES = [
   {
@@ -8,10 +9,6 @@ const FEATURES = [
   {
     title: 'Friendly to password managers',
     body: 'Detects the badges injected by 1Password, LastPass, Dashlane and Bitwarden, and keeps them from covering your slots.',
-  },
-  {
-    title: 'Unstyled, yours to design',
-    body: 'A render prop hands you every slot — its character, caret and focus state. Style it with Tailwind, CSS Modules, or anything else.',
   },
   {
     title: 'Accessible by default',
@@ -29,31 +26,33 @@ export function Features({ className }: { className?: string }) {
       aria-labelledby="features-heading"
       className={cn('w-full', className)}
     >
-      <div className="mx-auto grid max-w-5xl gap-12 px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+      <div className="mx-auto grid max-w-5xl gap-x-20 gap-y-14 px-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)]">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <h2
             id="features-heading"
-            className="text-balance text-2xl font-bold leading-tight tracking-tight md:text-4xl"
+            className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl"
           >
-            One real input. Any design.
+            One real input, wearing your design.
           </h2>
-          <p className="mt-4 max-w-[46ch] text-pretty text-base text-muted-foreground md:text-lg">
-            Under the hood, input-otp renders a single invisible{' '}
+          <p className="mt-4 max-w-[48ch] text-pretty text-base text-muted-foreground md:text-lg">
+            Under the hood there is a single invisible{' '}
             <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground">
               &lt;input&gt;
-            </code>{' '}
-            and mirrors its value, selection and caret onto the slots you
-            render. Everything a native input can do, your OTP field does too.
+            </code>
+            . The slots you see just mirror its state. Type below and watch it
+            live — value, selection, focus.
           </p>
+
+          <XRay className="mt-8" />
         </div>
 
-        <ul className="divide-y divide-border border-y border-border">
+        <ul className="divide-y divide-border border-y border-border lg:self-center">
           {FEATURES.map(feature => (
-            <li key={feature.title} className="py-6 first:pt-5 last:pb-5">
+            <li key={feature.title} className="py-7 first:pt-6 last:pb-6">
               <h3 className="text-base font-semibold md:text-lg">
                 {feature.title}
               </h3>
-              <p className="mt-2 max-w-[60ch] text-pretty text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p className="mt-2 max-w-[58ch] text-pretty text-sm leading-relaxed text-muted-foreground md:text-base">
                 {feature.body}
               </p>
             </li>

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
 
@@ -27,12 +27,12 @@ export function Showcase({ className, ...props }: { className?: string }) {
     }
     const t1 = setTimeout(() => {
       setDisabled(false)
-    }, 1_900)
+    }, 1_300)
     const t2 = setTimeout(
       () => {
         inputRef.current?.focus()
       },
-      isMobile ? 0 : 2_500,
+      isMobile ? 0 : 1_600,
     )
 
     return () => {
@@ -58,7 +58,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
 
       setTimeout(() => {
         setHasGuessed(false)
-      }, 1_000)
+      }, 1_200)
     } else {
       toast('Try guessing the right password 🤔', { position: 'top-right' })
     }
@@ -97,7 +97,7 @@ export function Showcase({ className, ...props }: { className?: string }) {
 
       <form
         className={cn(
-          'mx-auto flex max-w-[980px] justify-center pt-6 pb-4',
+          'mx-auto flex max-w-[980px] justify-center pt-8 pb-4',
           className,
         )}
         onSubmit={onSubmit}
@@ -114,11 +114,12 @@ export function Showcase({ className, ...props }: { className?: string }) {
           aria-label="showcase-otp-input"
           render={({ slots, isFocused }) => (
             <>
-              <div className="flex">
+              <div className="flex gap-1.5 md:gap-2">
                 {slots.slice(0, 3).map((slot, idx) => (
                   <Slot
                     key={idx}
                     isFocused={isFocused}
+                    isSuccess={hasGuessed}
                     animateIdx={idx}
                     {...slot}
                   />
@@ -126,13 +127,18 @@ export function Showcase({ className, ...props }: { className?: string }) {
               </div>
 
               {/* Layout inspired by Stripe */}
-              <div className="flex w-10 md:20 justify-center items-center">
-                <div className="w-3 md:w-6 h-1 md:h-2 rounded-full bg-border"></div>
+              <div className="flex w-8 md:w-16 justify-center items-center">
+                <div className="w-3 md:w-6 h-1 md:h-1.5 rounded-full bg-border"></div>
               </div>
 
-              <div className="flex">
+              <div className="flex gap-1.5 md:gap-2">
                 {slots.slice(3).map((slot, idx) => (
-                  <Slot isFocused={isFocused} key={idx} {...slot} />
+                  <Slot
+                    isFocused={isFocused}
+                    isSuccess={hasGuessed}
+                    key={idx}
+                    {...slot}
+                  />
                 ))}
               </div>
             </>
@@ -147,6 +153,7 @@ function Slot(props: {
   char: string | null
   isActive: boolean
   isFocused: boolean
+  isSuccess: boolean
   animateIdx?: number
 }) {
   const willAnimateChar = props.animateIdx !== undefined && props.animateIdx < 2
@@ -155,23 +162,23 @@ function Slot(props: {
   return (
     <div
       className={cn(
-        'relative w-10 md:w-20 h-14 md:h-28 text-[2rem] md:text-[4rem] flex items-center justify-center border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md',
-        'group-hover:border-accent-foreground/20 group-focus-within:!border-accent-foreground/50',
-        'transition-[border-color,box-shadow] duration-300 ease-out',
-        'will-change-[border-color,box-shadow]',
-        'backface-hidden [-webkit-backface-visibility:hidden] [transform:translateZ(0)]',
+        'keycap relative w-10 md:w-[4.5rem] h-14 md:h-24 text-[2rem] md:text-[3.25rem] font-medium tabular-nums rounded-lg md:rounded-xl',
+        'flex items-center justify-center',
+        'transition-[box-shadow,border-color,transform] duration-300 ease-out',
+        'group-hover:border-foreground/25',
         {
-          '[box-shadow:0_0_0_4px_hsl(var(--accent-foreground))]':
-            props.isActive,
-          '[box-shadow:0_0_0_0px_transparent]': !props.isActive,
+          '!border-foreground/80 md:-translate-y-0.5 shadow-[0_0_0_1px_hsl(var(--foreground)/0.8),0_8px_24px_-8px_hsl(var(--foreground)/0.35)]':
+            props.isActive && !props.isSuccess,
+          '!border-emerald-500 shadow-[0_0_0_1px_rgb(16_185_129),0_8px_28px_-6px_rgb(16_185_129/0.5)]':
+            props.isSuccess,
         },
       )}
     >
       <div
-        className={cn('duration-1000', {
+        className={cn('duration-500', {
           'lg:opacity-0 lg:animate-fade-in': willAnimateChar,
-          'lg:[animation-delay:1.5s]': props.animateIdx === 0,
-          'lg:[animation-delay:2s]': props.animateIdx === 1,
+          'lg:[animation-delay:800ms]': props.animateIdx === 0,
+          'lg:[animation-delay:1100ms]': props.animateIdx === 1,
         })}
       >
         {props.char && <div>{props.char}</div>}
@@ -181,7 +188,8 @@ function Slot(props: {
       {props.isActive && props.char === null && (
         <div
           className={cn({
-            'lg:opacity-0 lg:animate-fade-in': willAnimateCaret,
+            'lg:opacity-0 lg:animate-fade-in lg:[animation-delay:1400ms]':
+              willAnimateCaret,
           })}
         >
           <FakeCaret />
@@ -194,7 +202,7 @@ function Slot(props: {
 function FakeCaret() {
   return (
     <div className="absolute pointer-events-none inset-0 flex items-center justify-center animate-caret-blink [animate-delay:inherit]">
-      <div className="w-px h-8 md:w-0.5 md:h-16 bg-foreground" />
+      <div className="w-px h-8 md:w-0.5 md:h-12 bg-foreground" />
     </div>
   )
 }

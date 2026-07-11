@@ -63,6 +63,60 @@
 }
 
 @layer utilities {
+  /* Fine dot grid — the "graph paper" the OTP world sits on. */
+  .bg-dot-grid {
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--foreground) / 0.09) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+
+  /* Tactile key cell — the atomic unit of the page. */
+  .keycap {
+    border: 1px solid hsl(var(--border));
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--muted) / 0.6),
+      hsl(var(--background))
+    );
+    box-shadow:
+      0 1px 2px hsl(240 10% 4% / 0.06),
+      inset 0 1px 0 hsl(0 0% 100% / 0.7);
+  }
+  .dark .keycap {
+    background: linear-gradient(to bottom, hsl(240 5% 9%), hsl(240 6% 5.5%));
+    box-shadow:
+      0 2px 6px -2px rgb(0 0 0 / 0.6),
+      inset 0 1px 0 hsl(0 0% 100% / 0.07);
+  }
+}
+
+/* Hero atmosphere: a soft spotlight that leans in when the input is focused. */
+.hero-spotlight {
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 10%,
+    hsl(var(--foreground) / 0.022),
+    transparent 78%
+  );
+  opacity: 0.55;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dark .hero-spotlight {
+  background: radial-gradient(
+    ellipse 62% 52% at 50% 12%,
+    hsl(0 0% 100% / 0.09),
+    transparent 68%
+  );
+}
+.hero-scene:has(input:focus) .hero-spotlight {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-spotlight {
+    transition: none;
+  }
 }
 
 [data-highlighted-chars] {
