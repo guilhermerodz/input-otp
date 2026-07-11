@@ -14,11 +14,15 @@ export function Proof({ className }: { className?: string }) {
   const panelRef = React.useRef<HTMLDivElement>(null)
   const [value, setValue] = React.useState(TOTAL_DOWNLOADS)
   const [live, setLive] = React.useState(false)
+  const [revealed, setRevealed] = React.useState(false)
 
   React.useEffect(() => {
     const el = panelRef.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setRevealed(true)
+      return
+    }
 
     let raf = 0
     let interval: ReturnType<typeof setInterval> | undefined
@@ -29,6 +33,8 @@ export function Proof({ className }: { className?: string }) {
         if (!entry.isIntersecting || started) return
         started = true
         observer.disconnect()
+
+        setRevealed(true)
 
         const start = performance.now()
         const tick = (now: number) => {
@@ -75,7 +81,11 @@ export function Proof({ className }: { className?: string }) {
         <div
           ref={panelRef}
           aria-hidden
-          className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-12 md:rounded-3xl md:py-16 lg:py-20"
+          className={cn(
+            'relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-12 md:rounded-3xl md:py-16 lg:py-20',
+            'transition-[opacity,transform] duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]',
+            !revealed && 'translate-y-3 opacity-0',
+          )}
         >
           <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,rgb(255_255_255/0.055)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_75%_90%_at_50%_50%,black_35%,transparent_100%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_65%_at_50%_0%,rgb(255_255_255/0.06),transparent_70%)]" />
