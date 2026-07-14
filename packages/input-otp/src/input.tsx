@@ -271,11 +271,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
         const onPointerUp = () => {
           isPointerDown = false
-          // The edit menu anchors when it opens on release; it stays open
-          // after the text re-hides, so the window only needs to cover the
-          // anchor moment.
+          // The edit menu opens on release and survives the text re-hiding
+          // only once fully presented — hiding sooner (tested at 400ms)
+          // dismisses it mid-presentation.
           clearTimeout(hideTimer)
-          hideTimer = setTimeout(hideText, 400)
+          hideTimer = setTimeout(hideText, 1500)
         }
         // Long-press on an unfocused input: focus arrives while the pointer
         // is still down and the menu will anchor on release.
