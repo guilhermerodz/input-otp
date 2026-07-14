@@ -244,27 +244,38 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       let cleanupIOSReveal: () => void = () => {}
       if (initialLoadRef.current.isIOS) {
         let isPointerDown = false
+        let pointerX = 0
         let hideTimer: ReturnType<typeof setTimeout> | undefined
+        // The text is revealed at the pointer's x position, so the ~2px
+        // artifact renders under the fingertip (occluded by it) and the
+        // edit menu anchors at the touch point. offsetX is in the input's
+        // pre-transform coordinate space, matching text-indent.
         const revealText = () => {
           clearTimeout(hideTimer)
-          input.style.setProperty('text-indent', '0', 'important')
+          input.style.setProperty(
+            'text-indent',
+            `${Math.max(0, pointerX)}px`,
+            'important',
+          )
         }
         const hideText = () => {
           clearTimeout(hideTimer)
           input.style.removeProperty('text-indent')
         }
-        const onPointerDown = () => {
+        const onPointerDown = (e: PointerEvent) => {
           isPointerDown = true
+          pointerX = e.offsetX
           if (document.activeElement === input) {
             revealText()
           }
         }
         const onPointerUp = () => {
           isPointerDown = false
-          // Long enough for the edit menu to anchor to the revealed rect,
-          // short enough that the artifact only shows during the gesture.
+          // The edit menu anchors when it opens on release; it stays open
+          // after the text re-hides, so the window only needs to cover the
+          // anchor moment.
           clearTimeout(hideTimer)
-          hideTimer = setTimeout(hideText, 1500)
+          hideTimer = setTimeout(hideText, 400)
         }
         // Long-press on an unfocused input: focus arrives while the pointer
         // is still down and the menu will anchor on release.
