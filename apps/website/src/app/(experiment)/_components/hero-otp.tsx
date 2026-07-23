@@ -24,30 +24,54 @@ export function HeroOtp() {
   const [value, setValue] = React.useState('')
   const [done, setDone] = React.useState(false)
   const [error, setError] = React.useState(false)
-
-  React.useEffect(() => {
-    const timers = hintTimers.current
-    return () => timers.forEach(clearTimeout)
-  }, [])
+  const valueRef = React.useRef(value)
+  valueRef.current = value
 
   const clearHint = () => {
     hintTimers.current.forEach(clearTimeout)
     hintTimers.current = []
   }
 
-  // Wrong code: shake it off, then suggest the right one — type 1, 2 and
-  // hand the caret over on the third slot. The user notices it's their turn.
+  const at = (ms: number, fn: () => void) =>
+    hintTimers.current.push(setTimeout(fn, ms))
+
+  // Suggest the right code: type 1, 2, then hand the caret over on the
+  // third slot. The user notices it's their turn.
+  const runHint = (delay: number) => {
+    at(delay, () => setValue('1'))
+    at(delay + 200, () => setValue('12'))
+    at(delay + 400, () => inputRef.current?.focus())
+  }
+
+  // On load, once the intro curtain is gone, the hint plays by itself —
+  // unless the visitor already started typing.
+  React.useEffect(() => {
+    const begin = () => {
+      if (valueRef.current !== '') return
+      if (document.activeElement === inputRef.current) return
+      runHint(600)
+    }
+    const w = window as unknown as { __xpIntroDone?: boolean }
+    if (w.__xpIntroDone) {
+      begin()
+    } else {
+      window.addEventListener('xp:intro-done', begin, { once: true })
+    }
+    return () => {
+      window.removeEventListener('xp:intro-done', begin)
+      clearHint()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Wrong code: shake it off, then replay the suggestion.
   const failThenHint = () => {
     setError(true)
-    const at = (ms: number, fn: () => void) =>
-      hintTimers.current.push(setTimeout(fn, ms))
     at(450, () => {
       setError(false)
       setValue('')
     })
-    at(800, () => setValue('1'))
-    at(1000, () => setValue('12'))
-    at(1200, () => inputRef.current?.focus())
+    runHint(800)
   }
 
   return (

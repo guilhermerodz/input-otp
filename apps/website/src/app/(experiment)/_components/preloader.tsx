@@ -33,6 +33,12 @@ const REEL_H = 132
 
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
+/* Lets the hero know the stage is clear (flag covers late subscribers). */
+function announceIntroDone() {
+  ;(window as unknown as { __xpIntroDone?: boolean }).__xpIntroDone = true
+  window.dispatchEvent(new Event('xp:intro-done'))
+}
+
 /* One spinning strip. A couple of full 0-9 runs ending on the target
    character; a single decelerating transform plays the whole spin,
    blurred while it is fast. */
@@ -374,7 +380,10 @@ export function Preloader() {
       localStorage.setItem('xp-intro-seen', '1')
     } catch {}
     setPhase('lift')
-    setTimeout(() => setPhase('gone'), LIFT_MS)
+    setTimeout(() => {
+      setPhase('gone')
+      announceIntroDone()
+    }, LIFT_MS)
   }, [])
 
   React.useEffect(() => {
@@ -392,6 +401,7 @@ export function Preloader() {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
       setPhase('gone')
+      announceIntroDone()
       return
     }
     const pending = timeouts.current
