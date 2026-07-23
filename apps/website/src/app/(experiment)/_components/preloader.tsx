@@ -3,22 +3,26 @@
 import * as React from 'react'
 
 /**
- * Intro: a slot machine. Nine reels spin behind the page's own OTP frame —
- * motion-blurred digit strips landing left to right on 700.000.000 — the
- * frame turns green, "million downloads" types itself out, and a single
- * curtain lifts to reveal the site.
+ * Intro: a slot machine. A lever on the right pulls itself, nine
+ * motion-blurred reels land left to right on 700.000.000 and the frame
+ * turns green. Then the lever becomes a caret that sweeps right-to-left,
+ * clipping the machine away, and types "700 million downloads" in its
+ * place — before a single curtain lifts to reveal the site.
  */
 
 const TARGET = '700000000'
-const CAPTION = 'million downloads'
-const TYPE_MS = 42
+const PHRASE = '700 million downloads'
+const TYPE_MS = 40
 
-/* Reel i lands at REEL_BASE + i * REEL_STEP. */
-const REEL_BASE = 950
-const REEL_STEP = 170
-const LANDED_AT = REEL_BASE + (TARGET.length - 1) * REEL_STEP
-/* Green + caption fire on landing; curtain waits for the words. */
-const LIFT_AT = LANDED_AT + 150 + CAPTION.length * TYPE_MS + 520
+/* Timeline. The lever pull leads, reels start as it bottoms out. */
+const REEL_DELAY = 380
+const REEL_BASE = 850
+const REEL_STEP = 150
+const LANDED_AT = REEL_DELAY + REEL_BASE + (TARGET.length - 1) * REEL_STEP
+const SWEEP_AT = LANDED_AT + 450
+const SWEEP_MS = 620
+const WRITE_AT = SWEEP_AT + SWEEP_MS + 80
+const LIFT_AT = WRITE_AT + PHRASE.length * TYPE_MS + 560
 const LIFT_MS = 850
 
 const REEL_W = 58
@@ -26,9 +30,9 @@ const REEL_H = 76
 
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
-/* One spinning digit strip. The strip is a couple of full 0-9 runs ending
-   on the target digit; a single decelerating transform animation plays the
-   whole spin, blurred while it is fast. */
+/* One spinning digit strip. A couple of full 0-9 runs ending on the target
+   digit; a single decelerating transform plays the whole spin, blurred
+   while it is fast. */
 function Reel({
   digit,
   index,
@@ -51,7 +55,8 @@ function Reel({
         width: REEL_W,
         height: REEL_H,
         overflow: 'hidden',
-        borderLeft: index % 3 === 0 ? 'none' : `1px solid ${green ? '#12251c' : '#1f1f23'}`,
+        borderLeft:
+          index % 3 === 0 ? 'none' : `1px solid ${green ? '#12251c' : '#1f1f23'}`,
         transition: 'border-color .5s ease',
       }}
     >
@@ -61,6 +66,7 @@ function Reel({
           {
             '--final': `${-(rows.length - 1) * REEL_H}px`,
             '--dur': `${REEL_BASE + index * REEL_STEP}ms`,
+            '--delay': `${REEL_DELAY}ms`,
           } as React.CSSProperties
         }
       >
@@ -98,44 +104,103 @@ function Reel({
   )
 }
 
-/* Caption that types itself out under the machine, after `delay` ms. */
-function Typewriter({ text, delay }: { text: string; delay: number }) {
-  const [started, setStarted] = React.useState(false)
+/* The lever: a rod with a knob, pivoting at its base off the machine's
+   right edge. It pulls itself once at the start, then hands its place to
+   the sweeping caret. */
+function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        left: 'calc(100% + 26px)',
+        top: '50%',
+        width: 20,
+        height: 86,
+        transform: 'translateY(-56%)',
+        opacity: hidden ? 0 : 1,
+        transition: 'opacity .3s ease',
+      }}
+    >
+      <div className="xp-lever-arm">
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 14,
+            bottom: 6,
+            width: 4,
+            marginLeft: -2,
+            borderRadius: 2,
+            background: '#3f3f46',
+            transition: 'background .5s ease',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            width: 16,
+            height: 16,
+            marginLeft: -8,
+            borderRadius: '50%',
+            background: green ? '#34d399' : '#71717a',
+            transition: 'background .5s ease',
+          }}
+        />
+      </div>
+      {/* axle */}
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: 0,
+          width: 8,
+          height: 8,
+          marginLeft: -4,
+          borderRadius: '50%',
+          background: '#27272a',
+        }}
+      />
+    </div>
+  )
+}
+
+/* The phrase the caret leaves behind, typed left to right. */
+function WriteLine() {
   const [count, setCount] = React.useState(0)
 
   React.useEffect(() => {
-    const id = setTimeout(() => setStarted(true), delay)
-    return () => clearTimeout(id)
-  }, [delay])
-
-  React.useEffect(() => {
-    if (!started || count >= text.length) return
+    if (count >= PHRASE.length) return
     const id = setTimeout(() => setCount(c => c + 1), TYPE_MS)
     return () => clearTimeout(id)
-  }, [started, count, text.length])
+  }, [count])
 
   return (
     <div
       style={{
-        marginTop: 30,
-        textAlign: 'center',
         fontFamily: mono,
-        fontSize: 15,
-        letterSpacing: '0.24em',
-        color: '#86efac',
-        minHeight: 20,
+        fontSize: 30,
+        fontWeight: 500,
+        letterSpacing: '0.04em',
+        color: '#34d399',
         whiteSpace: 'pre',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
-      {text.slice(0, count)}
+      {PHRASE.slice(0, count)}
       <span
         style={{
           display: 'inline-block',
-          width: 8,
-          height: 15,
-          marginLeft: 2,
-          verticalAlign: 'text-bottom',
-          background: count < text.length ? '#34d399' : 'transparent',
+          width: 2,
+          height: 34,
+          marginLeft: 3,
+          background: '#34d399',
+          boxShadow: '0 0 12px rgba(52, 211, 153, 0.6)',
+          animation:
+            count >= PHRASE.length ? 'xp-blink 1s step-end infinite' : undefined,
         }}
       />
     </div>
@@ -143,18 +208,25 @@ function Typewriter({ text, delay }: { text: string; delay: number }) {
 }
 
 /* The machine: three grouped triplets of reels joined by dots — the same
-   frame the page's own OTP designs use. Neutral while spinning, green the
-   moment the last reel lands. */
+   frame the page's own OTP designs use. Neutral while spinning, green on
+   landing; then the caret sweeps it away and writes the phrase. */
 function Casino() {
   const [green, setGreen] = React.useState(false)
+  const [sweep, setSweep] = React.useState(false)
+  const [write, setWrite] = React.useState(false)
 
   React.useEffect(() => {
-    const id = setTimeout(() => setGreen(true), LANDED_AT)
-    return () => clearTimeout(id)
+    const t = [
+      setTimeout(() => setGreen(true), LANDED_AT),
+      setTimeout(() => setSweep(true), SWEEP_AT),
+      setTimeout(() => setWrite(true), WRITE_AT),
+    ]
+    return () => t.forEach(clearTimeout)
   }, [])
 
   const group = (from: number) => (
     <div
+      key={from}
       style={{
         display: 'flex',
         border: `1px solid ${green ? '#34d39955' : '#3f3f46'}`,
@@ -192,13 +264,15 @@ function Casino() {
   )
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       <div
+        className={sweep ? 'xp-machine--clip' : undefined}
         style={{
           display: 'flex',
           gap: 12,
           alignItems: 'center',
           justifyContent: 'center',
+          visibility: write ? 'hidden' : undefined,
         }}
       >
         {group(0)}
@@ -207,7 +281,23 @@ function Casino() {
         {dot(2)}
         {group(6)}
       </div>
-      <Typewriter text={CAPTION} delay={LANDED_AT + 150} />
+
+      <Lever green={green} hidden={sweep || write} />
+
+      {sweep && !write && <div className="xp-sweep-caret" />}
+
+      {write && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <WriteLine />
+        </div>
+      )}
     </div>
   )
 }

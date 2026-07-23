@@ -80,8 +80,71 @@ body {
    while it is fast. --final and --dur are set inline per reel. */
 .xp-reel-strip {
   animation:
-    xp-reel var(--dur) cubic-bezier(0.14, 0.8, 0.3, 1) forwards,
-    xp-reel-blur var(--dur) linear forwards;
+    xp-reel var(--dur) cubic-bezier(0.14, 0.8, 0.3, 1) var(--delay) both,
+    xp-reel-blur var(--dur) linear var(--delay) both;
+}
+
+/* The lever pulls itself once: swings down as the reels launch, springs
+   back while they spin. Pivot sits just above the axle. */
+.xp-lever-arm {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% calc(100% - 4px);
+  animation: xp-lever-pull 1100ms cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+
+@keyframes xp-lever-pull {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(150deg);
+  }
+  52% {
+    transform: rotate(150deg);
+  }
+  85% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* The caret sweep: the machine clips away from the right while the caret
+   travels to the left edge — same duration, same curve, so the caret is
+   always the clip edge. */
+.xp-machine--clip {
+  animation: xp-sweep-clip 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes xp-sweep-clip {
+  from {
+    clip-path: inset(-40px 0% -40px -40px);
+  }
+  to {
+    clip-path: inset(-40px 100% -40px -40px);
+  }
+}
+
+.xp-sweep-caret {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 76px;
+  margin-top: -38px;
+  background: #34d399;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+  animation: xp-sweep-move 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes xp-sweep-move {
+  from {
+    left: 100%;
+  }
+  to {
+    left: 0%;
+  }
 }
 
 @keyframes xp-reel {
