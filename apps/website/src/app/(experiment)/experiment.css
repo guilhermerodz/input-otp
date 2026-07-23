@@ -84,12 +84,10 @@ body {
     xp-reel-blur var(--dur) linear var(--delay) both;
 }
 
-/* The lever pulls itself once: swings down as the reels launch, springs
-   back while they spin. Pivot sits just above the axle. */
+/* The lever pulls itself once: the rod swings ~160deg around the elbow
+   as the reels launch, holds, then springs back while they spin. */
 .xp-lever-arm {
-  position: absolute;
-  inset: 0;
-  transform-origin: 50% calc(100% - 4px);
+  transform-origin: 50% calc(100% - 5px);
   animation: xp-lever-pull 1100ms cubic-bezier(0.45, 0, 0.3, 1) both;
 }
 
@@ -98,10 +96,10 @@ body {
     transform: rotate(0deg);
   }
   30% {
-    transform: rotate(150deg);
+    transform: rotate(160deg);
   }
   52% {
-    transform: rotate(150deg);
+    transform: rotate(160deg);
   }
   85% {
     transform: rotate(-8deg);

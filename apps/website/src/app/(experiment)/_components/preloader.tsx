@@ -109,65 +109,87 @@ function Reel({
   )
 }
 
-/* The lever: a rod with a knob, pivoting at its base off the machine's
-   right edge. It pulls itself once at the start, then hands its place to
-   the sweeping caret. */
+/* The lever, shaped like the classic cabinet part: a mount bracket on
+   the machine's side, a horizontal arm out of it, then an elbow and a
+   long rod up with the ball on top. The rod swings ~160deg around the
+   elbow for the pull, then springs back. */
 function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
+  const rodColor = '#1c1c21'
   return (
     <div
       aria-hidden
       style={{
         position: 'absolute',
-        left: 'calc(100% + 34px)',
+        left: '100%',
         top: '50%',
-        width: 26,
-        height: 124,
-        transform: 'translateY(-56%)',
+        width: 84,
+        height: 150,
+        transform: 'translateY(-50%)',
         opacity: hidden ? 0 : 1,
         transition: 'opacity .3s ease',
+        pointerEvents: 'none',
       }}
     >
-      <div className="xp-lever-arm">
+      {/* mount bracket hugging the cabinet side */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 5,
+          top: '50%',
+          width: 15,
+          height: 72,
+          marginTop: -36,
+          borderRadius: 8,
+          background: '#27272a',
+        }}
+      />
+      {/* horizontal arm out of the bracket */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 17,
+          top: '50%',
+          width: 28,
+          height: 10,
+          marginTop: 4,
+          borderRadius: '0 5px 5px 0',
+          background: rodColor,
+        }}
+      />
+      {/* rod + ball, pivoting at the elbow */}
+      <div
+        className="xp-lever-arm"
+        style={{
+          position: 'absolute',
+          left: 36,
+          top: '50%',
+          width: 10,
+          height: 98,
+          marginTop: -84,
+        }}
+      >
         <div
           style={{
             position: 'absolute',
-            left: '50%',
-            top: 20,
-            bottom: 8,
-            width: 5,
-            marginLeft: -2.5,
-            borderRadius: 3,
-            background: '#3f3f46',
-            transition: 'background .5s ease',
+            inset: 0,
+            borderRadius: 5,
+            background: rodColor,
           }}
         />
         <div
           style={{
             position: 'absolute',
             left: '50%',
-            top: 0,
-            width: 22,
-            height: 22,
-            marginLeft: -11,
+            top: -12,
+            width: 26,
+            height: 26,
+            marginLeft: -13,
             borderRadius: '50%',
             background: green ? '#34d399' : '#71717a',
             transition: 'background .5s ease',
           }}
         />
       </div>
-      {/* axle */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          bottom: 0,
-          width: 10,
-          height: 10,
-          marginLeft: -5,
-          borderRadius: '50%',
-          background: '#27272a',
-        }}
-      />
     </div>
   )
 }
