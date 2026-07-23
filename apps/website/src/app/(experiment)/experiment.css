@@ -61,19 +61,93 @@ body {
 
 /* Intro curtain ---------------------------------------------------------- */
 
-.xp-preloader {
+.xp-panel {
   position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
   background: #050506;
-  transform: translateY(0);
+  z-index: 50;
 }
 
-.xp-preloader--lift {
-  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+.xp-panel--full {
+  inset: 0;
+}
+
+/* variant 1 & 5 — curtain up (v1 adds the curved trailing edge, which is
+   why the lift overshoots by the bulge's height) */
+.xp-panel--up {
+  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(calc(-100% - 120px));
+}
+
+/* variant 2 — split from the middle */
+.xp-panel--top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+}
+
+.xp-panel--bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+}
+
+.xp-panel--top-lift {
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
   transform: translateY(-100%);
+}
+
+.xp-panel--bottom-lift {
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(100%);
+}
+
+/* variant 3 — the overlay simply dissolves while the content zooms */
+.xp-panel--fade {
+  transition: opacity 0.7s ease;
+  opacity: 0;
+}
+
+/* variant 4 — five staggered blinds (delay set inline per strip) */
+.xp-blind {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 20.5%;
+  background: #050506;
+  z-index: 50;
+}
+
+.xp-blind--lift {
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(-101%);
+}
+
+/* Slide content floats above the panels and exits on its own. */
+.xp-pre-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 52;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.xp-pre-exit {
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s ease;
+  opacity: 0;
+  transform: translateY(-24px) scale(0.97);
+}
+
+.xp-pre-zoomexit {
+  transition:
+    opacity 0.5s ease,
+    transform 0.55s cubic-bezier(0.5, 0, 0.8, 1);
+  opacity: 0;
+  transform: scale(1.7);
 }
 
 @keyframes xp-pre-fade {
