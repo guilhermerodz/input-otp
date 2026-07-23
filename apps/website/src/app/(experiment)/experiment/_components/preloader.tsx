@@ -8,8 +8,12 @@ import * as React from 'react'
  * — before the curtain lifts and reveals the page.
  */
 
-/* How long each slide holds, in ms. Index 0 also gets the fade-in. */
-const HOLDS = [1150, 700, 700, 400, 400, 400, 400, 700]
+/* How long each slide holds, in ms (base rhythm x SPEED). Index 0 also
+   gets the fade-in. */
+const SPEED = 0.7
+const HOLDS = [1150, 700, 700, 400, 400, 400, 400, 700].map(ms =>
+  Math.round(ms * SPEED),
+)
 const CURTAIN_MS = 850
 
 const mono = "var(--font-jetbrains), ui-monospace, Menlo, monospace"
@@ -89,9 +93,9 @@ function Keycaps() {
       <div
         style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}
       >
-        {['7', '0', ''].map(cap)}
+        {['7', '0', '', ''].map(cap)}
         <div style={{ width: 14, height: 3, background: '#3f3f46', borderRadius: 2 }} />
-        {['', '', ''].map(cap)}
+        {['', '', '', ''].map(cap)}
       </div>
       <Label>keycaps.tsx</Label>
     </div>
@@ -103,7 +107,7 @@ function Underline() {
   return (
     <div>
       <div style={{ display: 'flex', gap: 22, justifyContent: 'center' }}>
-        {['7', '0', '0', '', '', ''].map((c, i) => (
+        {['7', '0', '0', ''].map((c, i) => (
           <div key={i} style={{ width: 56, textAlign: 'center' }}>
             <div style={{ ...box, height: 68, fontSize: 44 }}>{c}</div>
             <div
@@ -161,7 +165,7 @@ function Masked() {
   return (
     <div>
       <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-        {[1, 1, 1, 1, 1, 0].map((filled, i) => (
+        {[1, 1, 1, 0].map((filled, i) => (
           <div
             key={i}
             style={{
@@ -196,7 +200,7 @@ function Pill() {
   return (
     <div>
       <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-        {['9', '4', '1', '7', ''].map((c, i) => (
+        {['9', '4', '1', '7', '0', '8', '', ''].map((c, i) => (
           <div
             key={i}
             style={{
@@ -252,7 +256,7 @@ function Terminal() {
   return (
     <div>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        {['7', '0', '0', '0', '0', '0'].map((c, i) => (
+        {['7', '0', '0', '0', '0', '0', '0', '0'].map((c, i) => (
           <div
             key={i}
             style={{
