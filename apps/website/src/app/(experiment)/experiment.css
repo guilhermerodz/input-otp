@@ -1,0 +1,139 @@
+/* Isolated styles for the /experiment page — intentionally not sharing globals.css */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.xp-body {
+  background: #09090b;
+  color: #fafafa;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.xp-mono {
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+}
+
+.xp {
+  max-width: 1120px;
+  margin: 0 auto;
+  border-left: 1px solid #1c1c1f;
+  border-right: 1px solid #1c1c1f;
+  min-height: 100dvh;
+}
+
+.xp a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.xp a:hover {
+  opacity: 0.8;
+}
+
+@keyframes xp-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.xp-caret {
+  position: absolute;
+  width: 2px;
+  height: 44px;
+  background: #fafafa;
+  animation: xp-blink 1s step-end infinite;
+}
+
+.xp-otp-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 52px 0 6px;
+  cursor: text;
+}
+
+.xp-slot {
+  position: relative;
+  width: 82px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+  font-size: 50px;
+  font-weight: 500;
+  color: #fafafa;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  background: #0c0c0e;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.xp-slot--active {
+  border-color: #fafafa;
+  box-shadow: 0 0 0 1px #fafafa;
+}
+
+.xp-copy-btn {
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: #71717a;
+}
+
+.xp-copy-btn:hover {
+  color: #fafafa;
+}
+
+@media (max-width: 900px) {
+  .xp-slot {
+    width: 44px;
+    height: 58px;
+    font-size: 26px;
+    border-radius: 10px;
+  }
+
+  .xp-caret {
+    height: 26px;
+  }
+
+  .xp-hero-title {
+    font-size: 38px !important;
+  }
+
+  .xp-stats {
+    gap: 32px !important;
+    flex-wrap: wrap;
+  }
+
+  .xp-grid-3,
+  .xp-grid-sponsors {
+    grid-template-columns: 1fr !important;
+  }
+
+  .xp-nav-links {
+    display: none !important;
+  }
+
+  .xp-usedby {
+    flex-wrap: wrap;
+  }
+}
