@@ -8,12 +8,12 @@ import * as React from 'react'
  * green with arcade win effects — a border beam racing the frame, a
  * double flash, a shake and radial sparks. Then the lever becomes a
  * caret that sweeps right-to-left, clipping the machine away, and types
- * "700 million downloads" in its place — before a single curtain lifts.
+ * "thank you for 700M downloads!" in its place — before a single curtain lifts.
  */
 
 const TARGET = ['7', '0', '0', 'M'] as const
-const PHRASE = '700 million downloads'
-const TYPE_MS = 40
+const PHRASE = 'thank you for 700M downloads!'
+const TYPE_MS = 16
 
 /* Timeline. The lever pull leads, reels start as it bottoms out. */
 const REEL_DELAY = 380
