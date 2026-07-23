@@ -67,6 +67,12 @@ body {
   z-index: 50;
 }
 
+/* Set on <html> before first paint when the intro was already seen. */
+.xp-intro-seen .xp-panel,
+.xp-intro-seen .xp-pre-layer {
+  display: none !important;
+}
+
 .xp-panel--full {
   inset: 0;
 }

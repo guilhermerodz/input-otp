@@ -369,10 +369,12 @@ export function Preloader() {
   }, [])
 
   React.useEffect(() => {
-    let seen = false
+    // The blocking script in the layout already hid the overlay pre-paint;
+    // this just unmounts it and records the visit.
+    let seen = document.documentElement.classList.contains('xp-intro-seen')
     try {
-      seen = sessionStorage.getItem('xp-intro-seen') === '1'
-      sessionStorage.setItem('xp-intro-seen', '1')
+      seen = seen || localStorage.getItem('xp-intro-seen') === '1'
+      localStorage.setItem('xp-intro-seen', '1')
     } catch {
       // storage unavailable: play the intro every time
     }

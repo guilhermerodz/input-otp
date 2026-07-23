@@ -80,7 +80,17 @@ export default function RootLayout({
       className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
       style={{ colorScheme: 'dark' }}
     >
-      <body className="xp-body">{children}</body>
+      <body className="xp-body">
+        {/* Runs before first paint: repeat visitors never see the intro
+            overlay, not even for a frame. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{localStorage.getItem('xp-intro-seen')&&document.documentElement.classList.add('xp-intro-seen')}catch(e){}",
+          }}
+        />
+        {children}
+      </body>
     </html>
   )
 }
