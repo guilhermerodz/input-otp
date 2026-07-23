@@ -54,6 +54,10 @@ type Ring = {
   h: number
   radius: string
   visible: boolean
+  /* True when the ring just appeared from hidden: position snaps into
+     place and only the opacity fades — the glide is for moves between
+     slots, not for arrival. */
+  snap: boolean
 }
 
 export function HeroOtp() {
@@ -76,6 +80,7 @@ export function HeroOtp() {
     h: 0,
     radius: '16px',
     visible: false,
+    snap: true,
   })
   const valueRef = React.useRef(value)
   valueRef.current = value
@@ -93,14 +98,15 @@ export function HeroOtp() {
       if (el && wrap) {
         const a = el.getBoundingClientRect()
         const b = wrap.getBoundingClientRect()
-        setRing({
+        setRing(prev => ({
           x: a.left - b.left,
           y: a.top - b.top,
           w: a.width,
           h: a.height,
           radius: getComputedStyle(el).borderRadius,
           visible: true,
-        })
+          snap: !prev.visible,
+        }))
       }
     } else {
       setRing(r => ({ ...r, visible: false }))
@@ -244,8 +250,9 @@ export function HeroOtp() {
             transform: `translate(${ring.x}px, ${ring.y}px)`,
             boxShadow: `0 0 0 2px ${error ? '#ef4444' : '#fafafa'}`,
             opacity: ring.visible ? 1 : 0,
-            transition:
-              'transform 0.13s ease-in-out, opacity 0.12s ease, box-shadow 0.2s ease',
+            transition: ring.snap
+              ? 'opacity 0.12s ease, box-shadow 0.2s ease'
+              : 'transform 0.13s ease-in-out, opacity 0.12s ease, box-shadow 0.2s ease',
             pointerEvents: 'none',
           }}
         />
