@@ -250,6 +250,9 @@ function WriteLine() {
         letterSpacing: '0.04em',
         color: '#34d399',
         whiteSpace: 'pre',
+        /* Both lines' worth of height from the first character, so the
+           block doesn't jump when typing crosses the line break. */
+        height: '2.8em',
       }}
     >
       {PHRASE.slice(0, count)}
