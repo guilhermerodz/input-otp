@@ -10,29 +10,13 @@ import * as React from 'react'
 
 /* How long each slide holds, in ms (base rhythm x SPEED). Index 0 also
    gets the fade-in. */
-const SPEED = 0.7
+const SPEED = 0.55
 const HOLDS = [1150, 700, 700, 400, 400, 400, 400, 700].map(ms =>
   Math.round(ms * SPEED),
 )
 const CURTAIN_MS = 850
 
 const mono = "var(--font-jetbrains), ui-monospace, Menlo, monospace"
-
-function Label(props: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        marginTop: 34,
-        fontFamily: mono,
-        fontSize: 14,
-        color: '#71717a',
-        textAlign: 'center',
-      }}
-    >
-      {props.children}
-    </div>
-  )
-}
 
 const box = {
   display: 'grid',
@@ -64,7 +48,6 @@ function Standard() {
           </div>
         ))}
       </div>
-      <Label>standard.tsx</Label>
     </div>
   )
 }
@@ -97,7 +80,6 @@ function Keycaps() {
         <div style={{ width: 14, height: 3, background: '#3f3f46', borderRadius: 2 }} />
         {['', '', '', ''].map(cap)}
       </div>
-      <Label>keycaps.tsx</Label>
     </div>
   )
 }
@@ -120,7 +102,6 @@ function Underline() {
           </div>
         ))}
       </div>
-      <Label>underline.tsx</Label>
     </div>
   )
 }
@@ -155,7 +136,6 @@ function Grouped() {
           </div>
         ))}
       </div>
-      <Label>grouped.tsx</Label>
     </div>
   )
 }
@@ -190,7 +170,6 @@ function Masked() {
           </div>
         ))}
       </div>
-      <Label>masked.tsx</Label>
     </div>
   )
 }
@@ -217,7 +196,6 @@ function Pill() {
           </div>
         ))}
       </div>
-      <Label>pill.tsx</Label>
     </div>
   )
 }
@@ -246,7 +224,6 @@ function Split() {
         <div style={{ display: 'flex', gap: 6 }}>{['0', '9'].map(cell)}</div>
         <div style={{ display: 'flex', gap: 6 }}>{['5', ''].map(cell)}</div>
       </div>
-      <Label>split.tsx</Label>
     </div>
   )
 }
@@ -274,9 +251,6 @@ function Terminal() {
           </div>
         ))}
       </div>
-      <Label>
-        <span style={{ color: '#34d399' }}>✓ verified</span>
-      </Label>
     </div>
   )
 }
