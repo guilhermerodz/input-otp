@@ -3,20 +3,19 @@
 import * as React from 'react'
 
 /**
- * Intro sequence: a big standard OTP fades in, then varied OTP designs
- * replace it instantly in an accelerating rhythm — 1...2..3..4.5.6.7.8..
- * — before the curtain lifts and reveals the page.
+ * Intro sequence: a standard OTP fades in, then varied OTP designs replace
+ * it instantly, each one slot wider than the last — 4 slots growing to 9,
+ * landing on 700.000.000 to celebrate 700M downloads — before the curtain
+ * lifts and reveals the page.
  */
 
 /* How long each slide holds, in ms (base rhythm x SPEED). Index 0 also
    gets the fade-in. */
 const SPEED = 0.55
-const HOLDS = [1150, 700, 700, 400, 400, 400, 400, 700].map(ms =>
-  Math.round(ms * SPEED),
-)
+const HOLDS = [1150, 700, 400, 400, 400, 900].map(ms => Math.round(ms * SPEED))
 const CURTAIN_MS = 850
 
-const mono = "var(--font-jetbrains), ui-monospace, Menlo, monospace"
+const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
 const box = {
   display: 'grid',
@@ -26,33 +25,31 @@ const box = {
   color: '#fafafa',
 } as const
 
-/* 1 — standard: the classic bordered boxes */
+/* 1 — standard: the classic bordered boxes (4 slots) */
 function Standard() {
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        {['7', '', '', '', '', ''].map((c, i) => (
-          <div
-            key={i}
-            style={{
-              ...box,
-              width: 72,
-              height: 88,
-              fontSize: 40,
-              border: `1px solid ${i === 1 ? '#fafafa' : '#27272a'}`,
-              borderRadius: 12,
-              background: '#0c0c0e',
-            }}
-          >
-            {c}
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+      {['7', '', '', ''].map((c, i) => (
+        <div
+          key={i}
+          style={{
+            ...box,
+            width: 72,
+            height: 88,
+            fontSize: 40,
+            border: `1px solid ${i === 1 ? '#fafafa' : '#27272a'}`,
+            borderRadius: 12,
+            background: '#0c0c0e',
+          }}
+        >
+          {c}
+        </div>
+      ))}
     </div>
   )
 }
 
-/* 2 — keycaps: soft caps with a dash separator */
+/* 2 — keycaps: soft caps with a dash separator (5 slots, 2+3) */
 function Keycaps() {
   const cap = (c: string, i: number) => (
     <div
@@ -72,190 +69,160 @@ function Keycaps() {
     </div>
   )
   return (
-    <div>
-      <div
-        style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}
-      >
-        {['7', '0', '', ''].map(cap)}
-        <div style={{ width: 14, height: 3, background: '#3f3f46', borderRadius: 2 }} />
-        {['', '', '', ''].map(cap)}
-      </div>
+    <div
+      style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}
+    >
+      {['7', '0'].map(cap)}
+      <div style={{ width: 14, height: 3, background: '#3f3f46', borderRadius: 2 }} />
+      {['', '', ''].map(cap)}
     </div>
   )
 }
 
-/* 3 — underline: bare digits over rules */
+/* 3 — underline: bare digits over rules (6 slots) */
 function Underline() {
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 22, justifyContent: 'center' }}>
-        {['7', '0', '0', ''].map((c, i) => (
-          <div key={i} style={{ width: 56, textAlign: 'center' }}>
-            <div style={{ ...box, height: 68, fontSize: 44 }}>{c}</div>
-            <div
-              style={{
-                height: 3,
-                borderRadius: 2,
-                background: c ? '#fafafa' : '#3f3f46',
-              }}
-            />
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+      {['7', '0', '0', '', '', ''].map((c, i) => (
+        <div key={i} style={{ width: 54, textAlign: 'center' }}>
+          <div style={{ ...box, height: 68, fontSize: 44 }}>{c}</div>
+          <div
+            style={{
+              height: 3,
+              borderRadius: 2,
+              background: c ? '#fafafa' : '#3f3f46',
+            }}
+          />
+        </div>
+      ))}
     </div>
   )
 }
 
-/* 4 — grouped: one container, hairline dividers */
-function Grouped() {
+/* 4 — masked: dots instead of digits (7 slots) */
+function Masked() {
+  return (
+    <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+      {[1, 1, 1, 1, 0, 0, 0].map((filled, i) => (
+        <div
+          key={i}
+          style={{
+            ...box,
+            width: 62,
+            height: 78,
+            border: '1px solid #232327',
+            borderRadius: 14,
+            background: '#0c0c0e',
+          }}
+        >
+          {filled ? (
+            <div
+              style={{
+                width: 15,
+                height: 15,
+                borderRadius: '50%',
+                background: '#fafafa',
+              }}
+            />
+          ) : null}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* 5 — pill: circular slots (8 slots) */
+function Pill() {
+  return (
+    <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+      {['7', '0', '0', '0', '0', '0', '', ''].map((c, i) => (
+        <div
+          key={i}
+          style={{
+            ...box,
+            width: 66,
+            height: 66,
+            fontSize: 30,
+            borderRadius: '50%',
+            border: `1px solid ${c ? '#3f3f46' : '#232327'}`,
+            background: '#0c0c0e',
+          }}
+        >
+          {c}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* 6 — the finale: 700.000.000, three grouped triplets joined by dots */
+function Celebration() {
+  const group = (digits: string[], key: number) => (
+    <div
+      key={key}
+      style={{
+        display: 'flex',
+        border: '1px solid #3f3f46',
+        borderRadius: 14,
+        background: '#0c0c0e',
+        overflow: 'hidden',
+        boxShadow: '0 0 34px rgba(250, 250, 250, 0.07)',
+      }}
+    >
+      {digits.map((c, i) => (
+        <div
+          key={i}
+          style={{
+            ...box,
+            width: 58,
+            height: 76,
+            fontSize: 34,
+            borderLeft: i === 0 ? 'none' : '1px solid #1f1f23',
+          }}
+        >
+          {c}
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div>
       <div
         style={{
           display: 'flex',
-          border: '1px solid #27272a',
-          borderRadius: 16,
-          background: '#0c0c0e',
-          overflow: 'hidden',
-          width: 'fit-content',
-          margin: '0 auto',
+          gap: 12,
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {['7', '0', '0', '4', '', ''].map((c, i) => (
-          <div
-            key={i}
-            style={{
-              ...box,
-              width: 68,
-              height: 86,
-              fontSize: 38,
-              borderLeft: i === 0 ? 'none' : '1px solid #1f1f23',
-            }}
-          >
-            {c}
-          </div>
-        ))}
+        {group(['7', '0', '0'], 0)}
+        <div
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#71717a' }}
+        />
+        {group(['0', '0', '0'], 1)}
+        <div
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#71717a' }}
+        />
+        {group(['0', '0', '0'], 2)}
+      </div>
+      <div
+        style={{
+          marginTop: 30,
+          textAlign: 'center',
+          fontFamily: mono,
+          fontSize: 15,
+          letterSpacing: '0.24em',
+          color: '#a1a1aa',
+        }}
+      >
+        million downloads
       </div>
     </div>
   )
 }
 
-/* 5 — masked: dots instead of digits */
-function Masked() {
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-        {[1, 1, 1, 0].map((filled, i) => (
-          <div
-            key={i}
-            style={{
-              ...box,
-              width: 68,
-              height: 84,
-              border: '1px solid #232327',
-              borderRadius: 14,
-              background: '#0c0c0e',
-            }}
-          >
-            {filled ? (
-              <div
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  background: '#fafafa',
-                }}
-              />
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* 6 — pill: circular slots */
-function Pill() {
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-        {['9', '4', '1', '7', '0', '8', '', ''].map((c, i) => (
-          <div
-            key={i}
-            style={{
-              ...box,
-              width: 76,
-              height: 76,
-              fontSize: 34,
-              borderRadius: '50%',
-              border: `1px solid ${c ? '#3f3f46' : '#232327'}`,
-              background: '#0c0c0e',
-            }}
-          >
-            {c}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-/* 7 — split: 2-2-2 groups */
-function Split() {
-  const cell = (c: string, i: number) => (
-    <div
-      key={i}
-      style={{
-        ...box,
-        width: 62,
-        height: 80,
-        fontSize: 34,
-        background: '#111113',
-        borderRadius: 10,
-      }}
-    >
-      {c}
-    </div>
-  )
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 26, justifyContent: 'center' }}>
-        <div style={{ display: 'flex', gap: 6 }}>{['3', '3'].map(cell)}</div>
-        <div style={{ display: 'flex', gap: 6 }}>{['0', '9'].map(cell)}</div>
-        <div style={{ display: 'flex', gap: 6 }}>{['5', ''].map(cell)}</div>
-      </div>
-    </div>
-  )
-}
-
-/* 8 — terminal: everything filled, verified */
-function Terminal() {
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        {['7', '0', '0', '0', '0', '0', '0', '0'].map((c, i) => (
-          <div
-            key={i}
-            style={{
-              ...box,
-              width: 72,
-              height: 88,
-              fontSize: 40,
-              border: '1px solid #34d39955',
-              borderRadius: 12,
-              background: '#0a100d',
-              color: '#34d399',
-            }}
-          >
-            {c}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const SLIDES = [Standard, Keycaps, Underline, Grouped, Masked, Pill, Split, Terminal]
+const SLIDES = [Standard, Keycaps, Underline, Masked, Pill, Celebration]
 
 export function Preloader() {
   const [idx, setIdx] = React.useState(0)
