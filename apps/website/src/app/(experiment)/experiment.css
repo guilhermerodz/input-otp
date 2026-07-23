@@ -421,6 +421,42 @@ body {
   box-shadow: 0 0 0 1px #fafafa;
 }
 
+.xp-slot--error {
+  border-color: #ef4444;
+}
+
+.xp-slot--error.xp-slot--active {
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+/* Wrong-code shake, the classic form-error gesture. */
+.xp-otp-shake {
+  animation: xp-otp-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes xp-otp-shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-8px);
+  }
+  40%,
+  60% {
+    transform: translateX(8px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .xp-copy-btn {
   display: grid;
   place-items: center;
