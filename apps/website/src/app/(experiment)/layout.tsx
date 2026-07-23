@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 
+import { siteConfig } from '../../config/site'
+import '../globals.css'
 import './experiment.css'
 
 const inter = Inter({
@@ -14,13 +16,60 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'input-otp — Stop wasting time building OTP inputs',
-  description:
-    'One-time passcode input for React. Unstyled, accessible, and copy-paste friendly out of the box.',
-  robots: { index: false },
+  title: {
+    default: siteConfig.name,
+    template: `%s - ${siteConfig.name}`,
+  },
+  metadataBase: new URL(siteConfig.url),
+  description: siteConfig.description,
+  keywords: [
+    'React',
+    'one-time-code',
+    'Input',
+    'Next.js',
+    'Tailwind CSS',
+    'Server Components',
+    'Accessible',
+  ],
+  authors: [
+    {
+      name: 'guilhermerodz',
+      url: 'https://rodz.dev',
+    },
+  ],
+  creator: 'guilhermerodz',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: '@guilherme_rodz',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
 }
 
-export default function ExperimentLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -28,7 +77,7 @@ export default function ExperimentLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`dark ${inter.variable} ${jetbrainsMono.variable}`}
       style={{ colorScheme: 'dark' }}
     >
       <body className="xp-body">{children}</body>

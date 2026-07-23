@@ -1,3 +1,4 @@
+import { Anatomy } from './_components/anatomy'
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
@@ -100,26 +101,41 @@ const FEATURES = [
   {
     id: '01',
     title: 'Accessible by default',
-    desc: 'one real input — screen readers & autofill just work',
+    desc: 'screen readers see the single real input it is — caret, selection, copy-paste and keyboard navigation behave natively',
   },
   {
     id: '02',
+    title: 'Autofill that actually works',
+    desc: 'one-tap SMS codes on iOS and Android — autocomplete="one-time-code" is the default, platform quirks already handled',
+  },
+  {
+    id: '03',
     title: 'Paste just works',
     desc: 'paste the whole code, every slot fills',
   },
   {
-    id: '03',
+    id: '04',
+    title: 'Friendly to password managers',
+    desc: 'detects the badges injected by 1Password, LastPass, Dashlane and Bitwarden, and keeps them off your slots',
+  },
+  {
+    id: '05',
     title: 'Bring your own styles',
     desc: 'unstyled primitives, render slots your way',
   },
   {
-    id: '04',
+    id: '06',
     title: 'Pattern validation',
     desc: 'digits, alphanumeric, or custom regex',
   },
+  {
+    id: '07',
+    title: 'Tiny and dependency-free',
+    desc: 'zero runtime dependencies, a few kilobytes over the wire, React 16.8+',
+  },
 ]
 
-export function ExperimentView() {
+export function ExperimentView({ starCount }: { starCount: string | null }) {
   return (
     <div className="xp">
       <Preloader />
@@ -161,7 +177,7 @@ export function ExperimentView() {
               fontSize: 13,
             }}
           >
-            ★ 3.2k
+            ★ {starCount ?? '3.2k'}
           </a>
         </nav>
       </header>
@@ -557,6 +573,22 @@ export function ExperimentView() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* How I built it */}
+      <section style={{ padding: '56px 0 0', borderTop: border }}>
+        <div style={{ padding: '0 40px' }}>
+          <h2
+            style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
+          >
+            How I built it
+          </h2>
+          <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
+            One real input, wearing your design — the slots you see just mirror
+            its state. Keep scrolling<span style={{ color: '#3f3f46' }}>_</span>
+          </div>
+        </div>
+        <Anatomy />
       </section>
 
       {/* CTA */}

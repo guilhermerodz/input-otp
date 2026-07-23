@@ -80,6 +80,102 @@
   }
 }
 
+/* ————— "How it's built" scroll story ————— */
+/* The --paint, --ghost, --boom and per-index --s/--f/--a values are written
+   once per scroll frame by anatomy.tsx; these rules just consume them. */
+.anatomy-paint {
+  opacity: var(--paint, 1);
+}
+.anatomy-ants {
+  stroke-dasharray: 7 7;
+}
+.anatomy-slot {
+  opacity: var(--st, 0);
+  transform: translateY(calc((1 - var(--st, 0)) * 12px));
+}
+.anatomy-slot-char {
+  opacity: var(--boom, 0);
+}
+.anatomy-flyer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: calc(1 - var(--boom, 0));
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--home) + var(--ft, 0) * var(--dx)));
+  will-change: transform;
+}
+.anatomy-attr {
+  opacity: var(--at, 0);
+  transform: translateY(calc((1 - var(--at, 0)) * 8px));
+}
+.anatomy-note {
+  opacity: min(calc(var(--sg, 0) * 5), calc((1 - var(--sg, 0)) * 5), 1);
+}
+/* The first note is visible on entry instead of fading in. */
+.anatomy-note-first {
+  opacity: min(calc((1 - var(--sg, 0)) * 5), 1);
+}
+/* Scrub-driven line drawing: paths carry pathLength=1. */
+.anatomy-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - min(calc(var(--sg, 0) * 2.5), 1));
+}
+/* Arrow heads wait for the body (done at --sg 0.4), then draw into the tip. */
+.anatomy-draw-head {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - clamp(0, calc(var(--sg, 0) * 5 - 2), 1));
+}
+/* Step bar: horizontal stepper. Labels grow/collapse straight from the
+   scroll position: expand over the first ~12% of the phase, collapse over
+   the last ~12%. Text is left-anchored, so growth reads left-to-right and
+   collapse right-to-left. */
+.anatomy5-item .keycap {
+  margin-top: 0;
+}
+.anatomy5-label {
+  overflow: hidden;
+  --t: min(calc(var(--sg, 0) * 8), 1, calc((1 - var(--sg, 0)) * 8));
+  max-width: calc(var(--t) * 240px);
+  opacity: var(--t);
+}
+/* The first label starts expanded on entry; the last stays expanded. */
+.anatomy5-item[data-first='true'] .anatomy5-label {
+  --t: min(1, calc((1 - var(--sg, 0)) * 8));
+}
+.anatomy5-item[data-last='true'] .anatomy5-label {
+  --t: min(calc(var(--sg, 0) * 8), 1);
+}
+.anatomy-segbar-fill {
+  transform: scaleX(var(--sg, 0));
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .anatomy-ants {
+    animation: anatomy-ants 1.3s linear infinite;
+  }
+  [data-live='true'] .anatomy-slot {
+    animation: anatomy-press 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+}
+@keyframes anatomy-ants {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+@keyframes anatomy-press {
+  0% {
+    transform: none;
+  }
+  35% {
+    transform: translateY(3px) scale(0.97);
+  }
+  100% {
+    transform: none;
+  }
+}
+
 [data-highlighted-chars] {
   @apply bg-zinc-700/50 rounded;
   box-shadow: 2px 2px 0 2px rgba(139, 139, 148, 0.5);
