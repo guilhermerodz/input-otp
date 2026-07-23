@@ -1,7 +1,7 @@
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
-import { Preloader, type IntroVariant } from './_components/preloader'
+import { Preloader } from './_components/preloader'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
@@ -119,10 +119,10 @@ const FEATURES = [
   },
 ]
 
-export function ExperimentView({ intro }: { intro: IntroVariant }) {
+export function ExperimentView() {
   return (
     <div className="xp">
-      <Preloader variant={intro} />
+      <Preloader />
 
       {/* Nav */}
       <header

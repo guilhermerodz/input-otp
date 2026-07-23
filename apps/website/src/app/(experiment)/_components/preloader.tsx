@@ -7,15 +7,9 @@ import * as React from 'react'
  * it instantly, each one gaining slots and digits — 4 slots growing to 9,
  * landing on 700.000.000 — before the curtain lifts and reveals the page.
  *
- * Five reveal stories, one per /experiment route:
- *   1 — curved curtain up + the hero OTP auto-types 700 after the reveal
- *   2 — curtain splits from the middle (top half up, bottom half down)
- *   3 — zoom-through: the finale scales into the camera as the overlay fades
- *   4 — blinds: five vertical strips lift in a stagger
- *   5 — flat curtain up + a live download odometer in the corner
+ * A live download odometer counts up in the corner while the slides play,
+ * and the reveal is five vertical blinds lifting in a stagger.
  */
-
-export type IntroVariant = 1 | 2 | 3 | 4 | 5
 
 const SPEED = 0.55
 const CAPTION = 'million downloads'
@@ -29,13 +23,8 @@ const HOLDS = [
   FINALE_HOLD,
 ]
 
-const LIFT_MS: Record<IntroVariant, number> = {
-  1: 900,
-  2: 800,
-  3: 700,
-  4: 1150,
-  5: 850,
-}
+/* Last blind starts at 360ms and travels 800ms. */
+const LIFT_MS = 1150
 
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
@@ -365,28 +354,7 @@ function Odometer({ duration }: { duration: number }) {
   )
 }
 
-/* Curved trailing edge for the variant-1 curtain. */
-function CurtainBulge() {
-  return (
-    <svg
-      viewBox="0 0 100 10"
-      preserveAspectRatio="none"
-      style={{
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        width: '100%',
-        height: 120,
-        display: 'block',
-      }}
-      aria-hidden="true"
-    >
-      <path d="M0 0 Q 50 10 100 0 Z" fill="#050506" />
-    </svg>
-  )
-}
-
-export function Preloader({ variant }: { variant: IntroVariant }) {
+export function Preloader() {
   const [idx, setIdx] = React.useState(0)
   const [phase, setPhase] = React.useState<'show' | 'lift' | 'gone'>('show')
   const phaseRef = React.useRef(phase)
@@ -397,11 +365,8 @@ export function Preloader({ variant }: { variant: IntroVariant }) {
     if (phaseRef.current !== 'show') return
     timeouts.current.forEach(clearTimeout)
     setPhase('lift')
-    setTimeout(() => {
-      setPhase('gone')
-      if (variant === 1) window.dispatchEvent(new Event('xp:intro-done'))
-    }, LIFT_MS[variant])
-  }, [variant])
+    setTimeout(() => setPhase('gone'), LIFT_MS)
+  }, [])
 
   React.useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -448,44 +413,19 @@ export function Preloader({ variant }: { variant: IntroVariant }) {
   const lifting = phase === 'lift'
   const showDuration = HOLDS.reduce((a, b) => a + b, 0)
 
-  /* The content leaves on its own — fading past the curtain instead of
-     riding it. Variant 3 zooms through the camera instead. */
-  const exitClass = variant === 3 ? 'xp-pre-zoomexit' : 'xp-pre-exit'
-
   return (
     <>
-      {/* Panels (the curtain itself) */}
-      {variant === 2 ? (
-        <>
-          <div
-            className={`xp-panel xp-panel--top ${lifting ? 'xp-panel--top-lift' : ''}`}
-          />
-          <div
-            className={`xp-panel xp-panel--bottom ${
-              lifting ? 'xp-panel--bottom-lift' : ''
-            }`}
-          />
-        </>
-      ) : variant === 3 ? (
-        <div className={`xp-panel xp-panel--full ${lifting ? 'xp-panel--fade' : ''}`} />
-      ) : variant === 4 ? (
-        <>
-          {[0, 1, 2, 3, 4].map(i => (
-            <div
-              key={i}
-              className={`xp-blind ${lifting ? 'xp-blind--lift' : ''}`}
-              style={{ left: `${i * 20}%`, transitionDelay: `${i * 90}ms` }}
-            />
-          ))}
-        </>
-      ) : (
-        <div className={`xp-panel xp-panel--full ${lifting ? 'xp-panel--up' : ''}`}>
-          {variant === 1 && <CurtainBulge />}
-        </div>
-      )}
+      {/* The curtain: five staggered blinds */}
+      {[0, 1, 2, 3, 4].map(i => (
+        <div
+          key={i}
+          className={`xp-blind ${lifting ? 'xp-blind--lift' : ''}`}
+          style={{ left: `${i * 20}%`, transitionDelay: `${i * 90}ms` }}
+        />
+      ))}
 
-      {/* Content layer, above the panels */}
-      <div className={`xp-pre-layer ${lifting ? exitClass : ''}`}>
+      {/* Content layer, above the blinds; exits on its own */}
+      <div className={`xp-pre-layer ${lifting ? 'xp-pre-exit' : ''}`}>
         <div key={idx} className={idx === 0 ? 'xp-pre-fade' : undefined}>
           <div className="xp-pre-scale">
             <Slide />
@@ -493,7 +433,7 @@ export function Preloader({ variant }: { variant: IntroVariant }) {
         </div>
       </div>
 
-      {variant === 5 && !lifting && <Odometer duration={showDuration} />}
+      {!lifting && <Odometer duration={showDuration} />}
     </>
   )
 }

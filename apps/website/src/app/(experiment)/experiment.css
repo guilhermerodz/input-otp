@@ -61,55 +61,7 @@ body {
 
 /* Intro curtain ---------------------------------------------------------- */
 
-.xp-panel {
-  position: fixed;
-  background: #050506;
-  z-index: 50;
-}
-
-.xp-panel--full {
-  inset: 0;
-}
-
-/* variant 1 & 5 — curtain up (v1 adds the curved trailing edge, which is
-   why the lift overshoots by the bulge's height) */
-.xp-panel--up {
-  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
-  transform: translateY(calc(-100% - 120px));
-}
-
-/* variant 2 — split from the middle */
-.xp-panel--top {
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-}
-
-.xp-panel--bottom {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-}
-
-.xp-panel--top-lift {
-  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
-  transform: translateY(-100%);
-}
-
-.xp-panel--bottom-lift {
-  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
-  transform: translateY(100%);
-}
-
-/* variant 3 — the overlay simply dissolves while the content zooms */
-.xp-panel--fade {
-  transition: opacity 0.7s ease;
-  opacity: 0;
-}
-
-/* variant 4 — five staggered blinds (delay set inline per strip) */
+/* The curtain: five staggered blinds (delay set inline per strip) */
 .xp-blind {
   position: fixed;
   top: 0;
@@ -140,14 +92,6 @@ body {
     transform 0.32s ease;
   opacity: 0;
   transform: translateY(-24px) scale(0.97);
-}
-
-.xp-pre-zoomexit {
-  transition:
-    opacity 0.5s ease,
-    transform 0.55s cubic-bezier(0.5, 0, 0.8, 1);
-  opacity: 0;
-  transform: scale(1.7);
 }
 
 @keyframes xp-pre-fade {
