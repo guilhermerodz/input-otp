@@ -1,6 +1,7 @@
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
+import { Preloader } from './_components/preloader'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
@@ -121,6 +122,8 @@ const FEATURES = [
 export default function ExperimentPage() {
   return (
     <div className="xp">
+      <Preloader />
+
       {/* Nav */}
       <header
         style={{

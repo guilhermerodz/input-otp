@@ -59,6 +59,44 @@ body {
   animation: xp-blink 1s step-end infinite;
 }
 
+/* Intro curtain ---------------------------------------------------------- */
+
+.xp-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: #050506;
+  transform: translateY(0);
+}
+
+.xp-preloader--lift {
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(-100%);
+}
+
+@keyframes xp-pre-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.xp-pre-fade {
+  animation: xp-pre-fade 0.65s ease-out both;
+}
+
+@media (max-width: 900px) {
+  .xp-pre-scale {
+    transform: scale(0.55);
+  }
+}
+
 .xp-hero {
   position: relative;
   overflow: hidden;
