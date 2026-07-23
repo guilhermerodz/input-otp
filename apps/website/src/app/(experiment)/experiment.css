@@ -61,19 +61,48 @@ body {
 
 /* Intro curtain ---------------------------------------------------------- */
 
-/* The curtain: five staggered blinds (delay set inline per strip) */
-.xp-blind {
+.xp-panel {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 20.5%;
   background: #050506;
   z-index: 50;
 }
 
-.xp-blind--lift {
-  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
-  transform: translateY(-101%);
+.xp-panel--full {
+  inset: 0;
+}
+
+.xp-panel--up {
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(-100%);
+}
+
+/* Slot-machine reel: one decelerating spin to its final digit, blurred
+   while it is fast. --final and --dur are set inline per reel. */
+.xp-reel-strip {
+  animation:
+    xp-reel var(--dur) cubic-bezier(0.14, 0.8, 0.3, 1) forwards,
+    xp-reel-blur var(--dur) linear forwards;
+}
+
+@keyframes xp-reel {
+  to {
+    transform: translateY(var(--final));
+  }
+}
+
+@keyframes xp-reel-blur {
+  0% {
+    filter: blur(0);
+  }
+  10% {
+    filter: blur(2.5px);
+  }
+  80% {
+    filter: blur(2.5px);
+  }
+  100% {
+    filter: blur(0);
+  }
 }
 
 /* Slide content floats above the panels and exits on its own. */
