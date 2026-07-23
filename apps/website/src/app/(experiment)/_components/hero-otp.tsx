@@ -5,27 +5,111 @@ import { OTPInput, REGEXP_ONLY_DIGITS, type SlotProps } from 'input-otp'
 
 const CORRECT = '123456'
 
-function Slot(props: SlotProps & { error: boolean }) {
+function Slot(
+  props: SlotProps & {
+    error: boolean
+    staticActive: boolean
+    slotRef: (el: HTMLDivElement | null) => void
+  },
+) {
   return (
     <div
-      className={`xp-slot ${props.isActive ? 'xp-slot--active' : ''} ${
+      ref={props.slotRef}
+      className={`xp-slot ${props.staticActive ? 'xp-slot--active' : ''} ${
         props.error ? 'xp-slot--error' : ''
       }`}
     >
-      {props.char}
+      {props.char !== null && (
+        // Keyed on the char so every new digit replays the slide-in
+        // (after Luxe UI's input-otp).
+        <div key={props.char} className="xp-char-in">
+          {props.char}
+        </div>
+      )}
       {props.hasFakeCaret && <div className="xp-caret" />}
     </div>
   )
 }
 
+/* Reports which slots are active, without setting state during render. */
+function ActiveProbe({
+  slots,
+  onChange,
+}: {
+  slots: { isActive: boolean }[]
+  onChange: (idxs: number[]) => void
+}) {
+  const key = slots.map(s => (s.isActive ? '1' : '0')).join('')
+  React.useEffect(() => {
+    onChange(slots.flatMap((s, i) => (s.isActive ? [i] : [])))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
+  return null
+}
+
+type Ring = {
+  x: number
+  y: number
+  w: number
+  h: number
+  radius: string
+  visible: boolean
+}
+
 export function HeroOtp() {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const wrapRef = React.useRef<HTMLDivElement>(null)
+  const slotRefs = React.useRef<(HTMLDivElement | null)[]>([])
   const hintTimers = React.useRef<ReturnType<typeof setTimeout>[]>([])
   const [value, setValue] = React.useState('')
   const [done, setDone] = React.useState(false)
   const [error, setError] = React.useState(false)
+  const [locked, setLocked] = React.useState(false)
+  const [active, setActive] = React.useState<number[]>([])
+  const [ring, setRing] = React.useState<Ring>({
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+    radius: '16px',
+    visible: false,
+  })
   const valueRef = React.useRef(value)
   valueRef.current = value
+  const activeRef = React.useRef(active)
+  activeRef.current = active
+
+  /* The focus ring is one element gliding between slots (Luxe's shared
+     indicator), measured off the real slot boxes so it survives the
+     mobile size change. */
+  const measureRing = React.useCallback(() => {
+    const current = activeRef.current
+    if (current.length === 1) {
+      const el = slotRefs.current[current[0]]
+      const wrap = wrapRef.current
+      if (el && wrap) {
+        const a = el.getBoundingClientRect()
+        const b = wrap.getBoundingClientRect()
+        setRing({
+          x: a.left - b.left,
+          y: a.top - b.top,
+          w: a.width,
+          h: a.height,
+          radius: getComputedStyle(el).borderRadius,
+          visible: true,
+        })
+      }
+    } else {
+      setRing(r => ({ ...r, visible: false }))
+    }
+  }, [])
+
+  React.useLayoutEffect(measureRing, [active, measureRing])
+
+  React.useEffect(() => {
+    window.addEventListener('resize', measureRing)
+    return () => window.removeEventListener('resize', measureRing)
+  }, [measureRing])
 
   const clearHint = () => {
     hintTimers.current.forEach(clearTimeout)
@@ -35,12 +119,17 @@ export function HeroOtp() {
   const at = (ms: number, fn: () => void) =>
     hintTimers.current.push(setTimeout(fn, ms))
 
-  // Suggest the right code: type 1, 2, then hand the caret over on the
-  // third slot. The user notices it's their turn.
+  // Suggest the right code: type 1, then 2 at a human pace, then unlock
+  // and hand the caret over on the third slot. The input is disabled
+  // while the ghost is typing so nobody can fight it for the keyboard.
   const runHint = (delay: number) => {
-    at(delay, () => setValue('1'))
-    at(delay + 200, () => setValue('12'))
-    at(delay + 400, () => inputRef.current?.focus())
+    at(delay, () => {
+      setLocked(true)
+      setValue('1')
+    })
+    at(delay + 280, () => setValue('12'))
+    at(delay + 760, () => setLocked(false))
+    at(delay + 800, () => inputRef.current?.focus())
   }
 
   // On load, once the intro curtain is gone, the hint plays by itself —
@@ -49,7 +138,7 @@ export function HeroOtp() {
     const begin = () => {
       if (valueRef.current !== '') return
       if (document.activeElement === inputRef.current) return
-      runHint(600)
+      runHint(900)
     }
     const w = window as unknown as { __xpIntroDone?: boolean }
     if (w.__xpIntroDone) {
@@ -71,50 +160,92 @@ export function HeroOtp() {
       setError(false)
       setValue('')
     })
-    runHint(800)
+    runHint(850)
   }
+
+  const multi = active.length > 1
 
   return (
     <>
-      <OTPInput
-        ref={inputRef}
-        value={value}
-        onChange={v => {
-          // A real keystroke or paste takes over from any pending hint.
-          clearHint()
-          setValue(v)
-          setDone(false)
-          setError(false)
-        }}
-        onComplete={(v: string) => {
-          if (v === CORRECT) {
-            setDone(true)
-          } else {
+      <div ref={wrapRef} style={{ position: 'relative' }}>
+        <OTPInput
+          ref={inputRef}
+          value={value}
+          disabled={locked}
+          onChange={v => {
+            // A real keystroke or paste takes over from any pending hint.
             clearHint()
-            failThenHint()
-          }
-        }}
-        maxLength={6}
-        pattern={REGEXP_ONLY_DIGITS}
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        containerClassName={`xp-otp-container ${error ? 'xp-otp-shake' : ''}`}
-        render={({ slots }) => (
-          <>
-            <div style={{ display: 'flex', gap: 10 }}>
-              {slots.slice(0, 3).map((slot, idx) => (
-                <Slot key={idx} {...slot} error={error} />
-              ))}
-            </div>
-            <div style={{ fontSize: 24, color: '#3f3f46' }}>·</div>
-            <div style={{ display: 'flex', gap: 10 }}>
-              {slots.slice(3).map((slot, idx) => (
-                <Slot key={idx} {...slot} error={error} />
-              ))}
-            </div>
-          </>
-        )}
-      />
+            setLocked(false)
+            setValue(v)
+            setDone(false)
+            setError(false)
+          }}
+          onComplete={(v: string) => {
+            if (v === CORRECT) {
+              setDone(true)
+            } else {
+              clearHint()
+              failThenHint()
+            }
+          }}
+          maxLength={6}
+          pattern={REGEXP_ONLY_DIGITS}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          containerClassName={`xp-otp-container ${error ? 'xp-otp-shake' : ''}`}
+          render={({ slots }) => (
+            <>
+              <ActiveProbe slots={slots} onChange={setActive} />
+              <div style={{ display: 'flex', gap: 10 }}>
+                {slots.slice(0, 3).map((slot, idx) => (
+                  <Slot
+                    key={idx}
+                    {...slot}
+                    error={error}
+                    staticActive={slot.isActive && multi}
+                    slotRef={el => {
+                      slotRefs.current[idx] = el
+                    }}
+                  />
+                ))}
+              </div>
+              <div style={{ fontSize: 24, color: '#3f3f46' }}>·</div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                {slots.slice(3).map((slot, idx) => (
+                  <Slot
+                    key={idx}
+                    {...slot}
+                    error={error}
+                    staticActive={slot.isActive && multi}
+                    slotRef={el => {
+                      slotRefs.current[idx + 3] = el
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        />
+
+        {/* The gliding focus ring */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: ring.w,
+            height: ring.h,
+            borderRadius: ring.radius,
+            transform: `translate(${ring.x}px, ${ring.y}px)`,
+            boxShadow: `0 0 0 2px ${error ? '#ef4444' : '#fafafa'}`,
+            opacity: ring.visible ? 1 : 0,
+            transition:
+              'transform 0.13s ease-in-out, opacity 0.12s ease, box-shadow 0.2s ease',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
       <div
         style={{
           height: 28,

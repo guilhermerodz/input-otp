@@ -411,9 +411,26 @@ body {
   border: 1px solid #27272a;
   border-radius: 16px;
   background: #0c0c0e;
+  overflow: hidden;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+/* New digits slide up into the slot (after Luxe UI's input-otp). */
+.xp-char-in {
+  animation: xp-char-in 0.14s ease-out both;
+}
+
+@keyframes xp-char-in {
+  from {
+    opacity: 0.2;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .xp-slot--active {
