@@ -8,11 +8,11 @@ import * as React from 'react'
  * green with arcade win effects — a border beam racing the frame, a
  * double flash, a shake and radial sparks. Then the lever becomes a
  * caret that sweeps right-to-left, clipping the machine away, and types
- * "thank you for 700M downloads!" in its place — before a single curtain lifts.
+ * a two-line thank-you in its place — before a single curtain lifts.
  */
 
 const TARGET = ['7', '0', '0', 'M'] as const
-const PHRASE = 'thank you for 700M downloads!'
+const PHRASE = 'thank you for\n700M downloads!'
 const TYPE_MS = 16
 
 /* Timeline. The lever pull leads, reels start as it bottoms out. */
@@ -228,7 +228,8 @@ function Sparks() {
   )
 }
 
-/* The phrase the caret leaves behind, typed left to right. */
+/* The two balanced lines the caret leaves behind, typed left to right —
+   the caret rides the text across the line break. */
 function WriteLine() {
   const [count, setCount] = React.useState(0)
 
@@ -243,12 +244,11 @@ function WriteLine() {
       style={{
         fontFamily: mono,
         fontSize: 34,
+        lineHeight: 1.4,
         fontWeight: 500,
         letterSpacing: '0.04em',
         color: '#34d399',
         whiteSpace: 'pre',
-        display: 'flex',
-        alignItems: 'center',
       }}
     >
       {PHRASE.slice(0, count)}
@@ -256,8 +256,9 @@ function WriteLine() {
         style={{
           display: 'inline-block',
           width: 3,
-          height: 40,
+          height: 34,
           marginLeft: 4,
+          verticalAlign: '-0.12em',
           background: '#34d399',
           boxShadow: '0 0 14px rgba(52, 211, 153, 0.6)',
           animation:
