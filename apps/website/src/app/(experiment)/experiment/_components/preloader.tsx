@@ -12,7 +12,7 @@ import * as React from 'react'
 /* How long each slide holds, in ms (base rhythm x SPEED). Index 0 also
    gets the fade-in. */
 const SPEED = 0.55
-const HOLDS = [1150, 700, 400, 400, 400, 900].map(ms => Math.round(ms * SPEED))
+const HOLDS = [1150, 700, 400, 400, 400, 1800].map(ms => Math.round(ms * SPEED))
 const CURTAIN_MS = 850
 
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
@@ -155,6 +155,44 @@ function Pill() {
   )
 }
 
+/* Caption that types itself out under the finale. */
+function Typewriter({ text }: { text: string }) {
+  const [count, setCount] = React.useState(0)
+
+  React.useEffect(() => {
+    if (count >= text.length) return
+    const id = setTimeout(() => setCount(c => c + 1), 42)
+    return () => clearTimeout(id)
+  }, [count, text.length])
+
+  return (
+    <div
+      style={{
+        marginTop: 30,
+        textAlign: 'center',
+        fontFamily: mono,
+        fontSize: 15,
+        letterSpacing: '0.24em',
+        color: '#86efac',
+        minHeight: 20,
+        whiteSpace: 'pre',
+      }}
+    >
+      {text.slice(0, count)}
+      <span
+        style={{
+          display: 'inline-block',
+          width: 8,
+          height: 15,
+          marginLeft: 2,
+          verticalAlign: 'text-bottom',
+          background: count < text.length ? '#34d399' : 'transparent',
+        }}
+      />
+    </div>
+  )
+}
+
 /* 6 — the finale: 700.000.000, three grouped triplets joined by dots */
 function Celebration() {
   const group = (digits: string[], key: number) => (
@@ -162,11 +200,11 @@ function Celebration() {
       key={key}
       style={{
         display: 'flex',
-        border: '1px solid #3f3f46',
+        border: '1px solid #34d39955',
         borderRadius: 14,
-        background: '#0c0c0e',
+        background: '#0a100d',
         overflow: 'hidden',
-        boxShadow: '0 0 34px rgba(250, 250, 250, 0.07)',
+        boxShadow: '0 0 34px rgba(52, 211, 153, 0.12)',
       }}
     >
       {digits.map((c, i) => (
@@ -177,7 +215,8 @@ function Celebration() {
             width: 58,
             height: 76,
             fontSize: 34,
-            borderLeft: i === 0 ? 'none' : '1px solid #1f1f23',
+            color: '#34d399',
+            borderLeft: i === 0 ? 'none' : '1px solid #12251c',
           }}
         >
           {c}
@@ -198,26 +237,15 @@ function Celebration() {
       >
         {group(['7', '0', '0'], 0)}
         <div
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#71717a' }}
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d39988' }}
         />
         {group(['0', '0', '0'], 1)}
         <div
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#71717a' }}
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d39988' }}
         />
         {group(['0', '0', '0'], 2)}
       </div>
-      <div
-        style={{
-          marginTop: 30,
-          textAlign: 'center',
-          fontFamily: mono,
-          fontSize: 15,
-          letterSpacing: '0.24em',
-          color: '#a1a1aa',
-        }}
-      >
-        million downloads
-      </div>
+      <Typewriter text="million downloads" />
     </div>
   )
 }
