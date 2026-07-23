@@ -72,7 +72,7 @@ body {
 }
 
 .xp-panel--up {
-  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
   transform: translateY(-100%);
 }
 
@@ -88,7 +88,7 @@ body {
    as the reels launch, holds, then springs back while they spin. */
 .xp-lever-arm {
   transform-origin: 50% calc(100% - 5px);
-  animation: xp-lever-pull 1100ms cubic-bezier(0.45, 0, 0.3, 1) both;
+  animation: xp-lever-pull 800ms cubic-bezier(0.45, 0, 0.3, 1) both;
 }
 
 @keyframes xp-lever-pull {

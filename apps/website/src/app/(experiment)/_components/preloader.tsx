@@ -15,17 +15,18 @@ const TARGET = ['7', '0', '0', 'M'] as const
 const PHRASE = 'thank you for\n700M downloads!'
 const TYPE_MS = 16
 
-/* Timeline. The lever pull leads, reels start as it bottoms out. */
-const REEL_DELAY = 380
-const REEL_BASE = 850
-const REEL_STEP = 170
+/* Timeline — phases overlap rather than queue: the sweep starts while
+   the win burst is still playing, and the curtain lifts during the final
+   blink instead of after it. */
+const REEL_DELAY = 240
+const REEL_BASE = 650
+const REEL_STEP = 130
 const LANDED_AT = REEL_DELAY + REEL_BASE + (TARGET.length - 1) * REEL_STEP
-/* Let the win effects play before the caret takes over. */
-const SWEEP_AT = LANDED_AT + 900
+const SWEEP_AT = LANDED_AT + 350
 const SWEEP_MS = 620
 const WRITE_AT = SWEEP_AT + SWEEP_MS + 80
-const LIFT_AT = WRITE_AT + PHRASE.length * TYPE_MS + 560
-const LIFT_MS = 850
+const LIFT_AT = WRITE_AT + PHRASE.length * TYPE_MS + 250
+const LIFT_MS = 700
 
 const REEL_W = 104
 const REEL_H = 132
@@ -326,8 +327,8 @@ function Casino() {
         )}
       </div>
 
-      {/* Win flash + sparks, once */}
-      {green && !sweep && (
+      {/* Win flash + sparks, once; they outlive the sweep start */}
+      {green && !write && (
         <>
           <div className="xp-win-flash" aria-hidden />
           <Sparks />
@@ -368,7 +369,17 @@ export function Preloader() {
   }, [])
 
   React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let seen = false
+    try {
+      seen = sessionStorage.getItem('xp-intro-seen') === '1'
+      sessionStorage.setItem('xp-intro-seen', '1')
+    } catch {
+      // storage unavailable: play the intro every time
+    }
+    if (
+      seen ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
       setPhase('gone')
       return
     }
