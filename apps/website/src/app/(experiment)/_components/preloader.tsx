@@ -364,17 +364,23 @@ export function Preloader() {
   const startLift = React.useCallback(() => {
     if (phaseRef.current !== 'show') return
     timeouts.current.forEach(clearTimeout)
+    // Recorded only once the intro has actually played through (or been
+    // skipped) — writing at mount made Strict Mode's second effect run
+    // read its own flag and kill the intro in dev.
+    try {
+      localStorage.setItem('xp-intro-seen', '1')
+    } catch {}
     setPhase('lift')
     setTimeout(() => setPhase('gone'), LIFT_MS)
   }, [])
 
   React.useEffect(() => {
     // The blocking script in the layout already hid the overlay pre-paint;
-    // this just unmounts it and records the visit.
+    // this just unmounts it. Read-only here — the flag is written when
+    // the intro finishes, so this effect stays idempotent.
     let seen = document.documentElement.classList.contains('xp-intro-seen')
     try {
       seen = seen || localStorage.getItem('xp-intro-seen') === '1'
-      localStorage.setItem('xp-intro-seen', '1')
     } catch {
       // storage unavailable: play the intro every time
     }
