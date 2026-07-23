@@ -64,7 +64,8 @@ export default async function IndexPage() {
             <PageHeaderHeading
               className={cn(fadeUpClassname, 'text-balance tracking-[-0.035em]')}
             >
-              Stop wasting time building OTP inputs.
+              Stop wasting time <br className="hidden md:block" />
+              building OTP inputs.
             </PageHeaderHeading>
 
             <Showcase
