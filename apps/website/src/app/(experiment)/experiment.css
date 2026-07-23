@@ -74,7 +74,7 @@ body {
      at the far edges — plus the bottom fade into the next section. */
   mask-image:
     radial-gradient(
-      ellipse 78% 78% at 50% 52%,
+      ellipse 78% 98% at 50% 52%,
       rgba(0, 0, 0, 0.04) 20%,
       rgba(0, 0, 0, 0.2) 48%,
       #00000000 100%
@@ -83,7 +83,7 @@ body {
   mask-composite: intersect;
   -webkit-mask-image:
     radial-gradient(
-      ellipse 78% 78% at 50% 52%,
+      ellipse 78% 98% at 50% 52%,
       rgba(0, 0, 0, 0.04) 20%,
       rgba(0, 0, 0, 0.2) 48%,
       #00000000 100%
