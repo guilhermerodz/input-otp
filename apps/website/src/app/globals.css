@@ -4,29 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 72.22% 50.59%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5% 64.9%;
     --radius: 0.5rem;
-  }
-
-  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -76,16 +54,6 @@
   /* Tactile key cell — the atomic unit of the page. */
   .keycap {
     border: 1px solid hsl(var(--border));
-    background: linear-gradient(
-      to bottom,
-      hsl(var(--muted) / 0.6),
-      hsl(var(--background))
-    );
-    box-shadow:
-      0 1px 2px hsl(240 10% 4% / 0.06),
-      inset 0 1px 0 hsl(0 0% 100% / 0.7);
-  }
-  .dark .keycap {
     background: linear-gradient(to bottom, hsl(240 5% 9%), hsl(240 6% 5.5%));
     box-shadow:
       0 2px 6px -2px rgb(0 0 0 / 0.6),
@@ -96,19 +64,12 @@
 /* Hero atmosphere: a soft spotlight that leans in when the input is focused. */
 .hero-spotlight {
   background: radial-gradient(
-    ellipse 75% 70% at 50% 10%,
-    hsl(var(--foreground) / 0.022),
-    transparent 78%
-  );
-  opacity: 0.55;
-  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.dark .hero-spotlight {
-  background: radial-gradient(
     ellipse 62% 52% at 50% 12%,
     hsl(0 0% 100% / 0.09),
     transparent 68%
   );
+  opacity: 0.55;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .hero-scene:has(input:focus) .hero-spotlight {
   opacity: 1;
@@ -120,10 +81,6 @@
 }
 
 [data-highlighted-chars] {
-  @apply bg-zinc-900 rounded;
-  box-shadow: 2px 2px 0 2px rgba(139, 139, 148, 0.5);
-}
-[data-highlighted-chars] .dark {
   @apply bg-zinc-700/50 rounded;
   box-shadow: 2px 2px 0 2px rgba(139, 139, 148, 0.5);
 }
@@ -137,15 +94,3 @@
   @apply inline-block min-h-4 w-full py-0.5 px-4;
 }
 
-html[class='light'] .code-example-light {
-  display: unset;
-}
-html[class='light'] .code-example-dark {
-  display: none;
-}
-html[class='dark'] .code-example-dark {
-  display: unset;
-}
-html[class='dark'] .code-example-light {
-  display: none;
-}

@@ -1,5 +1,4 @@
 import { Code } from '@/components/code'
-import { useTheme } from 'next-themes'
 
 const tsx = `'use client'
 import { OTPInput, SlotProps } from 'input-otp'
@@ -100,8 +99,7 @@ export function ExampleCode() {
   return (
     <div className="relative code-example w-full overflow-hidden">
       <div className="w-full">
-        <Code dark={false} code={code} toCopy={tsx} />
-        <Code dark={true} code={code} toCopy={tsx} />
+        <Code code={code} toCopy={tsx} />
       </div>
     </div>
   )

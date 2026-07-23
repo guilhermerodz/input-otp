@@ -4,7 +4,6 @@ import { siteConfig } from '../config/site'
 import { cn } from '../lib/utils'
 import { buttonVariants } from './ui/button'
 import { Icons } from './icons'
-import { ModeToggle } from './mode-toggle'
 
 function Wordmark() {
   return (
@@ -64,7 +63,6 @@ export function SiteHeader() {
               </div>
             </Link>
           </nav>
-          <ModeToggle />
         </div>
       </div>
     </header>
