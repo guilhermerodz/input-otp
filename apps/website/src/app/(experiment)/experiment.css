@@ -59,6 +59,40 @@ body {
   animation: xp-blink 1s step-end infinite;
 }
 
+.xp-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-hero-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
+
+.xp-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 78% 78% at 50% 52%,
+    rgba(9, 9, 11, 0.92) 0%,
+    rgba(9, 9, 11, 0.72) 42%,
+    rgba(9, 9, 11, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.xp-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .xp-otp-container {
   display: flex;
   align-items: center;

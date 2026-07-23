@@ -1,4 +1,5 @@
 import { CopyCommand } from './_components/copy-command'
+import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
@@ -164,14 +165,11 @@ export default function ExperimentPage() {
 
       {/* Hero */}
       <section
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          padding: '84px 40px 56px',
-        }}
+        className="xp-hero"
+        style={{ textAlign: 'center', padding: '84px 40px 56px' }}
       >
+        <HeroField />
+        <div className="xp-hero-copy">
         <h1
           className="xp-hero-title"
           style={{
@@ -252,6 +250,7 @@ export default function ExperimentPage() {
             </span>
           </span>
         </a>
+        </div>
       </section>
 
       {/* Stats + Used by */}
