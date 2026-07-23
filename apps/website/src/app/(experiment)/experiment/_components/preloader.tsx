@@ -155,15 +155,21 @@ function Pill() {
   )
 }
 
-/* Caption that types itself out under the finale. */
-function Typewriter({ text }: { text: string }) {
+/* Caption that types itself out under the finale, after `delay` ms. */
+function Typewriter({ text, delay }: { text: string; delay: number }) {
+  const [started, setStarted] = React.useState(false)
   const [count, setCount] = React.useState(0)
 
   React.useEffect(() => {
-    if (count >= text.length) return
+    const id = setTimeout(() => setStarted(true), delay)
+    return () => clearTimeout(id)
+  }, [delay])
+
+  React.useEffect(() => {
+    if (!started || count >= text.length) return
     const id = setTimeout(() => setCount(c => c + 1), 42)
     return () => clearTimeout(id)
-  }, [count, text.length])
+  }, [started, count, text.length])
 
   return (
     <div
@@ -193,18 +199,31 @@ function Typewriter({ text }: { text: string }) {
   )
 }
 
-/* 6 — the finale: 700.000.000, three grouped triplets joined by dots */
+/* 6 — the finale: 700.000.000, three grouped triplets joined by dots.
+   Starts neutral and turns green the moment the caption starts typing. */
+const GREEN_AT_MS = 350
+
 function Celebration() {
+  const [green, setGreen] = React.useState(false)
+
+  React.useEffect(() => {
+    const id = setTimeout(() => setGreen(true), GREEN_AT_MS)
+    return () => clearTimeout(id)
+  }, [])
+
   const group = (digits: string[], key: number) => (
     <div
       key={key}
       style={{
         display: 'flex',
-        border: '1px solid #34d39955',
+        border: `1px solid ${green ? '#34d39955' : '#3f3f46'}`,
         borderRadius: 14,
-        background: '#0a100d',
+        background: green ? '#0a100d' : '#0c0c0e',
         overflow: 'hidden',
-        boxShadow: '0 0 34px rgba(52, 211, 153, 0.12)',
+        boxShadow: green
+          ? '0 0 34px rgba(52, 211, 153, 0.12)'
+          : '0 0 34px rgba(250, 250, 250, 0.07)',
+        transition: 'border-color .5s ease, background .5s ease, box-shadow .5s ease',
       }}
     >
       {digits.map((c, i) => (
@@ -215,8 +234,9 @@ function Celebration() {
             width: 58,
             height: 76,
             fontSize: 34,
-            color: '#34d399',
-            borderLeft: i === 0 ? 'none' : '1px solid #12251c',
+            color: green ? '#34d399' : '#fafafa',
+            borderLeft: i === 0 ? 'none' : `1px solid ${green ? '#12251c' : '#1f1f23'}`,
+            transition: 'color .5s ease, border-color .5s ease',
           }}
         >
           {c}
@@ -237,15 +257,27 @@ function Celebration() {
       >
         {group(['7', '0', '0'], 0)}
         <div
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d39988' }}
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: green ? '#34d39988' : '#71717a',
+            transition: 'background .5s ease',
+          }}
         />
         {group(['0', '0', '0'], 1)}
         <div
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d39988' }}
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: green ? '#34d39988' : '#71717a',
+            transition: 'background .5s ease',
+          }}
         />
         {group(['0', '0', '0'], 2)}
       </div>
-      <Typewriter text="million downloads" />
+      <Typewriter text="million downloads" delay={GREEN_AT_MS} />
     </div>
   )
 }
