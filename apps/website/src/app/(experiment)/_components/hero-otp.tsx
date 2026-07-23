@@ -64,7 +64,10 @@ export function HeroOtp() {
   const [value, setValue] = React.useState('')
   const [done, setDone] = React.useState(false)
   const [error, setError] = React.useState(false)
-  const [locked, setLocked] = React.useState(false)
+  // Locked from mount: the input cannot be focused or edited until the
+  // hint hands the caret over — nothing shows as active before the
+  // user's turn.
+  const [locked, setLocked] = React.useState(true)
   const [active, setActive] = React.useState<number[]>([])
   const [ring, setRing] = React.useState<Ring>({
     x: 0,
@@ -132,12 +135,10 @@ export function HeroOtp() {
     at(delay + 800, () => inputRef.current?.focus())
   }
 
-  // On load, once the intro curtain is gone, the hint plays by itself —
-  // unless the visitor already started typing.
+  // On load, once the intro curtain is gone, the hint plays by itself.
   React.useEffect(() => {
     const begin = () => {
       if (valueRef.current !== '') return
-      if (document.activeElement === inputRef.current) return
       runHint(900)
     }
     const w = window as unknown as { __xpIntroDone?: boolean }
@@ -146,8 +147,11 @@ export function HeroOtp() {
     } else {
       window.addEventListener('xp:intro-done', begin, { once: true })
     }
+    // Failsafe: never leave the input locked if the intro signal is lost.
+    const failsafe = setTimeout(() => setLocked(false), 10000)
     return () => {
       window.removeEventListener('xp:intro-done', begin)
+      clearTimeout(failsafe)
       clearHint()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
