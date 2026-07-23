@@ -3,50 +3,55 @@
 import * as React from 'react'
 
 /**
- * Intro: a slot machine. A lever on the right pulls itself, nine
- * motion-blurred reels land left to right on 700.000.000 and the frame
- * turns green. Then the lever becomes a caret that sweeps right-to-left,
- * clipping the machine away, and types "700 million downloads" in its
- * place — before a single curtain lifts to reveal the site.
+ * Intro: a slot machine. A lever on the right pulls itself, four big
+ * motion-blurred reels land left to right on 700M and the frame turns
+ * green with arcade win effects — a border beam racing the frame, a
+ * double flash, a shake and radial sparks. Then the lever becomes a
+ * caret that sweeps right-to-left, clipping the machine away, and types
+ * "700 million downloads" in its place — before a single curtain lifts.
  */
 
-const TARGET = '700000000'
+const TARGET = ['7', '0', '0', 'M'] as const
 const PHRASE = '700 million downloads'
 const TYPE_MS = 40
 
 /* Timeline. The lever pull leads, reels start as it bottoms out. */
 const REEL_DELAY = 380
 const REEL_BASE = 850
-const REEL_STEP = 150
+const REEL_STEP = 170
 const LANDED_AT = REEL_DELAY + REEL_BASE + (TARGET.length - 1) * REEL_STEP
-const SWEEP_AT = LANDED_AT + 450
+/* Let the win effects play before the caret takes over. */
+const SWEEP_AT = LANDED_AT + 900
 const SWEEP_MS = 620
 const WRITE_AT = SWEEP_AT + SWEEP_MS + 80
 const LIFT_AT = WRITE_AT + PHRASE.length * TYPE_MS + 560
 const LIFT_MS = 850
 
-const REEL_W = 58
-const REEL_H = 76
+const REEL_W = 104
+const REEL_H = 132
 
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
-/* One spinning digit strip. A couple of full 0-9 runs ending on the target
-   digit; a single decelerating transform plays the whole spin, blurred
-   while it is fast. */
+/* One spinning strip. A couple of full 0-9 runs ending on the target
+   character; a single decelerating transform plays the whole spin,
+   blurred while it is fast. */
 function Reel({
-  digit,
+  char,
   index,
   green,
 }: {
-  digit: string
+  char: string
   index: number
   green: boolean
 }) {
-  const target = Number(digit)
   const runs = 2 + (index % 2)
-  const rows: number[] = []
+  const rows: (number | string)[] = []
   for (let r = 0; r < runs * 10; r++) rows.push(r % 10)
-  for (let d = 0; d <= target; d++) rows.push(d)
+  if (char === 'M') {
+    rows.push('M')
+  } else {
+    for (let d = 0; d <= Number(char); d++) rows.push(d)
+  }
 
   return (
     <div
@@ -56,7 +61,7 @@ function Reel({
         height: REEL_H,
         overflow: 'hidden',
         borderLeft:
-          index % 3 === 0 ? 'none' : `1px solid ${green ? '#12251c' : '#1f1f23'}`,
+          index === 0 ? 'none' : `1px solid ${green ? '#12251c' : '#1f1f23'}`,
         transition: 'border-color .5s ease',
       }}
     >
@@ -80,7 +85,7 @@ function Reel({
               placeItems: 'center',
               fontFamily: mono,
               fontWeight: 500,
-              fontSize: 34,
+              fontSize: 62,
               color: green ? '#34d399' : '#fafafa',
               transition: 'color .5s ease',
             }}
@@ -113,10 +118,10 @@ function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
       aria-hidden
       style={{
         position: 'absolute',
-        left: 'calc(100% + 26px)',
+        left: 'calc(100% + 34px)',
         top: '50%',
-        width: 20,
-        height: 86,
+        width: 26,
+        height: 124,
         transform: 'translateY(-56%)',
         opacity: hidden ? 0 : 1,
         transition: 'opacity .3s ease',
@@ -127,11 +132,11 @@ function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
           style={{
             position: 'absolute',
             left: '50%',
-            top: 14,
-            bottom: 6,
-            width: 4,
-            marginLeft: -2,
-            borderRadius: 2,
+            top: 20,
+            bottom: 8,
+            width: 5,
+            marginLeft: -2.5,
+            borderRadius: 3,
             background: '#3f3f46',
             transition: 'background .5s ease',
           }}
@@ -141,9 +146,9 @@ function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
             position: 'absolute',
             left: '50%',
             top: 0,
-            width: 16,
-            height: 16,
-            marginLeft: -8,
+            width: 22,
+            height: 22,
+            marginLeft: -11,
             borderRadius: '50%',
             background: green ? '#34d399' : '#71717a',
             transition: 'background .5s ease',
@@ -156,13 +161,47 @@ function Lever({ green, hidden }: { green: boolean; hidden: boolean }) {
           position: 'absolute',
           left: '50%',
           bottom: 0,
-          width: 8,
-          height: 8,
-          marginLeft: -4,
+          width: 10,
+          height: 10,
+          marginLeft: -5,
           borderRadius: '50%',
           background: '#27272a',
         }}
       />
+    </div>
+  )
+}
+
+/* Arcade win burst: radial sparks flying out of the machine's centre. */
+function Sparks() {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        pointerEvents: 'none',
+      }}
+    >
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = (i / 12) * Math.PI * 2
+        const dist = 150 + (i % 3) * 55
+        return (
+          <span
+            key={i}
+            className="xp-spark"
+            style={
+              {
+                '--dx': `${Math.cos(angle) * dist}px`,
+                '--dy': `${Math.sin(angle) * dist}px`,
+                transform: `rotate(${(angle * 180) / Math.PI}deg)`,
+                animationDelay: `${(i % 4) * 30}ms`,
+              } as React.CSSProperties
+            }
+          />
+        )
+      })}
     </div>
   )
 }
@@ -181,7 +220,7 @@ function WriteLine() {
     <div
       style={{
         fontFamily: mono,
-        fontSize: 30,
+        fontSize: 34,
         fontWeight: 500,
         letterSpacing: '0.04em',
         color: '#34d399',
@@ -194,11 +233,11 @@ function WriteLine() {
       <span
         style={{
           display: 'inline-block',
-          width: 2,
-          height: 34,
-          marginLeft: 3,
+          width: 3,
+          height: 40,
+          marginLeft: 4,
           background: '#34d399',
-          boxShadow: '0 0 12px rgba(52, 211, 153, 0.6)',
+          boxShadow: '0 0 14px rgba(52, 211, 153, 0.6)',
           animation:
             count >= PHRASE.length ? 'xp-blink 1s step-end infinite' : undefined,
         }}
@@ -207,9 +246,10 @@ function WriteLine() {
   )
 }
 
-/* The machine: three grouped triplets of reels joined by dots — the same
-   frame the page's own OTP designs use. Neutral while spinning, green on
-   landing; then the caret sweeps it away and writes the phrase. */
+/* The machine: one big group of four reels — the same frame the page's
+   OTP designs use. Neutral while spinning; on landing it goes green with
+   the arcade win burst, then the caret sweeps it away and writes the
+   phrase. */
 function Casino() {
   const [green, setGreen] = React.useState(false)
   const [sweep, setSweep] = React.useState(false)
@@ -224,63 +264,52 @@ function Casino() {
     return () => t.forEach(clearTimeout)
   }, [])
 
-  const group = (from: number) => (
-    <div
-      key={from}
-      style={{
-        display: 'flex',
-        border: `1px solid ${green ? '#34d39955' : '#3f3f46'}`,
-        borderRadius: 14,
-        background: green ? '#0a100d' : '#0c0c0e',
-        overflow: 'hidden',
-        boxShadow: green
-          ? '0 0 34px rgba(52, 211, 153, 0.12)'
-          : '0 0 34px rgba(250, 250, 250, 0.07)',
-        transition: 'border-color .5s ease, background .5s ease, box-shadow .5s ease',
-      }}
-    >
-      {[0, 1, 2].map(i => (
-        <Reel
-          key={from + i}
-          digit={TARGET[from + i]}
-          index={from + i}
-          green={green}
-        />
-      ))}
-    </div>
-  )
-
-  const dot = (key: number) => (
-    <div
-      key={key}
-      style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        background: green ? '#34d39988' : '#71717a',
-        transition: 'background .5s ease',
-      }}
-    />
-  )
-
   return (
-    <div style={{ position: 'relative' }}>
+    <div
+      style={{ position: 'relative' }}
+      className={green && !write ? 'xp-win-shake' : undefined}
+    >
       <div
         className={sweep ? 'xp-machine--clip' : undefined}
         style={{
-          display: 'flex',
-          gap: 12,
-          alignItems: 'center',
-          justifyContent: 'center',
+          position: 'relative',
           visibility: write ? 'hidden' : undefined,
         }}
       >
-        {group(0)}
-        {dot(1)}
-        {group(3)}
-        {dot(2)}
-        {group(6)}
+        <div
+          style={{
+            display: 'flex',
+            border: `1px solid ${green ? '#34d39955' : '#3f3f46'}`,
+            borderRadius: 18,
+            background: green ? '#0a100d' : '#0c0c0e',
+            overflow: 'hidden',
+            boxShadow: green
+              ? '0 0 54px rgba(52, 211, 153, 0.18)'
+              : '0 0 34px rgba(250, 250, 250, 0.07)',
+            transition:
+              'border-color .5s ease, background .5s ease, box-shadow .5s ease',
+          }}
+        >
+          {TARGET.map((c, i) => (
+            <Reel key={i} char={c} index={i} green={green} />
+          ))}
+        </div>
+
+        {/* Border beam racing the frame on win */}
+        {green && (
+          <div className="xp-beam-ring" aria-hidden>
+            <div className="xp-beam-spin" />
+          </div>
+        )}
       </div>
+
+      {/* Win flash + sparks, once */}
+      {green && !sweep && (
+        <>
+          <div className="xp-win-flash" aria-hidden />
+          <Sparks />
+        </>
+      )}
 
       <Lever green={green} hidden={sweep || write} />
 

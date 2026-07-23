@@ -130,9 +130,9 @@ body {
 .xp-sweep-caret {
   position: absolute;
   top: 50%;
-  width: 2px;
-  height: 76px;
-  margin-top: -38px;
+  width: 3px;
+  height: 132px;
+  margin-top: -66px;
   background: #34d399;
   box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
   animation: xp-sweep-move 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -144,6 +144,147 @@ body {
   }
   to {
     left: 0%;
+  }
+}
+
+/* Arcade win effects ------------------------------------------------------ */
+
+/* Border beam: a bright green segment racing around the machine frame
+   (after beam.jakubantalik.com). The ring is masked to a 3px border band;
+   the oversized conic gradient inside it spins fast. */
+.xp-beam-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 22px;
+  padding: 3px;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  overflow: hidden;
+  animation: xp-beam-in 0.25s ease-out both;
+}
+
+.xp-beam-spin {
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(
+    transparent 0deg,
+    transparent 250deg,
+    rgba(52, 211, 153, 0.55) 300deg,
+    #6ee7b7 330deg,
+    #d1fae5 344deg,
+    transparent 360deg
+  );
+  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.8));
+  animation: xp-beam-spin 0.65s linear infinite;
+}
+
+@keyframes xp-beam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes xp-beam-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Double flash on the jackpot frame. */
+.xp-win-flash {
+  position: absolute;
+  inset: -28px;
+  border-radius: 34px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(110, 231, 183, 0.55) 0%,
+    rgba(52, 211, 153, 0.22) 45%,
+    transparent 75%
+  );
+  animation: xp-win-flash 0.5s ease-out both;
+}
+
+@keyframes xp-win-flash {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  32% {
+    opacity: 0.15;
+  }
+  48% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cabinet shake, once, on the jackpot. */
+.xp-win-shake {
+  animation: xp-win-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes xp-win-shake {
+  10%,
+  90% {
+    transform: translate(-2px, 1px);
+  }
+  20%,
+  80% {
+    transform: translate(4px, -2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate(-7px, 2px) rotate(-0.4deg);
+  }
+  40%,
+  60% {
+    transform: translate(7px, -2px) rotate(0.4deg);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Radial sparks: little green dashes shot out of the centre. */
+.xp-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: #6ee7b7;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+  opacity: 0;
+  animation: xp-spark 0.55s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+
+@keyframes xp-spark {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--dx) var(--dy);
+    scale: 0.35;
   }
 }
 
