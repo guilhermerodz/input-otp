@@ -1,4 +1,5 @@
 import { Anatomy } from './_components/anatomy'
+import { StyleGallery } from './_components/gallery'
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
@@ -589,6 +590,21 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           </div>
         </div>
         <Anatomy />
+      </section>
+
+      {/* Style gallery */}
+      <section style={{ padding: '56px 40px', borderTop: border }}>
+        <h2
+          style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
+        >
+          Unstyled by default. Styled by you.
+        </h2>
+        <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
+          Every input below is the same component with a different render prop —
+          they all type, paste and autofill for real
+          <span style={{ color: '#3f3f46' }}>_</span>
+        </div>
+        <StyleGallery className="mt-12" />
       </section>
 
       {/* CTA */}
