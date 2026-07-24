@@ -214,8 +214,8 @@ export function HeroOtp() {
           <Kbd>A</Kbd> to select every slot
         </>,
         <>
-          hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd>
-          <Kbd>→</Kbd> and watch the selection grow slot by slot
+          now hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd> — watch the selection grow
+          back slot by slot
         </>,
         <>
           now cut, copy or paste it — <Kbd>{modK}</Kbd>
@@ -232,6 +232,18 @@ export function HeroOtp() {
     if (mode !== 'tutorial') return
     if (step === 0 && active.length === 6) {
       setStep(1)
+      // Select-all leaves nothing to grow, which made the next step a
+      // dead instruction. After a beat to admire the full selection, the
+      // tour parks the caret at the end so Shift+Left has room to work.
+      if (!isMobile) {
+        at(900, () => {
+          const el = inputRef.current
+          if (el && document.activeElement === el) {
+            const end = el.value.length
+            el.setSelectionRange(end, end)
+          }
+        })
+      }
     } else if (
       !isMobile &&
       step === 1 &&
