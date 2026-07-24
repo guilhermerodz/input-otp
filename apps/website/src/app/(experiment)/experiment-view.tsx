@@ -1,3 +1,4 @@
+import { ClerkParticles } from './_components/clerk-particles'
 import { StoryIso } from './_components/story-iso'
 import { StyleGallery } from './_components/gallery'
 import { CopyCommand } from './_components/copy-command'
@@ -448,13 +449,13 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 16,
+              overflow: 'hidden',
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ClerkParticles
               src="/sponsors/clerk-wordmark-white-trimmed.svg"
               alt="Clerk"
-              style={{ height: 30, width: 'auto' }}
+              height={30}
             />
             <div
               style={{
