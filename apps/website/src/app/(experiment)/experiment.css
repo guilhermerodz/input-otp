@@ -610,6 +610,119 @@ html {
   color: #fafafa;
 }
 
+/* Sponsor tiers ---------------------------------------------------------- */
+
+.xp-sponsor-beam-wrap,
+.xp-sponsor-beam-wrap > .xp-sponsor-card {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.xp-sponsor-card {
+  position: relative;
+  justify-content: center;
+  cursor: pointer;
+  transition: box-shadow 180ms ease;
+}
+
+.xp-sponsor-card--diamond {
+  min-height: 148px;
+}
+
+.xp-sponsor-card--silver {
+  min-height: 114px;
+}
+
+.xp-sponsor-tier-label {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #71717a;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  opacity: 0.68;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.xp-sponsor-card--diamond .xp-sponsor-tier-label {
+  bottom: 18px;
+}
+
+.xp-sponsor-card:hover {
+  box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.035);
+}
+
+.xp-sponsor-card:hover .xp-sponsor-tier-label {
+  color: #8f9aa6;
+  opacity: 0.88;
+}
+
+.xp-sponsor-card:active {
+  box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.065);
+}
+
+.xp-sponsor-card:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.xp-sponsor-cta {
+  overflow: hidden;
+}
+
+.xp-sponsor-cta-plus,
+.xp-sponsor-cta-label {
+  grid-area: 1 / 1;
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease;
+}
+
+.xp-sponsor-cta-plus {
+  font-size: 24px;
+  opacity: 1;
+  filter: blur(0);
+}
+
+.xp-sponsor-cta-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a1a1aa;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.xp-sponsor-cta:hover .xp-sponsor-cta-plus,
+.xp-sponsor-cta:focus-visible .xp-sponsor-cta-plus {
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.xp-sponsor-cta:hover .xp-sponsor-cta-label,
+.xp-sponsor-cta:focus-visible .xp-sponsor-cta-label {
+  opacity: 1;
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-sponsor-cta-plus,
+  .xp-sponsor-cta-label {
+    transition-duration: 0.01ms;
+  }
+}
+
 @media (max-width: 900px) {
   .xp-slot {
     width: 44px;

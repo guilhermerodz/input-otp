@@ -1,4 +1,7 @@
+import { ExternalLink } from 'lucide-react'
+
 import { ClerkParticles } from './_components/clerk-particles'
+import { SponsorBorderBeam } from './_components/sponsor-border-beam'
 import { StoryIso } from './_components/story-iso'
 import { StyleGallery } from './_components/gallery'
 import { CopyCommand } from './_components/copy-command'
@@ -7,9 +10,27 @@ import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
+const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
 const RESEND_URL = 'https://go.resend.com/input-otp'
 const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
+
+const SILVER_SPONSORS = [
+  {
+    src: '/sponsors/resend-wordmark-white-trimmed.svg',
+    alt: 'Resend',
+    href: RESEND_URL,
+    logoHeight: 23,
+    beamDuration: 3.17,
+  },
+  {
+    src: '/sponsors/evomi-wordmark-white-trimmed.svg',
+    alt: 'Evomi',
+    href: EVOMI_URL,
+    logoHeight: 27,
+    beamDuration: 3.73,
+  },
+] as const
 
 const border = '1px solid #1c1c1f'
 const card = {
@@ -437,50 +458,57 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             marginTop: 28,
           }}
         >
-          <a
-            href={CLERK_URL}
-            style={{
-              border: '1px solid #3d3423',
-              background: '#0e0d0a',
-              borderRadius: 14,
-              padding: 40,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 16,
-              overflow: 'hidden',
-            }}
-          >
-            <ClerkParticles
-              src="/sponsors/clerk-wordmark-white-trimmed.svg"
-              alt="Clerk"
-              height={30}
-            />
-            <div
+          <SponsorBorderBeam tier="diamond" duration={4.1}>
+            <a
+              href={CLERK_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="xp-sponsor-card xp-sponsor-card--diamond"
               style={{
-                fontSize: 12,
-                letterSpacing: '0.1em',
-                color: '#d4b262',
-                fontWeight: 600,
+                border: '1px solid #29292f',
+                background: '#0c0c0e',
+                borderRadius: 14,
+                padding: 40,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
               }}
             >
-              GOLD SPONSOR
-            </div>
-          </a>
+              <ClerkParticles
+                src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                alt="Clerk"
+                height={44}
+              />
+              <span className="xp-sponsor-tier-label">
+                <span>DIAMOND SPONSOR</span>
+                <ExternalLink size={9} strokeWidth={1.75} aria-hidden="true" />
+              </span>
+            </a>
+          </SponsorBorderBeam>
           <a
-            href={GITHUB_URL}
+            href={GITHUB_SPONSORS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="xp-sponsor-cta"
+            aria-label="Become a sponsor"
             style={{
               border: '1px dashed #27272a',
               borderRadius: 14,
               display: 'grid',
               placeItems: 'center',
-              fontSize: 24,
               color: '#3f3f46',
               minHeight: 100,
             }}
           >
-            +
+            <span className="xp-sponsor-cta-plus" aria-hidden="true">
+              +
+            </span>
+            <span className="xp-sponsor-cta-label" aria-hidden="true">
+              <span>Become a sponsor</span>
+              <ExternalLink size={12} strokeWidth={1.75} />
+            </span>
           </a>
         </div>
         <div
@@ -492,54 +520,68 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             marginTop: 20,
           }}
         >
-          {[
-            ['/sponsors/resend-wordmark-white-trimmed.svg', 'Resend', RESEND_URL],
-            ['/sponsors/evomi-wordmark-white-trimmed.svg', 'Evomi', EVOMI_URL],
-          ].map(([src, alt, href]) => (
-            <a
-              key={alt}
-              href={href}
-              style={{
-                border: '1px solid #1f1f23',
-                borderRadius: 14,
-                padding: 30,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 12,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt={alt}
-                style={{ height: 19, width: 'auto', opacity: 0.85 }}
-              />
-              <div
-                style={{
-                  fontSize: 11,
-                  letterSpacing: '0.1em',
-                  color: '#8f9aa6',
-                  fontWeight: 600,
-                }}
+          {SILVER_SPONSORS.map(
+            ({ src, alt, href, logoHeight, beamDuration }) => (
+              <SponsorBorderBeam
+                key={alt}
+                tier="silver"
+                duration={beamDuration}
               >
-                SILVER SPONSOR
-              </div>
-            </a>
-          ))}
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="xp-sponsor-card xp-sponsor-card--silver"
+                  style={{
+                    border: '1px solid #1f1f23',
+                    borderRadius: 14,
+                    padding: 30,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={alt}
+                    style={{ height: logoHeight, width: 'auto', opacity: 0.85 }}
+                  />
+                  <span className="xp-sponsor-tier-label">
+                    <span>SILVER SPONSOR</span>
+                    <ExternalLink
+                      size={9}
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
+                  </span>
+                </a>
+              </SponsorBorderBeam>
+            ),
+          )}
           <a
-            href={GITHUB_URL}
+            href={GITHUB_SPONSORS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="xp-sponsor-cta"
+            aria-label="Become a sponsor"
             style={{
               border: '1px dashed #27272a',
               borderRadius: 14,
               display: 'grid',
               placeItems: 'center',
-              fontSize: 24,
               color: '#3f3f46',
               minHeight: 100,
             }}
           >
-            +
+            <span className="xp-sponsor-cta-plus" aria-hidden="true">
+              +
+            </span>
+            <span className="xp-sponsor-cta-label" aria-hidden="true">
+              <span>Become a sponsor</span>
+              <ExternalLink size={12} strokeWidth={1.75} />
+            </span>
           </a>
         </div>
       </section>
