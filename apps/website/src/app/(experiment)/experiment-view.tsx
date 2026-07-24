@@ -8,6 +8,7 @@ import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
+import { UsedByMarquee } from './_components/used-by-marquee'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
@@ -295,7 +296,9 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         </div>
       </section>
 
-      {/* Stats + Used by */}
+      <UsedByMarquee />
+
+      {/* Stats */}
       <section style={{ padding: '56px 40px', borderTop: border, textAlign: 'center' }}>
         <div style={{ fontSize: 14, color: '#71717a' }}>
           Trusted at scale<span style={{ color: '#3f3f46' }}>_</span>
@@ -320,57 +323,6 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               </div>
             </div>
           ))}
-        </div>
-        <div
-          className="xp-usedby"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 44,
-            marginTop: 44,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 12,
-              letterSpacing: '0.18em',
-              color: '#71717a',
-              fontWeight: 600,
-            }}
-          >
-            USED BY
-          </span>
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: 9, opacity: 0.75 }}
-          >
-            <svg width="17" height="15" viewBox="0 0 76 65" fill="#fafafa">
-              <path d="M37.59.25l36.95 64H.64l36.95-64z" />
-            </svg>
-            <span
-              style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em' }}
-            >
-              Vercel
-            </span>
-          </div>
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: 0.75 }}
-          >
-            <svg width="12" height="26" viewBox="0 0 250 570" fill="#fafafa">
-              <path d="M125 0s15 30 40 75c38 68 65 135 65 205 0 88-40 165-90 220l-8 55h-14l-8-55c-50-55-90-132-90-220 0-70 27-137 65-205C110 30 125 0 125 0z" />
-            </svg>
-            <span
-              style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-0.02em' }}
-            >
-              MongoDB
-            </span>
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/sponsors/resend-wordmark-white-trimmed.svg"
-            alt="Resend"
-            style={{ height: 17, width: 'auto', opacity: 0.75 }}
-          />
         </div>
       </section>
 

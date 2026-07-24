@@ -723,6 +723,147 @@ html {
   }
 }
 
+/* Used by ---------------------------------------------------------------- */
+
+.xp-usedby-section {
+  padding: 42px 0 44px;
+  border-top: 1px solid #1c1c1f;
+}
+
+.xp-usedby-eyebrow {
+  margin-bottom: 26px;
+  color: #71717a;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+/* The band: hairlines above and below over the same panel fill the cards use,
+   so the belt reads as an inset strip instead of floating logos. */
+.xp-usedby-band {
+  position: relative;
+  padding: 22px 0;
+  border-top: 1px solid #17171a;
+  border-bottom: 1px solid #17171a;
+  background: #0c0c0e;
+  overflow: hidden;
+}
+
+/* Both ends are feathered so logos arrive and leave instead of being cut off.
+   The fade lives on this static layer, never on the band: an alpha ramp over a
+   fill this dark bands in 8-bit, and never on the track either, since a mask
+   would ride along with the animation. */
+.xp-usedby-viewport {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 13%,
+    #000 87%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 13%,
+    #000 87%,
+    transparent
+  );
+}
+
+/* Two identical belts, slid exactly half the track: the seam never shows. */
+.xp-usedby-track {
+  display: flex;
+  width: max-content;
+  animation: xp-usedby-scroll 46s linear infinite;
+}
+
+.xp-usedby-band:hover .xp-usedby-track {
+  animation-play-state: paused;
+}
+
+@keyframes xp-usedby-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.xp-usedby-belt {
+  display: flex;
+  align-items: center;
+}
+
+/* The gap after the separator is the cell's own padding, not a flex gap on the
+   belt: cells then tile identically and the two belts meet at exactly the same
+   rhythm as the logos inside one. */
+.xp-usedby-cell {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-right: 32px;
+}
+
+.xp-usedby-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #fafafa;
+  opacity: 0.5;
+  transition: opacity 220ms ease;
+}
+
+.xp-usedby-item:hover {
+  opacity: 1;
+}
+
+/* Stopping on the band picks one company out of the row. */
+.xp-usedby-band:hover .xp-usedby-item:not(:hover) {
+  opacity: 0.26;
+}
+
+.xp-usedby-name {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.xp-usedby-sep {
+  color: #27272a;
+  font-size: 13px;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-usedby-track {
+    width: 100%;
+    animation: none;
+  }
+
+  .xp-usedby-belt {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 18px;
+  }
+
+  .xp-usedby-belt[aria-hidden='true'] {
+    display: none;
+  }
+
+  /* No belt to join, so the row ends on a logo. */
+  .xp-usedby-cell:last-child {
+    padding-right: 0;
+  }
+
+  .xp-usedby-cell:last-child .xp-usedby-sep {
+    display: none;
+  }
+
+  .xp-usedby-band {
+    padding: 22px 24px;
+  }
+}
+
 @media (max-width: 900px) {
   .xp-slot {
     width: 44px;
@@ -753,7 +894,16 @@ html {
     display: none !important;
   }
 
-  .xp-usedby {
-    flex-wrap: wrap;
+  .xp-usedby-section {
+    padding: 34px 0 36px;
+  }
+
+  .xp-usedby-cell {
+    gap: 24px;
+    padding-right: 24px;
+  }
+
+  .xp-usedby-name {
+    font-size: 15px;
   }
 }
