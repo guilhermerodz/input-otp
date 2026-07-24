@@ -262,8 +262,10 @@ export function HeroOtp() {
     } else if (
       step === sliceStep &&
       (kind === 'cut' || kind === 'paste') &&
-      activeRef.current.length >= 2 &&
-      activeRef.current.length < 6
+      // Any multi-slot selection completes the tour. Holding Shift+← all
+      // the way grows the selection to all six slots — that must count
+      // too, or the tour dead-ends on the final cut.
+      activeRef.current.length >= 2
     ) {
       setStep(steps.length)
     }

@@ -41,7 +41,7 @@ export function IsoStage({ live }: { live: boolean }) {
         className="relative grid place-items-center"
         style={{
           height: 300,
-          transform: 'translateX(calc(var(--posx, 0) * 120px))',
+          transform: 'translateX(calc(var(--posx, 0) * 60px))',
         }}
       >
         <div className="relative" style={{ width: STAGE_W, height: 64 }}>
@@ -189,27 +189,27 @@ export function IsoStage({ live }: { live: boolean }) {
             <Note
               seg="--seg0"
               first
-              className="top-[46px] left-[-20px] w-max max-w-[300px] -rotate-2"
+              className="top-[11px] left-[-20px] w-max max-w-[300px] -rotate-2"
             >
               one real HTML input — paint and all
               <Arrow
                 seg="--seg0"
                 className="left-[130px] top-[calc(100%+3px)] h-[24px] w-[48px]"
-                d="M4 2 C 18 4, 32 10, 40 20"
-                head="M33 17.5 L40 20 M40.5 13 L40 20"
+                d="M44 2 C 30 4, 16 10, 8 20"
+                head="M15 17.5 L8 20 M7.5 13 L8 20"
               />
             </Note>
 
             <Note
               seg="--seg1"
-              className="top-[-14px] right-[-20px] w-max max-w-[320px] rotate-[1.5deg]"
+              className="top-[41px] right-[60px] w-max max-w-[320px] rotate-[1.5deg]"
             >
               paint gone — tilt it, it never left
               <Arrow
                 seg="--seg1"
                 className="right-[110px] top-[calc(100%+3px)] h-[24px] w-[48px]"
-                d="M44 2 C 30 4, 16 10, 8 20"
-                head="M15 17.5 L8 20 M7.5 13 L8 20"
+                d="M4 2 C 18 4, 32 10, 40 20"
+                head="M33 17.5 L40 20 M40.5 13 L40 20"
               />
             </Note>
 
@@ -220,22 +220,24 @@ export function IsoStage({ live }: { live: boolean }) {
               the slots live on a layer of their own
               <Arrow
                 seg="--seg2"
-                className="bottom-[calc(100%+2px)] left-1/2 h-[22px] w-[20px] -translate-x-1/2 -scale-y-100"
-                d="M10 2 C 8 8, 10 13, 10 18"
-                head="M5.5 14 L10 18 M14.5 14 L10 18"
+                viewBox="0 0 20 30"
+                className="bottom-[calc(100%+2px)] left-1/2 h-[30px] w-[20px] -translate-x-1/2 -scale-y-100"
+                d="M10 2 C 8 10, 10 18, 10 26"
+                head="M5.5 21.5 L10 26 M14.5 21.5 L10 26"
               />
             </Note>
 
             <Note
               seg="--seg3"
-              className="top-[-40px] left-1/2 w-max max-w-[320px] -translate-x-1/2 -rotate-1 text-center"
+              className="top-[-85px] left-1/2 w-max max-w-[320px] -translate-x-1/2 -rotate-1 text-center"
             >
               the hidden value drops into the slots
               <Arrow
                 seg="--seg3"
-                className="left-1/2 top-[calc(100%+2px)] h-[22px] w-[20px] -translate-x-1/2"
-                d="M10 2 C 8 8, 10 13, 10 18"
-                head="M5.5 14 L10 18 M14.5 14 L10 18"
+                viewBox="0 0 20 88"
+                className="left-1/2 top-[calc(100%+2px)] h-[88px] w-[20px] -translate-x-1/2"
+                d="M10 2 C 5 30, 13 58, 10 84"
+                head="M5.5 79 L10 84 M14.5 79 L10 84"
               />
             </Note>
 
@@ -246,20 +248,22 @@ export function IsoStage({ live }: { live: boolean }) {
               one selection — every layer follows
               <Arrow
                 seg="--seg4"
-                className="right-[120px] top-[calc(100%+3px)] h-[24px] w-[48px]"
-                d="M44 2 C 30 4, 16 10, 8 20"
-                head="M15 17.5 L8 20 M7.5 13 L8 20"
+                viewBox="0 0 20 30"
+                className="right-[40px] top-[calc(100%+3px)] h-[30px] w-[20px]"
+                d="M10 2 C 8 10, 10 18, 10 26"
+                head="M5.5 21.5 L10 26 M14.5 21.5 L10 26"
               />
             </Note>
 
             <Note
               seg="--seg6"
-              className="top-[-8px] left-1/2 w-max max-w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
+              className="top-[-63px] left-1/2 w-max max-w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
             >
               flat again — and live. type!
               <Arrow
                 seg="--seg6"
-                className="left-1/2 top-[calc(100%+2px)] h-[22px] w-[20px] -translate-x-1/2"
+                viewBox="0 0 20 22"
+                className="left-1/2 top-[calc(100%+57px)] h-[22px] w-[20px] -translate-x-1/2"
                 d="M10 2 C 8 8, 10 13, 10 18"
                 head="M5.5 14 L10 18 M14.5 14 L10 18"
               />
@@ -268,7 +272,13 @@ export function IsoStage({ live }: { live: boolean }) {
       </div>
 
       {/* Compat props typing on, then swapping for the live readout. */}
-      <div className="relative mt-2 h-40 w-full max-w-[27rem] font-mono text-xs leading-[1.9]">
+      <div
+        className="relative mt-2 h-40 font-mono text-xs leading-[1.9]"
+        style={{
+          width: 326,
+          transform: 'translateX(calc(var(--posx, 0) * 60px))',
+        }}
+      >
         <div
           aria-hidden
           className="absolute inset-x-0 top-[46px]"

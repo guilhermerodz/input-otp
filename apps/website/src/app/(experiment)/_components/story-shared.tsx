@@ -206,16 +206,18 @@ export function Arrow({
   head,
   className,
   seg: segVar,
+  viewBox = '0 0 48 24',
 }: {
   d: string
   head: string
   className?: string
   seg?: string
+  viewBox?: string
 }) {
   return (
     <svg
       className={cn('absolute', className)}
-      viewBox="0 0 48 24"
+      viewBox={viewBox}
       fill="none"
       style={
         segVar ? ({ '--sg': `var(${segVar})` } as React.CSSProperties) : undefined
