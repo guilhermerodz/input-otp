@@ -17,10 +17,9 @@ import * as React from 'react'
 // The static <img> stays for layout/no-JS/reduced-motion and fades out while
 // the particles fly in from scatter on first intersection.
 
-const GRID_CSS = 1.5 // grid pitch between particles, in css px
 const MAX_PARTICLES = 65536
 const FLOW_DOWNSCALE = 3
-const FLOW_RADIUS_CSS = 26
+const FLOW_RADIUS_CSS = 18
 const FORCE = 2.2
 const SPRING = 0.06
 const DAMPING = 0.885
@@ -91,6 +90,7 @@ uniform float uPointSize;
 uniform float uWobble;
 out float vAlpha;
 out float vGlow;
+out float vMotion;
 void main() {
   ivec2 ts = textureSize(uPos, 0);
   ivec2 tc = ivec2(gl_VertexID % ts.x, gl_VertexID / ts.x);
@@ -101,6 +101,7 @@ void main() {
     gl_PointSize = 0.0;
     vAlpha = 0.0;
     vGlow = 0.0;
+    vMotion = 0.0;
     return;
   }
   float seed = h.w;
@@ -109,20 +110,31 @@ void main() {
     cos(uTime * 1.9 + seed * 9.4248)
   ) * uWobble * (0.35 + 0.65 * fract(seed * 7.13));
   float speed = length(p.zw);
-  vec2 clip = (p.xy + wob) / uCanvasRes * 2.0 - 1.0;
+  float travel = length(p.xy - h.xy);
+  // Lock quiet particles exactly onto the resting grid. Without this, tiny
+  // spring residuals can shift a point by a fragment and reopen a seam.
+  float motion = smoothstep(0.75, 3.0, max(speed * 1.5, travel));
+  vec2 drawPos = mix(h.xy, p.xy + wob, motion);
+  vec2 clip = drawPos / uCanvasRes * 2.0 - 1.0;
   gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
-  gl_PointSize = uPointSize * (1.0 + min(speed * 0.02, 0.5));
+  // Settled cells tile edge-to-edge; disturbed cells contract into particles.
+  gl_PointSize = uPointSize * mix(1.0, 0.62, motion);
   vAlpha = h.z;
   vGlow = min(speed * 0.1, 1.0);
+  vMotion = motion;
 }`
 
 const POINTS_FS = `#version 300 es
 precision highp float;
 in float vAlpha;
 in float vGlow;
+in float vMotion;
 out vec4 outColor;
 void main() {
-  float a = vAlpha * (0.95 + 0.05 * vGlow);
+  float radius = length(gl_PointCoord - 0.5) * 2.0;
+  float dot = 1.0 - smoothstep(0.72, 1.0, radius);
+  float shape = mix(1.0, dot, smoothstep(0.15, 0.65, vMotion));
+  float a = vAlpha * shape * (0.95 + 0.05 * vGlow);
   vec3 col = mix(vec3(1.0), vec3(1.0, 0.85, 0.55), vGlow * 0.6);
   outColor = vec4(col * a, a);
 }`
@@ -213,10 +225,9 @@ function createParticleSystem(
   canvas.width = canvasW
   canvas.height = canvasH
 
-  // Rasterize the wordmark, then sample it on a coarse grid so individual
-  // particle squares stay visible (the Ship-effect look). Integer device-px
-  // pitch and cell size keep the resting grid rasterizing cleanly.
-  const pitch = Math.max(2, Math.round(GRID_CSS * dpr))
+  // One sample per device pixel preserves the source texture at rest. The
+  // particles only reveal themselves once the flow field disturbs them.
+  const pitch = 1
   const cols = Math.max(1, Math.floor((logoCssWidth * dpr) / pitch))
   const rows = Math.max(1, Math.floor((logoCssHeight * dpr) / pitch))
   const raster = document.createElement('canvas')
@@ -231,8 +242,8 @@ function createParticleSystem(
   const lit: number[] = []
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      const a = pixels[(y * cols + x) * 4 + 3]
-      if (a > 115) lit.push(x, y, 1)
+      const alpha = pixels[(y * cols + x) * 4 + 3] / 255
+      if (alpha > 0) lit.push(x, y, alpha)
     }
   }
   const litCount = lit.length / 3
@@ -241,7 +252,8 @@ function createParticleSystem(
   if (count === 0) return null
   const simSize = Math.ceil(Math.sqrt(count))
 
-  const pointSize = Math.max(1, pitch - 1)
+  // Fill the full grid cell at rest. The shader shrinks it only while moving.
+  const pointSize = pitch
   // Snap resting squares so their edges fall between fragment centers —
   // otherwise sub-pixel residuals randomly flip cells by a pixel.
   const snap = (v: number) =>

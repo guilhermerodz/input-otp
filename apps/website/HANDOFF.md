@@ -58,16 +58,17 @@ a high-fidelity take on basement.studio's Vercel Ship particle effect
 
 How it works:
 
-- The wordmark image is rasterized offscreen and sampled on a **coarse grid**
-  into particle "home" positions — one square sprite per grid cell — so the
-  individual rects read like the Ship effect (not a dense dot cloud).
+- The wordmark image is rasterized offscreen at **device-pixel resolution**
+  into particle "home" positions. Samples retain the source alpha, so the
+  settled canvas matches the antialiased wordmark; the individual particles
+  reveal themselves only while moving.
 - A low-res ping-pong **flow FBO** encodes direction-to-cursor (RG) and
   magnitude (B), fading each frame → cursor inertia, not 1:1 tracking.
 - A ping-pong **RGBA32F position/velocity FBO** integrates: flow-field
   **repulsion** (particles flee the cursor), a spring back to home, and
   damping. Draws as additive point sprites via `gl_VertexID` (no buffers).
-- Resting home positions are **pixel-snapped** so the grid rasterizes cleanly;
-  cells are binary (full-brightness or dropped) rather than anti-aliased.
+- Resting home positions are **pixel-snapped** so the texture rasterizes
+  cleanly without seams or subpixel shimmer.
 
 Design decisions worth knowing before you touch it:
 
@@ -85,8 +86,8 @@ Design decisions worth knowing before you touch it:
   **falls back to the static `<img>`** if WebGL2 / float render targets are
   unavailable or the image isn't canvas-readable (must be same-origin/CORS).
 
-Tunable constants at the top of the file: `GRID_CSS` (cell pitch — bigger =
-chunkier), `FLOW_RADIUS_CSS`, `FORCE`, `SPRING`, `DAMPING`.
+Tunable constants at the top of the file: `FLOW_RADIUS_CSS`, `FORCE`,
+`SPRING`, `DAMPING`.
 
 ## State of the branch
 
