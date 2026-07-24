@@ -1,4 +1,4 @@
-import { Anatomy } from './_components/anatomy'
+import { StoryIso } from './_components/story-iso'
 import { StyleGallery } from './_components/gallery'
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
@@ -589,7 +589,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             its state. Keep scrolling<span style={{ color: '#3f3f46' }}>_</span>
           </div>
         </div>
-        <Anatomy />
+        <StoryIso />
       </section>
 
       {/* Style gallery */}

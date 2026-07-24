@@ -41,9 +41,9 @@ export const SENTENCES: React.ReactNode[] = [
 
 export const SLOT_W = 46
 export const SLOT_GAP = 10
-const CHAR_W = 12
+export const CHAR_W = 12
 export const STAGE_W = 6 * SLOT_W + 5 * SLOT_GAP
-const DEMO_VALUE = '141952'
+export const DEMO_VALUE = '141952'
 
 function seg(p: number, a: number, b: number) {
   return Math.min(1, Math.max(0, (p - a) / (b - a)))
@@ -99,6 +99,19 @@ export function useStoryScrub(
         s.setProperty(`--a${j}`, easeOut(at).toFixed(4))
       }
 
+      // Isometric choreography: plain->iso tilt, left->center->right
+      // travel, and exploded layer separation that collapses again as the
+      // quirks are absorbed.
+      const tilt =
+        easeInOut(seg(p, 0.16, 0.245)) * (1 - easeInOut(seg(p, 0.845, 0.92)))
+      const posx =
+        -1 + easeInOut(seg(p, 0.13, 0.255)) + easeInOut(seg(p, 0.845, 0.93))
+      const explode =
+        easeInOut(seg(p, 0.29, 0.36)) * (1 - easeInOut(seg(p, 0.72, 0.8)))
+      s.setProperty('--tilt', tilt.toFixed(4))
+      s.setProperty('--posx', posx.toFixed(4))
+      s.setProperty('--explode', explode.toFixed(4))
+
       // Beat 4: a selection sweeps across the slots and recedes.
       s.setProperty('--selw', easeInOut(seg(p, 0.585, 0.665)).toFixed(4))
       s.setProperty(
@@ -138,14 +151,14 @@ export function useStoryScrub(
   return step
 }
 
-const ATTRS = [
+export const ATTRS = [
   { code: 'autoComplete="one-time-code"', note: 'one-tap SMS codes' },
   { code: 'inputMode="numeric"', note: 'the right mobile keyboard' },
   { code: 'clipPath="inset(0 40px 0 0)"', note: 'dodges password-manager badges' },
   { code: 'WebkitTextFillColor="transparent"', note: 'WebKit has opinions' },
 ] as const
 
-function FakeCaret() {
+export function FakeCaret() {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center motion-safe:animate-caret-blink">
       <div className="h-6 w-px bg-white" />
@@ -154,7 +167,7 @@ function FakeCaret() {
 }
 
 /** Hand-drawn note that appears while its beat runs (gated by --sg). */
-function Note({
+export function Note({
   seg: segVar,
   first,
   className,
@@ -179,7 +192,7 @@ function Note({
   )
 }
 
-function Arrow({
+export function Arrow({
   d,
   head,
   className,

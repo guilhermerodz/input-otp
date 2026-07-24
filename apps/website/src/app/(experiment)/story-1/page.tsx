@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { StoryV1 } from '../_components/story-v1'
+
+export const metadata: Metadata = { robots: { index: false } }
 
 export default function Page() {
   return (

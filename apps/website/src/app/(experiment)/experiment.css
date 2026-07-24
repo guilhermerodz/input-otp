@@ -477,6 +477,34 @@ html {
   }
 }
 
+/* Isometric story stage --------------------------------------------------
+   --tilt (0 flat, 1 isometric), --explode (layer separation) are written
+   per scroll frame by the shared scrub. No perspective on purpose: the
+   projection stays orthographic, like a technical drawing. */
+.xp-iso-board {
+  transform: rotateX(calc(var(--tilt, 0) * 55deg))
+    rotateZ(calc(var(--tilt, 0) * -45deg));
+  transform-style: preserve-3d;
+}
+
+.xp-iso-plane {
+  transform: translateZ(calc(var(--explode, 0) * 88px));
+}
+
+/* A character riding the input plane until its beat drops it into the
+   slot layer: x eases home->slot with --ft, z falls from the plane's
+   altitude to the board as the same --ft completes. */
+.xp-iso-flyer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: calc(1 - var(--boom, 0));
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--home) + var(--ft, 0) * var(--dx)))
+    translateZ(calc(var(--explode, 0) * (1 - var(--ft, 0)) * 88px));
+  will-change: transform;
+}
+
 /* Highlighter sweep for the chalk-talk story variant: the pen drags
    across the current sentence, driven by --hl. */
 .xp-hl {
