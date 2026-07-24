@@ -248,10 +248,10 @@ export function IsoStage({ live }: { live: boolean }) {
               one selection — every layer follows
               <Arrow
                 seg="--seg4"
-                viewBox="0 0 20 30"
-                className="left-[40px] top-[calc(100%+3px)] h-[30px] w-[20px]"
-                d="M10 2 C 8 10, 10 18, 10 26"
-                head="M5.5 21.5 L10 26 M14.5 21.5 L10 26"
+                viewBox="0 0 95 65"
+                className="left-[40px] top-[calc(100%+3px)] h-[65px] w-[95px]"
+                d="M10 2 C 4 32, 28 56, 82 58"
+                head="M73 53.5 L82 58 M74.5 63 L82 58"
               />
             </Note>
 
