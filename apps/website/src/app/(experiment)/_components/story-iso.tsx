@@ -135,7 +135,7 @@ export function IsoStage({ live }: { live: boolean }) {
               <div
                 className="absolute inset-y-2.5 left-2.5 rounded-lg border border-white/30 bg-white/15"
                 style={{
-                  width: 'calc(var(--selw, 0) * 100%)',
+                  width: 'calc(var(--selw, 0) * (100% - 20px))',
                   opacity: 'var(--selo, 0)',
                 }}
               />
@@ -182,32 +182,12 @@ export function IsoStage({ live }: { live: boolean }) {
             </div>
           </div>
 
-          {/* Boom: a hand-drawn ring around the landed component. */}
-          <svg
-            aria-hidden
-            className="pointer-events-none absolute -inset-7 text-white/70"
-            viewBox="0 0 100 40"
-            preserveAspectRatio="none"
-            fill="none"
-            style={{ '--sg': 'var(--seg6)' } as React.CSSProperties}
-          >
-            <path
-              className="anatomy-draw"
-              pathLength={1}
-              d="M50 3 C 88 2, 99 10, 98 20 C 97 32, 76 38, 49 37.5 C 18 37, 2 30, 2.5 19 C 3 8, 22 3.5, 44 3.2"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-
           {/* Hand-written margin notes, one per beat. */}
           <div aria-hidden className="pointer-events-none absolute inset-0">
             <Note
               seg="--seg0"
               first
-              className="bottom-[calc(100%+40px)] left-[-20px] w-[300px] -rotate-2"
+              className="bottom-[calc(100%+40px)] left-[-20px] w-max max-w-[300px] -rotate-2"
             >
               one real HTML input — paint and all
               <Arrow
@@ -220,7 +200,7 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg1"
-              className="bottom-[calc(100%+44px)] right-[-30px] w-[320px] rotate-[1.5deg] text-right"
+              className="bottom-[calc(100%+44px)] right-[-30px] w-max max-w-[320px] rotate-[1.5deg]"
             >
               paint gone — tilt it, it never left
               <Arrow
@@ -233,7 +213,7 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg2"
-              className="left-1/2 top-[calc(100%+64px)] w-[320px] -translate-x-1/2 -rotate-1 text-center"
+              className="left-1/2 top-[calc(100%+64px)] w-max max-w-[320px] -translate-x-1/2 -rotate-1 text-center"
             >
               the slots live on a layer of their own
               <Arrow
@@ -246,7 +226,7 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg3"
-              className="bottom-[calc(100%+58px)] left-1/2 w-[320px] -translate-x-1/2 -rotate-1 text-center"
+              className="bottom-[calc(100%+58px)] left-1/2 w-max max-w-[320px] -translate-x-1/2 -rotate-1 text-center"
             >
               the hidden value drops into the slots
               <Arrow
@@ -259,7 +239,7 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg4"
-              className="bottom-[calc(100%+58px)] right-[-24px] w-[320px] rotate-1 text-right"
+              className="bottom-[calc(100%+58px)] right-[-24px] w-max max-w-[320px] rotate-1"
             >
               one selection — every layer follows
               <Arrow
@@ -272,7 +252,7 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg6"
-              className="bottom-[calc(100%+40px)] left-1/2 w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
+              className="bottom-[calc(100%+40px)] left-1/2 w-max max-w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
             >
               flat again — and live. type!
               <Arrow
@@ -287,10 +267,10 @@ export function IsoStage({ live }: { live: boolean }) {
       </div>
 
       {/* Compat props typing on, then swapping for the live readout. */}
-      <div className="relative mt-2 h-32 w-full max-w-[27rem] font-mono text-xs leading-[1.9]">
+      <div className="relative mt-2 h-40 w-full max-w-[27rem] font-mono text-xs leading-[1.9]">
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0"
+          className="absolute inset-x-0 top-[46px]"
           style={{ opacity: 'calc(1 - var(--aout, 0))' }}
         >
           {ATTRS.map((attr, j) => (
@@ -306,7 +286,7 @@ export function IsoStage({ live }: { live: boolean }) {
             </div>
           ))}
         </div>
-        <Note seg="--seg5" className="left-0.5 top-[97px] -rotate-1">
+        <Note seg="--seg5" className="left-0.5 top-0 -rotate-1">
           countless hours of DX, so you never think about this
         </Note>
         <div
@@ -349,7 +329,17 @@ export function StoryIso() {
           ref={sceneRef}
           className="mx-auto grid w-full max-w-5xl items-center gap-y-10 px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-16"
         >
-          <div className="flex flex-col gap-5 lg:gap-7">
+          <div className="flex gap-6">
+            <div
+              aria-hidden
+              className="relative w-[3px] self-stretch overflow-hidden rounded-full bg-white/10"
+            >
+              <div
+                className="absolute inset-0 origin-top rounded-full bg-white/60"
+                style={{ transform: 'scaleY(var(--prog, 0))' }}
+              />
+            </div>
+            <div className="flex flex-col gap-5 lg:gap-7">
             {SENTENCES.map((sentence, i) => (
               <p
                 key={i}
@@ -359,6 +349,7 @@ export function StoryIso() {
                 {sentence}
               </p>
             ))}
+            </div>
           </div>
 
           <div className="min-w-[420px] max-lg:min-w-0">

@@ -95,9 +95,11 @@ export function useStoryScrub(
         s.setProperty(`--f${i}`, easeInOut(fly).toFixed(4))
       }
       for (let j = 0; j < 4; j++) {
-        const at = seg(p, 0.725 + j * 0.028, 0.775 + j * 0.028)
+        // The "countless hours" note leads beat 5; the props follow it.
+        const at = seg(p, 0.762 + j * 0.022, 0.802 + j * 0.022)
         s.setProperty(`--a${j}`, easeOut(at).toFixed(4))
       }
+      s.setProperty('--prog', p.toFixed(4))
 
       // Isometric choreography: plain->iso tilt, left->center->right
       // travel, and exploded layer separation that collapses again as the
@@ -166,21 +168,28 @@ export function FakeCaret() {
   )
 }
 
-/** Hand-drawn note that appears while its beat runs (gated by --sg). */
+/** Hand-drawn note that appears while its beat runs (gated by --sg).
+ *  Renders as a dark, blurred chip for legibility; `plain` skips the
+ *  panel for notes that are mostly drawing. */
 export function Note({
   seg: segVar,
   first,
+  plain,
   className,
   children,
 }: React.PropsWithChildren<{
   seg: string
   first?: boolean
+  plain?: boolean
   className?: string
 }>) {
   return (
     <div
       className={cn(
-        'anatomy-note pointer-events-none absolute text-[1.02rem] leading-snug text-white/90',
+        'anatomy-note pointer-events-none absolute',
+        plain
+          ? 'text-[1.02rem] leading-snug text-white/90'
+          : 'xp-note-chip',
         first && 'anatomy-note-first',
         fontHand.className,
         className,
@@ -360,26 +369,6 @@ export function StoryStage({ live }: { live: boolean }) {
           </span>
         </div>
 
-        {/* Boom: a hand-drawn ring celebrates the finished component. */}
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute -inset-7 text-white/70"
-          viewBox="0 0 100 40"
-          preserveAspectRatio="none"
-          fill="none"
-          style={{ '--sg': 'var(--seg6)' } as React.CSSProperties}
-        >
-          <path
-            className="anatomy-draw"
-            pathLength={1}
-            d="M50 3 C 88 2, 99 10, 98 20 C 97 32, 76 38, 49 37.5 C 18 37, 2 30, 2.5 19 C 3 8, 22 3.5, 44 3.2"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-
         {/* Hand-written margin notes, one per beat. */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <Note
@@ -409,7 +398,7 @@ export function StoryStage({ live }: { live: boolean }) {
             />
           </Note>
 
-          <Note seg="--seg2" className="inset-x-0 top-[calc(100%+10px)]">
+          <Note seg="--seg2" plain className="inset-x-0 top-[calc(100%+10px)]">
             <svg
               className="mx-auto block"
               width={STAGE_W}

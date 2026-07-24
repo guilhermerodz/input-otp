@@ -477,6 +477,20 @@ html {
   }
 }
 
+/* Hand-written note chip: optical legibility over the illustration —
+   generous tracking, a dark blurred panel, and breathing room. */
+.xp-note-chip {
+  padding: 7px 14px 8px;
+  border-radius: 12px;
+  background: rgba(5, 5, 7, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  font-size: 1.06rem;
+  letter-spacing: 0.025em;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.95);
+}
+
 /* Isometric story stage --------------------------------------------------
    --tilt (0 flat, 1 isometric), --explode (layer separation) are written
    per scroll frame by the shared scrub. No perspective on purpose: the
