@@ -257,13 +257,13 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg6"
-              className="top-[-63px] left-1/2 w-max max-w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
+              className="top-[27px] left-1/2 w-max max-w-[300px] -translate-x-1/2 rotate-[-1.5deg] text-center"
             >
               flat again — and live. type!
               <Arrow
                 seg="--seg6"
                 viewBox="0 0 20 22"
-                className="left-1/2 top-[calc(100%+57px)] h-[22px] w-[20px] -translate-x-1/2"
+                className="left-1/2 top-[calc(100%+7px)] h-[22px] w-[20px] -translate-x-1/2"
                 d="M10 2 C 8 8, 10 13, 10 18"
                 head="M5.5 14 L10 18 M14.5 14 L10 18"
               />
@@ -281,7 +281,7 @@ export function IsoStage({ live }: { live: boolean }) {
       >
         <div
           aria-hidden
-          className="absolute inset-x-0 top-[46px]"
+          className="absolute inset-x-0 top-[-4px]"
           style={{ opacity: 'calc(1 - var(--aout, 0))' }}
         >
           {ATTRS.map((attr, j) => (
@@ -297,12 +297,12 @@ export function IsoStage({ live }: { live: boolean }) {
             </div>
           ))}
         </div>
-        <Note seg="--seg5" className="left-0.5 top-0 -rotate-1">
+        <Note seg="--seg5" className="left-0.5 top-[-60px] -rotate-1">
           countless hours of DX, so you never think about this
         </Note>
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0"
+          className="absolute inset-x-0 top-[-50px]"
           style={{ opacity: 'var(--rin, 0)' }}
         >
           <div className="text-white/50">{'// the hidden <input>, live'}</div>
