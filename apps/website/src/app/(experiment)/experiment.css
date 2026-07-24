@@ -477,6 +477,20 @@ html {
   }
 }
 
+/* Highlighter sweep for the chalk-talk story variant: the pen drags
+   across the current sentence, driven by --hl. */
+.xp-hl {
+  background-image: linear-gradient(
+    rgba(52, 211, 153, 0.16),
+    rgba(52, 211, 153, 0.16)
+  );
+  background-repeat: no-repeat;
+  background-size: calc(var(--hl, 0) * 102%) 100%;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 /* Keyboard keys in the tour. */
 .xp-kbd {
   display: inline-grid;
