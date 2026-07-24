@@ -446,6 +446,68 @@ body {
   box-shadow: 0 0 0 1px #ef4444;
 }
 
+.xp-slot--success {
+  border-color: #34d39999;
+}
+
+/* Success: a softer, vertical nod — the input agreeing with you. */
+.xp-otp-bounce {
+  animation: xp-otp-bounce 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes xp-otp-bounce {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+  72% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Keyboard keys in the tour. */
+.xp-kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  margin: 0 2px;
+  border: 1px solid #3f3f46;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: #18181b;
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e4e4e7;
+  vertical-align: middle;
+}
+
+/* Status/tour copy fades in softly on every change. */
+.xp-fade-text {
+  animation: xp-fade-text 0.5s ease both;
+}
+
+@keyframes xp-fade-text {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Wrong-code shake, the classic form-error gesture. */
 .xp-otp-shake {
   animation: xp-otp-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;

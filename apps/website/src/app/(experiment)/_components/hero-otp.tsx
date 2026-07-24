@@ -1,13 +1,22 @@
 'use client'
 
 import * as React from 'react'
-import { OTPInput, REGEXP_ONLY_DIGITS, type SlotProps } from 'input-otp'
+import {
+  OTPInput,
+  REGEXP_ONLY_DIGITS_AND_CHARS,
+  type SlotProps,
+} from 'input-otp'
 
 const CORRECT = '123456'
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return <kbd className="xp-kbd">{children}</kbd>
+}
 
 function Slot(
   props: SlotProps & {
     error: boolean
+    success: boolean
     staticActive: boolean
     slotRef: (el: HTMLDivElement | null) => void
   },
@@ -17,7 +26,7 @@ function Slot(
       ref={props.slotRef}
       className={`xp-slot ${props.staticActive ? 'xp-slot--active' : ''} ${
         props.error ? 'xp-slot--error' : ''
-      }`}
+      } ${props.success ? 'xp-slot--success' : ''}`}
     >
       {props.char !== null && (
         // Keyed on the char so every new digit replays the slide-in
@@ -60,19 +69,24 @@ type Ring = {
   snap: boolean
 }
 
+type Mode = 'play' | 'success' | 'tutorial'
+
 export function HeroOtp() {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const wrapRef = React.useRef<HTMLDivElement>(null)
   const slotRefs = React.useRef<(HTMLDivElement | null)[]>([])
   const hintTimers = React.useRef<ReturnType<typeof setTimeout>[]>([])
   const [value, setValue] = React.useState('')
-  const [done, setDone] = React.useState(false)
+  const [mode, setMode] = React.useState<Mode>('play')
+  const [step, setStep] = React.useState(0)
   const [error, setError] = React.useState(false)
   // Locked from mount: the input cannot be focused or edited until the
   // hint hands the caret over — nothing shows as active before the
   // user's turn.
   const [locked, setLocked] = React.useState(true)
   const [active, setActive] = React.useState<number[]>([])
+  const [isMobile, setIsMobile] = React.useState(false)
+  const [isMac, setIsMac] = React.useState(true)
   const [ring, setRing] = React.useState<Ring>({
     x: 0,
     y: 0,
@@ -86,6 +100,11 @@ export function HeroOtp() {
   valueRef.current = value
   const activeRef = React.useRef(active)
   activeRef.current = active
+
+  React.useEffect(() => {
+    setIsMobile(window.matchMedia('(pointer: coarse)').matches)
+    setIsMac(/Mac/i.test(navigator.platform))
+  }, [])
 
   /* The focus ring is one element gliding between slots (Luxe's shared
      indicator), measured off the real slot boxes so it survives the
@@ -173,36 +192,103 @@ export function HeroOtp() {
     runHint(850)
   }
 
+  // Correct code: green vertical bounce, then hand the stage to the tour
+  // and disarm the input — from here on nothing is right or wrong.
+  const succeed = () => {
+    setMode('success')
+    at(1300, () => setMode('tutorial'))
+  }
+
+  /* ————— The tour ————— */
+
+  const modK = isMac ? '⌘' : 'Ctrl'
+
+  const steps: React.ReactNode[] = isMobile
+    ? [
+        <>long-press the code and tap Select All</>,
+        <>now use the menu to cut, copy or paste — every slot follows</>,
+      ]
+    : [
+        <>
+          press <Kbd>{modK}</Kbd>
+          <Kbd>A</Kbd> to select every slot
+        </>,
+        <>
+          hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd>
+          <Kbd>→</Kbd> and watch the selection grow slot by slot
+        </>,
+        <>
+          now cut, copy or paste it — <Kbd>{modK}</Kbd>
+          <Kbd>X</Kbd> / <Kbd>{modK}</Kbd>
+          <Kbd>C</Kbd> / <Kbd>{modK}</Kbd>
+          <Kbd>V</Kbd>
+        </>,
+      ]
+  const clipStep = isMobile ? 1 : 2
+  const finished = step >= steps.length
+
+  // Selection-driven steps advance when the user actually does the thing.
+  React.useEffect(() => {
+    if (mode !== 'tutorial') return
+    if (step === 0 && active.length === 6) {
+      setStep(1)
+    } else if (
+      !isMobile &&
+      step === 1 &&
+      active.length >= 2 &&
+      active.length < 6
+    ) {
+      setStep(2)
+    }
+  }, [active, mode, step, isMobile])
+
+  const onClipboard = () => {
+    if (mode === 'tutorial' && step === clipStep) {
+      setStep(steps.length)
+    }
+  }
+
+  const success = mode === 'success'
   const multi = active.length > 1
 
   return (
     <>
-      <div ref={wrapRef} style={{ position: 'relative' }}>
+      <div
+        ref={wrapRef}
+        style={{ position: 'relative' }}
+        onCutCapture={onClipboard}
+        onCopyCapture={onClipboard}
+        onPasteCapture={onClipboard}
+      >
         <OTPInput
           ref={inputRef}
           value={value}
           disabled={locked}
           onChange={v => {
             // A real keystroke or paste takes over from any pending hint.
-            clearHint()
-            setLocked(false)
+            if (mode === 'play') {
+              clearHint()
+              setLocked(false)
+              setError(false)
+            }
             setValue(v)
-            setDone(false)
-            setError(false)
           }}
           onComplete={(v: string) => {
+            if (mode !== 'play') return
+            clearHint()
             if (v === CORRECT) {
-              setDone(true)
+              succeed()
             } else {
-              clearHint()
               failThenHint()
             }
           }}
           maxLength={6}
-          pattern={REGEXP_ONLY_DIGITS}
-          inputMode="numeric"
+          pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+          inputMode="text"
           autoComplete="one-time-code"
-          containerClassName={`xp-otp-container ${error ? 'xp-otp-shake' : ''}`}
+          containerClassName={`xp-otp-container ${
+            error ? 'xp-otp-shake' : ''
+          } ${success ? 'xp-otp-bounce' : ''}`}
           render={({ slots }) => (
             <>
               <ActiveProbe slots={slots} onChange={setActive} />
@@ -212,6 +298,7 @@ export function HeroOtp() {
                     key={idx}
                     {...slot}
                     error={error}
+                    success={success}
                     staticActive={slot.isActive && multi}
                     slotRef={el => {
                       slotRefs.current[idx] = el
@@ -226,6 +313,7 @@ export function HeroOtp() {
                     key={idx}
                     {...slot}
                     error={error}
+                    success={success}
                     staticActive={slot.isActive && multi}
                     slotRef={el => {
                       slotRefs.current[idx + 3] = el
@@ -248,7 +336,9 @@ export function HeroOtp() {
             height: ring.h,
             borderRadius: ring.radius,
             transform: `translate(${ring.x}px, ${ring.y}px)`,
-            boxShadow: `0 0 0 2px ${error ? '#ef4444' : '#fafafa'}`,
+            boxShadow: `0 0 0 2px ${
+              error ? '#ef4444' : success ? '#34d399' : '#fafafa'
+            }`,
             opacity: ring.visible ? 1 : 0,
             transition: ring.snap
               ? 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease'
@@ -257,17 +347,42 @@ export function HeroOtp() {
           }}
         />
       </div>
+
+      {/* Status line: error nudge → success → guided tour, all on fades */}
       <div
         style={{
-          height: 28,
+          minHeight: 36,
           display: 'grid',
           placeItems: 'center',
           fontSize: 14,
-          color: error ? '#f87171' : '#34d399',
+          textAlign: 'center',
+          padding: '4px 16px 0',
         }}
       >
-        {done && <span>✓ Code verified</span>}
-        {error && <span>✗ Wrong code</span>}
+        {mode === 'play' && error && (
+          <div key="err" className="xp-fade-text" style={{ color: '#f87171' }}>
+            not this one — psst, it starts with 1 2 …
+          </div>
+        )}
+        {mode === 'success' && (
+          <div key="ok" className="xp-fade-text" style={{ color: '#34d399' }}>
+            ✓ 123456 — you&apos;re in
+          </div>
+        )}
+        {mode === 'tutorial' && !finished && (
+          <div
+            key={`step-${step}`}
+            className="xp-fade-text"
+            style={{ color: '#a1a1aa' }}
+          >
+            {steps[step]}
+          </div>
+        )}
+        {mode === 'tutorial' && finished && (
+          <div key="fin" className="xp-fade-text" style={{ color: '#71717a' }}>
+            that&apos;s input-otp — one real input, wearing your design
+          </div>
+        )}
       </div>
     </>
   )
