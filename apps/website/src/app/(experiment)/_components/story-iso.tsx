@@ -243,13 +243,13 @@ export function IsoStage({ live }: { live: boolean }) {
 
             <Note
               seg="--seg4"
-              className="top-[-40px] right-[-20px] w-max max-w-[320px] rotate-1"
+              className="top-[-80px] right-[-5px] w-max max-w-[320px] rotate-1"
             >
               one selection — every layer follows
               <Arrow
                 seg="--seg4"
                 viewBox="0 0 20 30"
-                className="right-[40px] top-[calc(100%+3px)] h-[30px] w-[20px]"
+                className="left-[40px] top-[calc(100%+3px)] h-[30px] w-[20px]"
                 d="M10 2 C 8 10, 10 18, 10 26"
                 head="M5.5 21.5 L10 26 M14.5 21.5 L10 26"
               />
