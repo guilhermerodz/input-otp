@@ -206,7 +206,9 @@ export function HeroOtp() {
   const steps: React.ReactNode[] = isMobile
     ? [
         <>long-press the code and tap Select All</>,
-        <>now use the menu to cut, copy or paste — every slot follows</>,
+        <>tap Cut — the whole code lifts out</>,
+        <>long-press and Paste it back</>,
+        <>drag the handles around part of it, then cut or paste just that</>,
       ]
     : [
         <>
@@ -214,17 +216,26 @@ export function HeroOtp() {
           <Kbd>A</Kbd> to select every slot
         </>,
         <>
-          now hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd> — watch the selection grow
-          back slot by slot
+          cut it all — <Kbd>{modK}</Kbd>
+          <Kbd>X</Kbd>
         </>,
         <>
-          now cut, copy or paste it — <Kbd>{modK}</Kbd>
+          bring it back — <Kbd>{modK}</Kbd>
+          <Kbd>V</Kbd>
+        </>,
+        <>
+          hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd> — the selection grows slot by
+          slot
+        </>,
+        <>
+          now cut or paste just that slice — <Kbd>{modK}</Kbd>
           <Kbd>X</Kbd> / <Kbd>{modK}</Kbd>
-          <Kbd>C</Kbd> / <Kbd>{modK}</Kbd>
           <Kbd>V</Kbd>
         </>,
       ]
-  const clipStep = isMobile ? 1 : 2
+  const cutStep = 1
+  const pasteStep = 2
+  const sliceStep = isMobile ? 3 : 4
   const finished = step >= steps.length
 
   // Selection-driven steps advance when the user actually does the thing.
@@ -232,30 +243,28 @@ export function HeroOtp() {
     if (mode !== 'tutorial') return
     if (step === 0 && active.length === 6) {
       setStep(1)
-      // Select-all leaves nothing to grow, which made the next step a
-      // dead instruction. After a beat to admire the full selection, the
-      // tour parks the caret at the end so Shift+Left has room to work.
-      if (!isMobile) {
-        at(900, () => {
-          const el = inputRef.current
-          if (el && document.activeElement === el) {
-            const end = el.value.length
-            el.setSelectionRange(end, end)
-          }
-        })
-      }
     } else if (
       !isMobile &&
-      step === 1 &&
+      step === 3 &&
       active.length >= 2 &&
       active.length < 6
     ) {
-      setStep(2)
+      setStep(4)
     }
   }, [active, mode, step, isMobile])
 
-  const onClipboard = () => {
-    if (mode === 'tutorial' && step === clipStep) {
+  const onClip = (kind: 'cut' | 'copy' | 'paste') => {
+    if (mode !== 'tutorial') return
+    if (step === cutStep && kind === 'cut') {
+      setStep(pasteStep)
+    } else if (step === pasteStep && kind === 'paste') {
+      setStep(pasteStep + 1)
+    } else if (
+      step === sliceStep &&
+      (kind === 'cut' || kind === 'paste') &&
+      activeRef.current.length >= 2 &&
+      activeRef.current.length < 6
+    ) {
       setStep(steps.length)
     }
   }
@@ -268,9 +277,9 @@ export function HeroOtp() {
       <div
         ref={wrapRef}
         style={{ position: 'relative' }}
-        onCutCapture={onClipboard}
-        onCopyCapture={onClipboard}
-        onPasteCapture={onClipboard}
+        onCutCapture={() => onClip('cut')}
+        onCopyCapture={() => onClip('copy')}
+        onPasteCapture={() => onClip('paste')}
       >
         <OTPInput
           ref={inputRef}
@@ -391,8 +400,18 @@ export function HeroOtp() {
           </div>
         )}
         {mode === 'tutorial' && finished && (
-          <div key="fin" className="xp-fade-text" style={{ color: '#71717a' }}>
-            that&apos;s input-otp — one real input, wearing your design
+          <div key="fin" className="xp-fade-text" style={{ color: '#a1a1aa' }}>
+            that&apos;s input-otp!{' '}
+            <a
+              href="#how"
+              style={{
+                color: '#fafafa',
+                textDecoration: 'underline',
+                textUnderlineOffset: 4,
+              }}
+            >
+              I want to see how it works
+            </a>
           </div>
         )}
       </div>

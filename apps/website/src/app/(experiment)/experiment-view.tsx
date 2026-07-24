@@ -577,7 +577,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
       </section>
 
       {/* How I built it */}
-      <section style={{ padding: '56px 0 0', borderTop: border }}>
+      <section id="how" style={{ padding: '56px 0 0', borderTop: border }}>
         <div style={{ padding: '0 40px' }}>
           <h2
             style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}

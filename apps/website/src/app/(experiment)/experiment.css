@@ -12,6 +12,10 @@ body {
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .xp-body {
   background: #09090b;
   color: #fafafa;
