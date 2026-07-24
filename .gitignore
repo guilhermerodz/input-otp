@@ -14,6 +14,7 @@ playwright/.cache/
 
 # next.js
 .next/
+.next-dev/
 out/
 build
 next-env.d.ts
