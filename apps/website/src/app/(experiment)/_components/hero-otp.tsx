@@ -251,7 +251,7 @@ export function HeroOtp() {
             boxShadow: `0 0 0 2px ${error ? '#ef4444' : '#fafafa'}`,
             opacity: ring.visible ? 1 : 0,
             transition: ring.snap
-              ? 'opacity 0.12s ease, box-shadow 0.2s ease'
+              ? 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease'
               : 'transform 0.13s ease-in-out, opacity 0.12s ease, box-shadow 0.2s ease',
             pointerEvents: 'none',
           }}
