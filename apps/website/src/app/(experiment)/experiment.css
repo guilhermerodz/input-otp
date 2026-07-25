@@ -439,18 +439,22 @@ html {
 
    Every stop is translucent, so the page — and the motes field behind it —
    reads through the whole slot rather than only where a gradient runs out.
-   Alphas are picked against the page's #09090b: rgba(20,20,25,0.72) lands
-   near #111115 composited, a touch above the old flat #0c0c0e instead of
-   the #17171b that made the first pass read as lit. Nothing here composites
-   the backdrop (no blur, no filters) — these are plain paint. */
+   Nothing here composites the backdrop (no blur, no filters) — plain paint.
+
+   The numbers are chosen by what they composite to over the page's #09090b
+   (r=9), not by how they read on their own: rgba(18,18,23,0.6) lands at
+   0.6·18 + 0.4·9 ≈ 14, i.e. #0e0e12 — just above the old flat #0c0c0e, and
+   well under the #17171b of the first pass. Every ramp ends at or a little
+   below the page tone, so the top-to-bottom delta is ~5 levels: enough to
+   see the gradient, not enough to see a lit box. */
 
 /* Dim along the top edge, thinning out to nothing at the bottom. */
 [data-slot-bg='lift'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(20, 20, 25, 0.72) 0%,
-    rgba(17, 17, 22, 0.5) 45%,
-    rgba(17, 17, 22, 0) 100%
+    rgba(18, 18, 23, 0.6) 0%,
+    rgba(15, 15, 20, 0.34) 45%,
+    rgba(15, 15, 20, 0) 100%
   );
 }
 
@@ -458,19 +462,19 @@ html {
 [data-slot-bg='well'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(17, 17, 22, 0) 0%,
-    rgba(17, 17, 22, 0.5) 55%,
-    rgba(20, 20, 25, 0.72) 100%
+    rgba(15, 15, 20, 0) 0%,
+    rgba(15, 15, 20, 0.34) 55%,
+    rgba(18, 18, 23, 0.6) 100%
   );
 }
 
 /* An even veil: alpha holds, only the tint shifts — top sits above the page
-   tone, bottom settles onto it. The steadiest of the five. */
+   tone, bottom dips just under it. The steadiest of the five. */
 [data-slot-bg='sheet'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(21, 21, 26, 0.68) 0%,
-    rgba(10, 10, 13, 0.68) 100%
+    rgba(20, 20, 26, 0.5) 0%,
+    rgba(6, 6, 9, 0.5) 100%
   );
 }
 
@@ -478,11 +482,11 @@ html {
 [data-slot-bg='frost'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
       180deg,
-      rgba(221, 234, 254, 0.055) 0%,
-      rgba(221, 234, 254, 0.012) 58%,
+      rgba(221, 234, 254, 0.03) 0%,
+      rgba(221, 234, 254, 0.007) 58%,
       rgba(221, 234, 254, 0) 100%
     ),
-    rgba(11, 11, 15, 0.62);
+    rgba(11, 11, 16, 0.5);
 }
 
 /* Not a ramp but an edge: a hairline of specular on the top bevel, then the
@@ -490,10 +494,10 @@ html {
 [data-slot-bg='seam'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.055) 0%,
-    rgba(19, 19, 24, 0.62) 10%,
-    rgba(16, 16, 20, 0.38) 58%,
-    rgba(16, 16, 20, 0.1) 100%
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(17, 17, 22, 0.48) 10%,
+    rgba(14, 14, 19, 0.26) 58%,
+    rgba(14, 14, 19, 0.06) 100%
   );
 }
 
@@ -1686,45 +1690,49 @@ html {
   opacity: 1;
 }
 
-/* The package name in outline, sunk below the footer border and fading out
-   upward, so the letters rise from the border rather than sit behind the copy.
-   Nine characters, so it is never allowed to break. */
+/* The package name filled, sunk below the footer border, and taken over by the
+   particle shader once it is on screen (see ParticleWordmark). Nine
+   characters, so it is never allowed to break. The em here is the clamped
+   size, so how deep the letters sit scales with them. */
 .xp-cta-mark {
   position: absolute;
   left: 50%;
   bottom: -0.3em;
   translate: -50% 0;
   font-size: clamp(52px, 13.2vw, 158px);
-  font-weight: 700;
-  letter-spacing: -0.05em;
   line-height: 1;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1px #2c2c33;
-  mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
   pointer-events: none;
   user-select: none;
 }
 
-/* The light already arrives from above, so the glow off the bottom border is
-   only here to lift the wordmark off it — not to be a second sun. */
-.xp-cta-glow {
+/* The DOM copy: what layout, no-JS and reduced motion get, and what the
+   canvas is measured against. A block with line-height 1, so its baseline is
+   predictable from the font metrics — an inline box would be sized by the
+   font instead, and the canvas would land in the wrong place. */
+.xp-cta-mark-text {
+  display: block;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  /* Matches MARK_ALPHA, which is what the particles are drawn at. */
+  color: rgba(255, 255, 255, 0.14);
+  transition: opacity 250ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-text {
+  opacity: 0;
+}
+
+/* Positioned from the measured ink box, so the two copies sit on top of each
+   other and the handover doesn't move the letters. */
+.xp-cta-mark-canvas {
   position: absolute;
-  left: 50%;
-  bottom: -170px;
-  translate: -50% 0;
-  width: 130%;
-  height: 360px;
-  background: radial-gradient(
-    ellipse 50% 50% at 50% 50%,
-    rgba(200, 222, 255, 0.36),
-    rgba(140, 170, 255, 0.13) 45%,
-    transparent 72%
-  );
-  filter: blur(6px);
-  opacity: 0.55;
-  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-canvas {
+  opacity: 1;
 }
 
 /* The border itself, with a light running the length of it. */
