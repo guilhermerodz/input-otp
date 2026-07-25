@@ -9,30 +9,45 @@ import { createPortal } from 'react-dom'
    itself never moves, so the section can sit under the hero without competing
    with it, and a logo is never a moving target to click. */
 
+/* Nine marks drawn to nine different specs, set on one line: sizing them by
+   eye leaves the row uneven and — because the tallest logo on screen decides
+   how tall the row is — makes it change height every time one swaps. So they
+   are normalized instead, in two steps.
+
+   One: every file's viewBox is trimmed to its own ink, so a logo's height is
+   the height of the shape rather than of whatever artboard it shipped in, and
+   the gap to the wordmark is measured from the shape too.
+
+   Two: `scale` corrects what equal height still gets wrong. A solid blob at
+   40px reads bigger than an outlined circle at 40px, and a narrow leaf reads
+   smaller than either. Each number is 1/(density × aspect)^0.175 against the
+   set's average — mostly matching height, partly matching ink — so a heavy
+   mark is set a little smaller and a sparse one a little larger. Recompute it
+   if a logo is added or replaced; the exponent is the only taste in it. */
 const COMPANIES = [
   {
     name: 'Vercel',
     src: '/logos/vercel.svg',
-    height: 15,
+    scale: 0.96,
     href: 'https://vercel.com',
   },
-  { name: 'xAI', src: '/logos/xai.svg', height: 18, href: 'https://x.ai' },
+  { name: 'xAI', src: '/logos/xai.svg', scale: 1.01, href: 'https://x.ai' },
   {
     name: 'Lovable',
     src: '/logos/lovable.svg',
-    height: 19,
+    scale: 0.92,
     href: 'https://lovable.dev',
   },
   {
     name: 'ElevenLabs',
     src: '/logos/elevenlabs.svg',
-    height: 17,
+    scale: 1.02,
     href: 'https://elevenlabs.io',
   },
   {
     name: 'Sanity',
     src: '/logos/sanity.svg',
-    height: 18,
+    scale: 0.96,
     href: 'https://www.sanity.io',
   },
   // Clerk and Resend sponsor the library, so they get their tracked links here
@@ -40,25 +55,25 @@ const COMPANIES = [
   {
     name: 'Clerk',
     src: '/logos/clerk.svg',
-    height: 19,
+    scale: 1.02,
     href: 'https://go.clerk.com/input-otp',
   },
   {
     name: 'Resend',
     src: '/logos/resend.svg',
-    height: 17,
+    scale: 1.02,
     href: 'https://go.resend.com/input-otp',
   },
   {
     name: 'Cluely',
     src: '/logos/cluely.svg',
-    height: 20,
+    scale: 0.99,
     href: 'https://cluely.com',
   },
   {
     name: 'MongoDB',
     src: '/logos/mongodb.svg',
-    height: 21,
+    scale: 1.1,
     href: 'https://www.mongodb.com',
   },
 ] as const
@@ -86,45 +101,65 @@ const shotFor = (src: string) =>
 const SHOT_OFFSET = 22
 const SHOT_PAD = 12
 
+const scramble = (name: string) =>
+  Array.from(name, () =>
+    NOISE.charAt(Math.floor(Math.random() * NOISE.length)),
+  ).join('')
+
+function Mark({ company }: { company: (typeof COMPANIES)[number] }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      className="xp-usedby-mark"
+      src={company.src}
+      alt=""
+      style={{ '--mark-scale': company.scale } as React.CSSProperties}
+    />
+  )
+}
+
 function Lockup({ company }: { company: (typeof COMPANIES)[number] }) {
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="xp-usedby-mark"
-        src={company.src}
-        alt=""
-        style={{ '--mark-h': `${company.height}px` } as React.CSSProperties}
-      />
+      <Mark company={company} />
       <span className="xp-usedby-name">{company.name}</span>
     </>
   )
 }
 
 /* The name dissolves into junk for the length of the tear, then resolves as
-   the real one — the swap reads as a decode rather than a cut. */
+   the real one — the swap reads as a decode rather than a cut.
+
+   The junk rides over the real name rather than replacing it. Mono junk sets
+   wider than the name it stands in for, and in the flow that width would
+   widen the column mid-tear; the old fix was to set it smaller, which is why
+   a name looked like it shrank and grew back every time one swapped. Out of
+   the flow it can be set at full size — where the mono face's caps land on
+   Inter's, so nothing changes size — and only has to be squeezed enough (see
+   the CSS) to stay off its neighbours. */
 function ScrambledName({ name, active }: { name: string; active: boolean }) {
-  const [text, setText] = useState(name)
+  /* Seeded rather than empty: the interval below cannot run until after the
+     first painted frame of a tear, and that frame should already be junk. */
+  const [text, setText] = useState(() => scramble(name))
 
   useEffect(() => {
-    if (!active) {
-      setText(name)
-      return
-    }
-    const roll = () =>
-      setText(
-        Array.from(name, () =>
-          NOISE.charAt(Math.floor(Math.random() * NOISE.length)),
-        ).join(''),
-      )
+    if (!active) return
+    const roll = () => setText(scramble(name))
     roll()
     const id = setInterval(roll, 55)
     return () => clearInterval(id)
   }, [active, name])
 
   return (
-    <span className={`xp-usedby-name${active ? ' xp-usedby-name--junk' : ''}`}>
-      {text}
+    <span className="xp-usedby-name">
+      <span className={active ? 'xp-usedby-name-under' : undefined}>
+        {name}
+      </span>
+      {active ? (
+        <span className="xp-usedby-name-junk" aria-hidden="true">
+          {text}
+        </span>
+      ) : null}
     </span>
   )
 }
@@ -380,17 +415,7 @@ export function UsedByMarquee() {
                 <span
                   className={`xp-usedby-lockup${torn ? ' xp-usedby-tear' : ''}`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="xp-usedby-mark"
-                    src={company.src}
-                    alt=""
-                    style={
-                      {
-                        '--mark-h': `${company.height}px`,
-                      } as React.CSSProperties
-                    }
-                  />
+                  <Mark company={company} />
                   <ScrambledName name={company.name} active={torn} />
                 </span>
               </a>

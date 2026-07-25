@@ -1046,6 +1046,12 @@ html {
   align-items: center;
   column-gap: 30px;
   padding: 0 24px;
+  /* The height every mark is normalized to, and the line they are all set on.
+     The line is the taller of the two on purpose: a mark is centred in it and
+     is free to overflow it, so the row keeps one height no matter which three
+     logos are on screen — including any added later. */
+  --usedby-mark: 38px;
+  --usedby-line: 46px;
 }
 
 .xp-usedby-cell {
@@ -1091,11 +1097,15 @@ html {
   display: flex;
   align-items: center;
   gap: 16px;
+  height: var(--usedby-line);
 }
 
+/* Both viewBox and scale are per logo — see the component. The gap above is
+   from ink to ink, since the box is the ink. */
 .xp-usedby-mark {
-  height: calc(var(--mark-h) * 2.4);
+  height: calc(var(--usedby-mark) * var(--mark-scale, 1));
   width: auto;
+  flex: none;
 }
 
 /* Scoped through the row so these win over the page-wide `.xp a:hover`. */
@@ -1117,6 +1127,7 @@ html {
 }
 
 .xp-usedby-name {
+  position: relative;
   font-size: 30px;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -1217,12 +1228,24 @@ html {
   }
 }
 
-/* Junk is set in the mono face at the ratio where its fixed advance lands on
-   Inter's average one, so a name dissolving cannot swell past its column. */
-.xp-usedby-name--junk {
+/* The real name stays in the flow, holding the width, while the junk lies over
+   it. Not `display: none` on the name: it is what the column is measured
+   against, and what a screen reader gets to keep. */
+.xp-usedby-name-under {
+  visibility: hidden;
+}
+
+/* Full size, because JetBrains Mono's capitals are the same height as Inter's:
+   the tear now changes the letters without changing how big they look. Only
+   the width is touched — mono sets a name about a fifth wider, and scaleX
+   takes that back without touching the caps, which font-size could not do. */
+.xp-usedby-name-junk {
+  position: absolute;
+  top: 0;
+  left: 50%;
   font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
-  font-size: 0.88em;
   letter-spacing: 0;
+  transform: translateX(-50%) scaleX(0.9);
 }
 
 /* Stepped, never eased: the tear should read as dropped frames, not motion.
@@ -1295,14 +1318,12 @@ html {
   .xp-usedby-row {
     column-gap: 12px;
     padding: 0 12px;
+    --usedby-mark: 22px;
+    --usedby-line: 28px;
   }
 
   .xp-usedby-lockup {
     gap: 8px;
-  }
-
-  .xp-usedby-mark {
-    height: calc(var(--mark-h) * 1.5);
   }
 
   .xp-usedby-name {
