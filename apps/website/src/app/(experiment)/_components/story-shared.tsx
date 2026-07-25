@@ -19,24 +19,25 @@ export const SENTENCES: React.ReactNode[] = [
     <code className="rounded bg-white/10 px-1.5 font-mono text-[0.82em]">
       &lt;input&gt;
     </code>{' '}
-    — not six divs faking it.
+    — not six inputs faking it.
   </>,
   <>
-    Then I stripped its paint. It&apos;s still there — the dashed line is its
-    footprint.
+    Then I made it transparent. It&apos;s still there: the dashed line is where
+    it sits.
   </>,
   <>I drew my own slots. Six plain divs, pure presentation.</>,
   <>
     The value is mirrored — each slot shows one character of the hidden text.
   </>,
   <>
-    Caret, selection, copy-paste — still native. The slots just follow along.
+    I wrote an algorithm to always have an active selection. The slots just
+    follow along.
   </>,
   <>
-    Then I absorbed the quirks: SMS autofill, mobile keyboards, password-manager
+    I spent countless hours on SMS autofill, mobile keyboards, password-manager
     badges, WebKit&apos;s opinions.
   </>,
-  <>Boom — input-otp. Go ahead, type in it.</>,
+  <>That&apos;s input-otp. Type in it.</>,
 ]
 
 export const SLOT_W = 46
