@@ -213,6 +213,25 @@ export function HeroOtp() {
   const at = (ms: number, fn: () => void) =>
     hintTimers.current.push(setTimeout(fn, ms))
 
+  /**
+   * Whether the field is still worth handing the keyboard to.
+   *
+   * The hint lands about 1.7s after the intro clears, which is long enough
+   * for someone to have started reading further down the page. Focusing an
+   * input that has scrolled away pulls the whole page back up to it — and
+   * because the page scrolls smoothly, it does so as a long glide that
+   * reads like the site fighting you. It also hands the keyboard to a
+   * field the reader can no longer see, and on a phone opens the keyboard
+   * for it. Mostly-visible is the bar: a field peeking in at the edge is
+   * not one you want to start typing into.
+   */
+  const fieldOnScreen = () => {
+    const box = wrapRef.current?.getBoundingClientRect()
+    if (!box || box.height === 0) return false
+    const shown = Math.min(box.bottom, window.innerHeight) - Math.max(box.top, 0)
+    return shown >= box.height * 0.6
+  }
+
   // Suggest the right code: type 1, then 2 at a human pace, then unlock
   // and hand the caret over on the third slot. The input is disabled
   // while the ghost is typing so nobody can fight it for the keyboard.
@@ -223,7 +242,13 @@ export function HeroOtp() {
     })
     at(delay + 280, () => setValue('12'))
     at(delay + 760, () => setLocked(false))
-    at(delay + 800, () => inputRef.current?.focus())
+    at(delay + 800, () => {
+      if (!fieldOnScreen()) return
+      // preventScroll even when it is on screen: it may be only just
+      // inside the fold, and centring itself would still move the page
+      // under someone who never asked for the caret.
+      inputRef.current?.focus({ preventScroll: true })
+    })
   }
 
   // On load, once the intro curtain is gone, the hint plays by itself.
