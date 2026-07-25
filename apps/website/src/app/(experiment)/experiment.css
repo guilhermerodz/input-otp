@@ -771,21 +771,13 @@ html {
   );
 }
 
-/* Two identical belts, slid exactly half the track: the seam never shows. */
+/* Two identical belts. The offset is written here from the component, one belt
+   width per pass, so the seam never shows — see used-by-marquee.tsx for why the
+   travel is not a keyframe animation. */
 .xp-usedby-track {
   display: flex;
   width: max-content;
-  animation: xp-usedby-scroll 46s linear infinite;
-}
-
-.xp-usedby-band:hover .xp-usedby-track {
-  animation-play-state: paused;
-}
-
-@keyframes xp-usedby-scroll {
-  to {
-    transform: translateX(-50%);
-  }
+  will-change: transform;
 }
 
 .xp-usedby-belt {
@@ -812,13 +804,22 @@ html {
   transition: opacity 220ms ease;
 }
 
-.xp-usedby-item:hover {
+/* Scoped through the band so these win over the page-wide `.xp a:hover`. */
+.xp-usedby-band .xp-usedby-item:hover,
+.xp-usedby-band .xp-usedby-item:focus-visible {
   opacity: 1;
 }
 
 /* Stopping on the band picks one company out of the row. */
-.xp-usedby-band:hover .xp-usedby-item:not(:hover) {
+.xp-usedby-band:hover .xp-usedby-item:not(:hover),
+.xp-usedby-band:focus-within .xp-usedby-item:not(:focus-visible) {
   opacity: 0.26;
+}
+
+.xp-usedby-item:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 6px;
+  border-radius: 2px;
 }
 
 .xp-usedby-name {
@@ -835,9 +836,11 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The component leaves the belt alone at this setting, so it only has to be
+     laid out as a static row. */
   .xp-usedby-track {
     width: 100%;
-    animation: none;
+    will-change: auto;
   }
 
   .xp-usedby-belt {
