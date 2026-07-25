@@ -691,23 +691,97 @@ html {
   -webkit-box-decoration-break: clone;
 }
 
-/* Keyboard keys in the tour. */
-.xp-kbd {
+/* ————— Keyboard keys in the tour —————
+   Holds the chip and the pulse that fires out from under it. */
+.xp-kbd-wrap {
+  position: relative;
   display: inline-grid;
   place-items: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
   margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* Every chip is the same box: one square per key, so a chord reads as a
+   row of keys rather than a set of differently sized labels. Widths were
+   drifting before because the box grew with the glyph, and ⌘ is wider
+   than a capital in the fallback symbol font. */
+.xp-kbd {
+  --xp-cap: 0.73em; /* cap height of the chip's own type */
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 1px solid #3f3f46;
   border-bottom-width: 2px;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #18181b;
   font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
   font-size: 12px;
   font-weight: 500;
+  line-height: 1;
   color: #e4e4e7;
-  vertical-align: middle;
+  transition:
+    transform 0.09s ease,
+    background-color 0.09s ease,
+    border-color 0.14s ease,
+    color 0.14s ease;
+}
+
+/* The worded keys (Shift, Ctrl) keep the height and grow sideways only. */
+.xp-kbd--wide {
+  width: auto;
+  min-width: 24px;
+  padding: 0 7px;
+}
+
+/* Drawn glyphs, cropped to their ink, so ⌘ and ← stand exactly as tall as
+   the X or V in the chip next door. */
+.xp-kbd-glyph {
+  width: var(--xp-cap);
+  height: var(--xp-cap);
+}
+
+/* Held down: the key drops onto its short edge, the way the border-bottom
+   suggests it would. */
+.xp-kbd--down {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+  border-color: #52525b;
+  background-color: #232327;
+  color: #fafafa;
+}
+
+/* One ring per keystroke, in the same cool light the hero throws. */
+.xp-kbd-pulse {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(226, 236, 255, 0.55);
+  border-radius: 8px;
+  animation: xp-kbd-pulse 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes xp-kbd-pulse {
+  from {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-kbd-pulse {
+    display: none;
+  }
+
+  .xp-kbd {
+    transition: none;
+  }
 }
 
 /* Status/tour copy fades in softly on every change. */
@@ -723,6 +797,29 @@ html {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* A tour step the reader has just satisfied leaves slowly — twice as long
+   as it took to arrive, and drifting up rather than down, so it reads as
+   the instruction being retired and not as another one landing. Timed with
+   STEP_FADE in hero-otp.tsx. Declared after the rule above so it wins the
+   animation shorthand on an element that carries both classes. */
+.xp-fade-text--out {
+  /* ease-in, not ease: the label should keep its opacity for most of the
+     fade and then go, rather than dropping to a fifth of it by the halfway
+     mark and lingering there where nobody can read it. */
+  animation: xp-fade-text-out 0.55s ease-in both;
+}
+
+@keyframes xp-fade-text-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
   }
 }
 

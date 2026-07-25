@@ -9,8 +9,158 @@ import {
 
 const CORRECT = '123456'
 
-function Kbd({ children }: { children: React.ReactNode }) {
-  return <kbd className="xp-kbd">{children}</kbd>
+/* Which physical key each chip in the tour stands for. ⌘ and Ctrl are the
+   same chip on different platforms, so they share a token. */
+const KEY_TOKEN: Record<string, string> = {
+  '⌘': 'mod',
+  Ctrl: 'mod',
+  Shift: 'shift',
+  '←': 'left',
+}
+
+const tokenFor = (label: string) => KEY_TOKEN[label] ?? label.toLowerCase()
+
+type Presses = {
+  /* Keys held down right now. */
+  down: string[]
+  /* Press counter per key — bumping it replays that chip's pulse. */
+  pulse: Record<string, number>
+}
+
+const PressContext = React.createContext<Presses>({ down: [], pulse: {} })
+
+/**
+ * Mirrors the keys the tour names while the reader presses them.
+ *
+ * Modifiers come from the event flags rather than their own keydown, which
+ * keeps them honest when a chord starts before the page had focus. The
+ * plain keys get a release timer as well: a ⌘X hands the keyup to whatever
+ * took the focus, and a chip must never be left looking held down.
+ */
+function usePresses(enabled: boolean, isMac: boolean): Presses {
+  const [down, setDown] = React.useState<string[]>([])
+  const [pulse, setPulse] = React.useState<Record<string, number>>({})
+  const heldRef = React.useRef<Set<string>>(new Set())
+  const timers = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+
+  React.useEffect(() => {
+    if (!enabled) return
+
+    const release = (token: string) => {
+      clearTimeout(timers.current[token])
+      if (!heldRef.current.delete(token)) return
+      setDown(Array.from(heldRef.current))
+    }
+
+    const press = (token: string, failsafe: number) => {
+      if (failsafe) {
+        clearTimeout(timers.current[token])
+        timers.current[token] = setTimeout(() => release(token), failsafe)
+      }
+      // Auto-repeat keeps firing keydown; only the first one is a press.
+      if (heldRef.current.has(token)) return
+      heldRef.current.add(token)
+      setDown(Array.from(heldRef.current))
+      setPulse(p => ({ ...p, [token]: (p[token] ?? 0) + 1 }))
+    }
+
+    const plainKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') return 'left'
+      return /^[a-z]$/i.test(e.key) ? e.key.toLowerCase() : null
+    }
+
+    // No failsafe on the modifiers: holding Shift down while walking the
+    // selection left is the point of the last step. The flags on the next
+    // event are what let them go.
+    const syncMods = (e: KeyboardEvent) => {
+      const held = (token: string, isHeld: boolean) =>
+        isHeld ? press(token, 0) : release(token)
+      held('mod', isMac ? e.metaKey : e.ctrlKey)
+      held('shift', e.shiftKey)
+    }
+
+    const onDown = (e: KeyboardEvent) => {
+      syncMods(e)
+      const token = plainKey(e)
+      if (token) press(token, 700)
+    }
+    const onUp = (e: KeyboardEvent) => {
+      syncMods(e)
+      const token = plainKey(e)
+      if (token) release(token)
+    }
+    // Nothing can be held once the window is gone — and a chord that ends
+    // in ⌘Tab would otherwise leave both chips stuck.
+    const onBlur = () => {
+      Object.values(timers.current).forEach(clearTimeout)
+      heldRef.current.clear()
+      setDown([])
+    }
+
+    window.addEventListener('keydown', onDown)
+    window.addEventListener('keyup', onUp)
+    window.addEventListener('blur', onBlur)
+    return () => {
+      window.removeEventListener('keydown', onDown)
+      window.removeEventListener('keyup', onUp)
+      window.removeEventListener('blur', onBlur)
+      onBlur()
+    }
+  }, [enabled, isMac])
+
+  return { down, pulse }
+}
+
+/* JetBrains Mono carries no ⌘ or ←, so both fall back to whatever symbol
+   font the OS has — where they come out shorter than the capitals beside
+   them and sit off the cap band. Drawn here instead, each viewBox cropped
+   to its own ink so the glyph is exactly cap height on every platform. */
+function Glyph({ name }: { name: 'mod' | 'left' }) {
+  const shared = {
+    className: 'xp-kbd-glyph',
+    role: 'img' as const,
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2.6,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+  }
+  return name === 'mod' ? (
+    <svg {...shared} viewBox="1.7 1.7 20.6 20.6" aria-label="Command">
+      <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+    </svg>
+  ) : (
+    <svg {...shared} viewBox="3.7 3.7 16.6 16.6" aria-label="Left arrow">
+      <path d="M19 12H5" />
+      <path d="m12 19-7-7 7-7" />
+    </svg>
+  )
+}
+
+function Kbd({ children }: { children: string }) {
+  const { down, pulse } = React.useContext(PressContext)
+  const token = tokenFor(children)
+  const nonce = pulse[token]
+  return (
+    <span className="xp-kbd-wrap">
+      {/* Behind the chip and keyed on the press count: every press starts
+          its own ring instead of riding the last one's animation. */}
+      {nonce ? <span key={nonce} className="xp-kbd-pulse" aria-hidden /> : null}
+      <kbd
+        className={`xp-kbd ${children.length > 1 ? 'xp-kbd--wide' : ''} ${
+          down.includes(token) ? 'xp-kbd--down' : ''
+        }`}
+      >
+        {children === '⌘' ? (
+          <Glyph name="mod" />
+        ) : children === '←' ? (
+          <Glyph name="left" />
+        ) : (
+          children
+        )}
+      </kbd>
+    </span>
+  )
 }
 
 /* How much of the cursor light each slot's rim returns. The hero's
@@ -81,6 +231,11 @@ type Ring = {
 
 type Mode = 'play' | 'success' | 'tutorial'
 
+/* How long a satisfied step stays put before it starts to leave, and how
+   long it takes to go. The fade matches xp-fade-text-out in the CSS. */
+const STEP_HOLD = 700
+const STEP_FADE = 550
+
 export function HeroOtp() {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const wrapRef = React.useRef<HTMLDivElement>(null)
@@ -89,6 +244,10 @@ export function HeroOtp() {
   const [value, setValue] = React.useState('')
   const [mode, setMode] = React.useState<Mode>('play')
   const [step, setStep] = React.useState(0)
+  // The step on screen trails the step the reader is on — see the hold
+  // below. `leaving` is the stretch where the old one is fading out.
+  const [shown, setShown] = React.useState(0)
+  const [leaving, setLeaving] = React.useState(false)
   const [error, setError] = React.useState(false)
   // Locked from mount: the input cannot be focused or edited until the
   // hint hands the caret over — nothing shows as active before the
@@ -110,6 +269,8 @@ export function HeroOtp() {
   valueRef.current = value
   const activeRef = React.useRef(active)
   activeRef.current = active
+  const stepRef = React.useRef(step)
+  stepRef.current = step
 
   React.useEffect(() => {
     setIsMobile(window.matchMedia('(pointer: coarse)').matches)
@@ -228,7 +389,8 @@ export function HeroOtp() {
   const fieldOnScreen = () => {
     const box = wrapRef.current?.getBoundingClientRect()
     if (!box || box.height === 0) return false
-    const shown = Math.min(box.bottom, window.innerHeight) - Math.max(box.top, 0)
+    const shown =
+      Math.min(box.bottom, window.innerHeight) - Math.max(box.top, 0)
     return shown >= box.height * 0.6
   }
 
@@ -327,7 +489,7 @@ export function HeroOtp() {
   const cutStep = 1
   const pasteStep = 2
   const sliceStep = isMobile ? 3 : 4
-  const finished = step >= steps.length
+  const finished = shown >= steps.length
 
   // Selection-driven steps advance when the user actually does the thing.
   React.useEffect(() => {
@@ -343,6 +505,27 @@ export function HeroOtp() {
       setStep(4)
     }
   }, [active, mode, step, isMobile])
+
+  /* The label does not swap the instant the reader gets a step right —
+     that reads as the instruction being taken away rather than as having
+     done it. The satisfied line holds where it is for a beat, then fades
+     out slowly, and only then does the next one fade in. */
+  React.useEffect(() => {
+    // A step landing mid-fade doesn't restart the hold: the line is already
+    // on its way out, and it lands on whatever step is current when it goes.
+    if (leaving || step === shown) return
+    const t = setTimeout(() => setLeaving(true), STEP_HOLD)
+    return () => clearTimeout(t)
+  }, [step, shown, leaving])
+
+  React.useEffect(() => {
+    if (!leaving) return
+    const t = setTimeout(() => {
+      setShown(stepRef.current)
+      setLeaving(false)
+    }, STEP_FADE)
+    return () => clearTimeout(t)
+  }, [leaving])
 
   const onClip = (kind: 'cut' | 'copy' | 'paste') => {
     if (mode !== 'tutorial') return
@@ -364,6 +547,8 @@ export function HeroOtp() {
 
   const success = mode === 'success'
   const multi = active.length > 1
+  // Only the desktop tour shows key chips to light up.
+  const presses = usePresses(mode === 'tutorial' && !isMobile, isMac)
 
   return (
     <>
@@ -487,11 +672,13 @@ export function HeroOtp() {
         )}
         {mode === 'tutorial' && !finished && (
           <div
-            key={`step-${step}`}
-            className="xp-fade-text"
+            key={`step-${shown}`}
+            className={`xp-fade-text ${leaving ? 'xp-fade-text--out' : ''}`}
             style={{ color: '#a1a1aa' }}
           >
-            {steps[step]}
+            <PressContext.Provider value={presses}>
+              {steps[shown]}
+            </PressContext.Provider>
           </div>
         )}
         {mode === 'tutorial' && finished && (
