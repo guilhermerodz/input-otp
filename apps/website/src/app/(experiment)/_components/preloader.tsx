@@ -4,15 +4,31 @@ import * as React from 'react'
 
 /**
  * Intro: a slot machine. A lever on the right pulls itself, four big
- * motion-blurred reels land left to right on 700M and the frame turns
+ * motion-blurred reels land left to right on the download milestone and the frame turns
  * green with arcade win effects — a border beam racing the frame, a
  * double flash, a shake and radial sparks. Then the lever becomes a
  * caret that sweeps right-to-left, clipping the machine away, and types
  * a two-line thank-you in its place — before a single curtain lifts.
  */
 
-const TARGET = ['7', '0', '0', 'M'] as const
-const PHRASE = 'thank you for\n700M downloads!'
+/* The figure on the reels is the last hundred million the package has crossed,
+   read from npm-stat on the server and handed down as a prop (see
+   _data/npm-downloads.ts) — so the thank-you keeps up with the counter down in
+   "trusted at scale" instead of quietly celebrating last quarter.
+
+   It is always four characters, which is what lets the timeline below stay
+   constant: four reels, and a phrase whose length never changes. */
+const MILESTONE_LEN = 4
+const REELS = MILESTONE_LEN
+
+function phraseFor(milestone: string) {
+  return `thank you for\n${milestone} downloads!`
+}
+
+const PHRASE_LEN = phraseFor('0'.repeat(MILESTONE_LEN)).length
+
+const MilestoneContext = React.createContext('700M')
+
 const TYPE_MS = 16
 
 /* Timeline — phases overlap rather than queue: the sweep starts while
@@ -21,11 +37,11 @@ const TYPE_MS = 16
 const REEL_DELAY = 240
 const REEL_BASE = 650
 const REEL_STEP = 130
-const LANDED_AT = REEL_DELAY + REEL_BASE + (TARGET.length - 1) * REEL_STEP
+const LANDED_AT = REEL_DELAY + REEL_BASE + (REELS - 1) * REEL_STEP
 const SWEEP_AT = LANDED_AT + 350
 const SWEEP_MS = 620
 const WRITE_AT = SWEEP_AT + SWEEP_MS + 80
-const LIFT_AT = WRITE_AT + PHRASE.length * TYPE_MS + 250
+const LIFT_AT = WRITE_AT + PHRASE_LEN * TYPE_MS + 250
 const LIFT_MS = 700
 
 const REEL_W = 104
@@ -267,10 +283,11 @@ function Sparks() {
 /* The two balanced lines the caret leaves behind, typed left to right —
    the caret rides the text across the line break. */
 function WriteLine() {
+  const phrase = phraseFor(React.useContext(MilestoneContext))
   const [count, setCount] = React.useState(0)
 
   React.useEffect(() => {
-    if (count >= PHRASE.length) return
+    if (count >= phrase.length) return
     const id = setTimeout(() => setCount(c => c + 1), TYPE_MS)
     return () => clearTimeout(id)
   }, [count])
@@ -290,7 +307,7 @@ function WriteLine() {
         height: '2.8em',
       }}
     >
-      {PHRASE.slice(0, count)}
+      {phrase.slice(0, count)}
       <span
         style={{
           display: 'inline-block',
@@ -301,7 +318,9 @@ function WriteLine() {
           background: '#34d399',
           boxShadow: '0 0 14px rgba(52, 211, 153, 0.6)',
           animation:
-            count >= PHRASE.length ? 'xp-blink 1s step-end infinite' : undefined,
+            count >= phrase.length
+              ? 'xp-blink 1s step-end infinite'
+              : undefined,
         }}
       />
     </div>
@@ -313,6 +332,7 @@ function WriteLine() {
    the arcade win burst, then the caret sweeps it away and writes the
    phrase. */
 function Casino() {
+  const target = React.useContext(MilestoneContext).split('')
   const [green, setGreen] = React.useState(false)
   const [sweep, setSweep] = React.useState(false)
   const [write, setWrite] = React.useState(false)
@@ -352,7 +372,7 @@ function Casino() {
               'border-color .5s ease, background .5s ease, box-shadow .5s ease',
           }}
         >
-          {TARGET.map((c, i) => (
+          {target.map((c, i) => (
             <Reel key={i} char={c} index={i} green={green} />
           ))}
         </div>
@@ -393,7 +413,7 @@ function Casino() {
   )
 }
 
-export function Preloader() {
+export function Preloader({ milestone }: { milestone: string }) {
   const [phase, setPhase] = React.useState<'show' | 'lift' | 'gone'>('show')
   const phaseRef = React.useRef(phase)
   phaseRef.current = phase
@@ -450,10 +470,7 @@ export function Preloader() {
       // storage unavailable: play the intro every time
     }
     const pending = timeouts.current
-    if (
-      seen ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
+    if (seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setPhase('gone')
       announceIntroDone()
     } else {
@@ -503,7 +520,7 @@ export function Preloader() {
   const asked = replaying.current ? '' : undefined
 
   return (
-    <>
+    <MilestoneContext.Provider value={milestone}>
       {/* One simple curtain */}
       <div
         className={`xp-panel xp-panel--full ${lifting ? 'xp-panel--up' : ''}`}
@@ -521,6 +538,6 @@ export function Preloader() {
           </div>
         </div>
       </div>
-    </>
+    </MilestoneContext.Provider>
   )
 }

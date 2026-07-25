@@ -20,6 +20,22 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Download stats
+
+The landing page's "trusted at scale" counter (and the milestone the intro
+celebrates) comes from npm-stat, not from numbers typed into the source — see
+`src/app/(experiment)/_data/npm-downloads.ts`. The fetch is cached for 12 hours,
+so the page rebuilds itself at most twice a day.
+
+`vercel.json` also runs `/api/refresh-stats` on a 12-hour cron, which drops that
+cache entry on schedule instead of waiting for a visitor. Set `CRON_SECRET` in
+the project's environment — Vercel sends it as `Authorization: Bearer …` on cron
+invocations, and the route refuses anything else. Without the variable the route
+answers 503 in production (and stays open locally, for testing).
+
+If npm-stat is down or answers with something unusable, the section falls back
+to the last figures committed in that file.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
