@@ -139,6 +139,10 @@ export function UsedByMarquee() {
      one is missing from the folder or a hover ends mid-request. */
   const [previewing, setPreviewing] = useState(-1)
   const [ready, setReady] = useState<Record<string, boolean>>({})
+  const [card, setCard] = useState<{
+    company: (typeof COMPANIES)[number]
+    open: boolean
+  } | null>(null)
   const shotRef = useRef<HTMLDivElement>(null)
   const pointer = useRef({ x: 0, y: 0 })
   const frame = useRef(0)
@@ -260,6 +264,12 @@ export function UsedByMarquee() {
 
     el.dataset.side = side
     el.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`
+    /* The cursor, in the card's own coordinates. The card grows out of this
+       point and collapses back into it, so the corner it springs from is
+       wherever the pointer actually is — including when the card has been
+       flipped under the cursor or slid along to clear an edge. */
+    el.style.setProperty('--ox', `${Math.round(x - left)}px`)
+    el.style.setProperty('--oy', `${Math.round(y - top)}px`)
   }
 
   const track = (event: React.PointerEvent) => {
@@ -289,6 +299,26 @@ export function UsedByMarquee() {
     hovered && ready[hovered.name] && typeof document !== 'undefined'
       ? hovered
       : null
+
+  /* The card outlives the hover: leaving flips it to closed and it stays
+     mounted long enough to shrink back into the cursor, then takes itself off
+     on the animation's end. Coming back before that just flips it open again,
+     and the animation restarts from wherever it had got to. */
+  useEffect(() => {
+    if (shot) setCard({ company: shot, open: true })
+    else
+      setCard(current =>
+        current?.open ? { ...current, open: false } : current,
+      )
+  }, [shot])
+
+  /* The closed card takes itself off on animationend; this is only here so a
+     dropped event can never leave one stranded on screen. */
+  useEffect(() => {
+    if (!card || card.open) return
+    const id = setTimeout(() => setCard(null), 600)
+    return () => clearTimeout(id)
+  }, [card])
 
   return (
     <section className="xp-usedby-section">
@@ -367,17 +397,24 @@ export function UsedByMarquee() {
           )
         })}
       </div>
-      {shot &&
+      {card &&
         createPortal(
           /* At the end of the body, out of reach of any ancestor's overflow,
              stacking context or transform — a fixed layer inside one of those
              would be positioned against it instead of the window. */
           <div className="xp-usedby-shot" ref={shotRef} aria-hidden="true">
-            {/* Keyed by company so moving to another logo replays the
-                arrival rather than silently swapping the image. */}
-            <div className="xp-usedby-shot-card" key={shot.name}>
+            {/* Keyed by company so moving to another logo replays the arrival
+                rather than silently swapping the image. */}
+            <div
+              className="xp-usedby-shot-card"
+              key={card.company.name}
+              data-state={card.open ? 'open' : 'closed'}
+              onAnimationEnd={() => {
+                if (!card.open) setCard(null)
+              }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={shotFor(shot.src)} alt="" decoding="async" />
+              <img src={shotFor(card.company.src)} alt="" decoding="async" />
             </div>
           </div>,
           document.body,
