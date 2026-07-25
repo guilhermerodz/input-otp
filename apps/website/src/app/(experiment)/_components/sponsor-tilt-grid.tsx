@@ -14,10 +14,8 @@ const TILE_SELECTOR = '.xp-sponsor-beam-wrap, .xp-sponsor-cta'
 export function SponsorTiltGrid({
   className,
   children,
-}: {
-  className?: string
-  children: React.ReactNode
-}) {
+  ...rest
+}: React.ComponentPropsWithoutRef<'div'>) {
   const gridRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -71,7 +69,7 @@ export function SponsorTiltGrid({
   }, [])
 
   return (
-    <div ref={gridRef} className={className}>
+    <div ref={gridRef} className={className} {...rest}>
       {children}
     </div>
   )

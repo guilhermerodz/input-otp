@@ -1,5 +1,8 @@
 import { ExternalLink } from 'lucide-react'
 
+import { RevealRoot } from './_reveal/reveal-root'
+import { VariantSwitch } from './_reveal/variant-switch'
+
 import { ClerkParticles } from './_components/clerk-particles'
 import { CtaDaybreak } from './_components/cta-daybreak'
 import { FeatureBento } from './_components/feature-bento'
@@ -75,10 +78,18 @@ function Logo() {
   )
 }
 
-export function ExperimentView({ starCount }: { starCount: string | null }) {
+export function ExperimentView({
+  starCount,
+  variant,
+}: {
+  starCount: string | null
+  variant: number
+}) {
   return (
+    <RevealRoot variant={variant}>
     <div className="xp">
       <Preloader />
+      <VariantSwitch current={variant} />
 
       {/* Nav */}
       <header
@@ -89,8 +100,11 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           padding: '18px 40px',
           borderBottom: border,
         }}
+        data-rv-group="hero"
       >
-        <Logo />
+        <div data-rv="eyebrow">
+          <Logo />
+        </div>
         <nav
           className="xp-nav-links"
           style={{
@@ -101,10 +115,17 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             color: '#a1a1aa',
           }}
         >
-          <a href={`${GITHUB_URL}#readme`}>Docs</a>
-          <a href="https://input-otp.rodz.dev">Examples</a>
-          <a href="#sponsors">Sponsors</a>
+          <a data-rv="chrome" href={`${GITHUB_URL}#readme`}>
+            Docs
+          </a>
+          <a data-rv="chrome" href="https://input-otp.rodz.dev">
+            Examples
+          </a>
+          <a data-rv="chrome" href="#sponsors">
+            Sponsors
+          </a>
           <a
+            data-rv="chrome"
             href={GITHUB_URL}
             style={{
               display: 'flex',
@@ -126,11 +147,13 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
       <section
         className="xp-hero"
         style={{ textAlign: 'center', padding: '84px 40px 56px' }}
+        data-rv-group="hero"
       >
         <HeroField />
         <div className="xp-hero-copy">
           <h1
             className="xp-hero-title"
+            data-rv="title"
             style={{
               margin: 0,
               fontSize: 56,
@@ -144,6 +167,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             Stop wasting time building OTP inputs.
           </h1>
           <p
+            data-rv="lede"
             style={{
               margin: '20px 0 0',
               fontSize: 18,
@@ -156,9 +180,12 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             copy-paste friendly out of the box.
           </p>
 
-          <HeroOtp />
+          <div data-rv="card">
+            <HeroOtp />
+          </div>
 
           <div
+            data-rv="action"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -173,6 +200,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           </div>
 
           <a
+            data-rv="chrome"
             href={CLERK_URL}
             style={{
               display: 'flex',
@@ -210,8 +238,10 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
       <section
         id="sponsors"
         style={{ padding: '56px 40px', borderTop: border }}
+        data-rv-group
       >
         <h2
+          data-rv="title"
           style={{
             margin: 0,
             fontSize: 28,
@@ -221,13 +251,13 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         >
           Our sponsors
         </h2>
-        <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
+        <div data-rv="lede" style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
           Thank you for believing in what we&apos;re building
           <span style={{ color: '#3f3f46' }}>_</span>
         </div>
 
-        <SponsorTiltGrid className="xp-sponsors-grid">
-          <SponsorBorderBeam tier="diamond" duration={4.1}>
+        <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
+          <SponsorBorderBeam tier="diamond" duration={4.1} revealRole="card">
             <a
               href={CLERK_URL}
               target="_blank"
@@ -261,6 +291,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             target="_blank"
             rel="noreferrer"
             className="xp-sponsor-cta xp-sponsor-cta--filler"
+            data-rv="card"
             aria-label="Become a sponsor"
           >
             <span className="xp-sponsor-cta-plus" aria-hidden="true">
@@ -277,6 +308,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
                 key={alt}
                 tier="silver"
                 duration={beamDuration}
+                revealRole="card"
               >
                 <a
                   href={href}
@@ -316,6 +348,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             target="_blank"
             rel="noreferrer"
             className="xp-sponsor-cta"
+            data-rv="card"
             aria-label="Become a sponsor"
           >
             <span className="xp-sponsor-cta-plus" aria-hidden="true">
@@ -333,8 +366,9 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
 
       {/* How I built it */}
       <section id="how" style={{ padding: '56px 0 0', borderTop: border }}>
-        <div style={{ padding: '0 40px' }}>
+        <div style={{ padding: '0 40px' }} data-rv-group>
           <h2
+            data-rv="title"
             style={{
               margin: 0,
               fontSize: 28,
@@ -344,7 +378,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           >
             How I built it
           </h2>
-          <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
+          <div data-rv="lede" style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
             One real input, wearing your design — the slots you see just mirror
             its state. Keep scrolling<span style={{ color: '#3f3f46' }}>_</span>
           </div>
@@ -367,14 +401,22 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           flexWrap: 'wrap',
           gap: 12,
         }}
+        data-rv-group
       >
-        <span>MIT © Guilherme Rodz</span>
+        <span data-rv="chrome">MIT © Guilherme Rodz</span>
         <div style={{ display: 'flex', gap: 20 }}>
-          <a href={`${GITHUB_URL}#readme`}>Docs</a>
-          <a href={GITHUB_URL}>GitHub</a>
-          <a href="https://twitter.com/guilherme_rodz">Twitter</a>
+          <a data-rv="chrome" href={`${GITHUB_URL}#readme`}>
+            Docs
+          </a>
+          <a data-rv="chrome" href={GITHUB_URL}>
+            GitHub
+          </a>
+          <a data-rv="chrome" href="https://twitter.com/guilherme_rodz">
+            Twitter
+          </a>
         </div>
       </footer>
     </div>
+    </RevealRoot>
   )
 }

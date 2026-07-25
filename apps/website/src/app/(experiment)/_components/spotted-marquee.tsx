@@ -329,14 +329,15 @@ export function SpottedMarquee() {
   }
 
   return (
-    <section className="xp-sp-section">
-      <h2 className="xp-sp-title">Spotted by the best</h2>
-      <div className="xp-sp-sub">
+    <section className="xp-sp-section" data-rv-group>
+      <h2 className="xp-sp-title" data-rv="title">Spotted by the best</h2>
+      <div className="xp-sp-sub" data-rv="lede">
         People we admire, admiring back
         <span style={{ color: '#3f3f46' }}>_</span>
       </div>
       <div
         className="xp-sp-band"
+        data-rv="card"
         ref={bandRef}
         onPointerEnter={hold}
         onPointerLeave={release}

@@ -151,12 +151,12 @@ export function StatsOdometer() {
   })
 
   return (
-    <section className="xp-st-section" ref={hostRef}>
-      <div className="xp-st-eyebrow xp-mono">
+    <section className="xp-st-section" ref={hostRef} data-rv-group>
+      <div className="xp-st-eyebrow xp-mono" data-rv="eyebrow">
         TRUSTED AT SCALE<span style={{ color: '#3f3f46' }}>_</span>
       </div>
 
-      <div className="xp-st-odo xp-mono" aria-hidden="true">
+      <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
         {Array.from({ length: DIGITS }, (_, j) => {
           const power = DIGITS - 1 - j
           return (
@@ -185,12 +185,12 @@ export function StatsOdometer() {
         {Math.round(PER_SECOND)} a second.
       </p>
 
-      <div className="xp-st-caption">
+      <div className="xp-st-caption" data-rv="lede">
         total downloads
         <span className="xp-st-dim">{` · ${WEEKLY_SHORT} weekly downloads`}</span>
       </div>
 
-      <div className="xp-st-row">
+      <div className="xp-st-row" data-rv="chrome">
         {/* Their own mark, so the chip reads as the shadcn/ui docs before anyone
             reads the words — and the whole thing is the link out. */}
         <a className="xp-st-chip" href={SHADCN_URL} target="_blank" rel="noreferrer">

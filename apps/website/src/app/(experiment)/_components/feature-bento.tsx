@@ -43,7 +43,7 @@ function CardHeading({
 
 function ComparisonCard() {
   return (
-    <article className="xp-fb-card xp-fb-comparison">
+    <article data-rv="card" className="xp-fb-card xp-fb-comparison">
       <CardHeading
         index="01"
         title="One real input. Native wins."
@@ -230,6 +230,7 @@ function StyleCard() {
   return (
     <article
       ref={cardRef}
+      data-rv="card"
       className="xp-fb-card xp-fb-styles"
       data-running={running}
       onMouseEnter={() => setHeld(true)}
@@ -310,7 +311,7 @@ function StyleCard() {
 
 function PasswordCard() {
   return (
-    <article className="xp-fb-card xp-fb-password">
+    <article data-rv="card" className="xp-fb-card xp-fb-password">
       <CardHeading
         index="03"
         title="Friendly to password managers"
@@ -344,7 +345,7 @@ function PasswordCard() {
 
 function PatternCard() {
   return (
-    <article className="xp-fb-card xp-fb-pattern">
+    <article data-rv="card" className="xp-fb-card xp-fb-pattern">
       <CardHeading
         index="04"
         title="Pattern validation"
@@ -395,7 +396,7 @@ function PatternCard() {
 
 function TinyCard() {
   return (
-    <article className="xp-fb-card xp-fb-tiny">
+    <article data-rv="card" className="xp-fb-card xp-fb-tiny">
       <CardHeading
         index="05"
         title="Tiny and dependency-free"
@@ -471,25 +472,26 @@ export function FeatureBento() {
       ref={sectionRef}
       className="xp-fb"
       aria-labelledby="xp-features-title"
+      data-rv-group
     >
       <div className="xp-fb-intro">
         <div>
-          <span className="xp-fb-path">~/features</span>
-          <h2 id="xp-features-title">
+          <span className="xp-fb-path" data-rv="eyebrow">~/features</span>
+          <h2 id="xp-features-title" data-rv="title">
             Small API.
             <br />
             Unusually capable.
           </h2>
         </div>
         <div className="xp-fb-intro-side">
-          <p>
+          <p data-rv="lede">
             Five animated proofs of what a single native input can do when the
             visible slots only mirror its state.
           </p>
         </div>
       </div>
 
-      <div className="xp-fb-grid">
+      <div className="xp-fb-grid" data-rv-group>
         <ComparisonCard />
         <StyleCard />
         <PasswordCard />

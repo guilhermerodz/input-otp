@@ -39,6 +39,14 @@ function announceIntroDone() {
   window.dispatchEvent(new Event('xp:intro-done'))
 }
 
+/* Fired the moment the curtain starts moving, ~700ms before it is gone.
+   The page's reveal cascade keys off this rather than the "done" signal so
+   the hero is already in motion by the time the curtain clears it — the
+   intro handing over instead of ending. */
+function announceIntroLift() {
+  window.dispatchEvent(new Event('xp:intro-lift'))
+}
+
 /* One spinning strip. A couple of full 0-9 runs ending on the target
    character; a single decelerating transform plays the whole spin,
    blurred while it is fast. */
@@ -380,6 +388,7 @@ export function Preloader() {
       localStorage.setItem('xp-intro-seen', '1')
     } catch {}
     setPhase('lift')
+    announceIntroLift()
     setTimeout(() => {
       setPhase('gone')
       announceIntroDone()

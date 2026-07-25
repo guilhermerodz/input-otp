@@ -6,6 +6,7 @@ import '../globals.css'
 import './experiment.css'
 import './feature-bento.css'
 import './stats-odometer.css'
+import './reveal.css'
 
 const inter = Inter({
   subsets: ['latin'],

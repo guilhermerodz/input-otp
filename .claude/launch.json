@@ -19,20 +19,6 @@
         "3041"
       ],
       "port": 3041
-    },
-    {
-      "name": "website-reveal",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": [
-        "-C",
-        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/reveal-variants/apps/website",
-        "exec",
-        "next",
-        "dev",
-        "--port",
-        "3046"
-      ],
-      "port": 3046
     }
   ]
 }
