@@ -11,6 +11,13 @@ export const OTPInputContext = React.createContext<RenderProps>(
   {} as RenderProps,
 )
 
+/** Failsafe for the iOS text reveal (see the reveal logic in the effect
+ *  below): only fires when a gesture is interrupted before `pointerup`.
+ *  Generous on purpose — a normal interaction is ended by typing, blur or
+ *  scroll long before this, and being late here is harmless while being
+ *  early can dismiss the native edit menu. */
+const IOS_REVEAL_BACKSTOP_MS = 5000
+
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
@@ -237,30 +244,51 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       // iOS: the text is parked offscreen (see the iOS rule above) so the
       // native selection artifact is never visible at rest. The copy/paste
       // menu, however, only appears when the tap/long-press lands near an
-      // on-screen caret/selection rect — so reveal the text while a pointer
-      // gesture is active and re-hide it right after. Inline
-      // `text-indent: 0` wins over the stylesheet's `-9999px`; removing it
+      // on-screen caret/selection rect — so reveal the text while the user
+      // is interacting and hide it again once the interaction ends. Inline
+      // `text-indent` wins over the stylesheet's `-9999px`; removing it
       // falls back to hidden.
+      //
+      // Hiding is event-driven rather than timed: the edit menu tracks its
+      // anchor rect while it presents, so a timer racing that animation can
+      // dismiss the menu (measured: hiding 400ms after pointerup killed it,
+      // 1500ms did not — but that margin is device- and OS-dependent, so we
+      // don't rely on it). Instead we hide on the events that actually mean
+      // "the interaction is over" — typing, blur, scroll — and keep a long
+      // backstop timer purely so an interrupted gesture (a pointerup that
+      // never arrives) can't leave the text revealed indefinitely.
       let cleanupIOSReveal: () => void = () => {}
       if (initialLoadRef.current.isIOS) {
         let isPointerDown = false
         let pointerX = 0
-        let hideTimer: ReturnType<typeof setTimeout> | undefined
+        let backstopTimer: ReturnType<typeof setTimeout> | undefined
         // The text is revealed at the pointer's x position, so the ~2px
         // artifact renders under the fingertip (occluded by it) and the
         // edit menu anchors at the touch point. offsetX is in the input's
         // pre-transform coordinate space, matching text-indent.
+        const hideText = () => {
+          clearTimeout(backstopTimer)
+          input.style.removeProperty('text-indent')
+        }
+        // Armed whenever the text is revealed — not only on pointerup, since
+        // iOS's text-interaction gesture recognizer can swallow pointerup
+        // entirely (observed on iOS 18 when a tap opens the edit menu),
+        // which would otherwise leave the text revealed indefinitely. For
+        // the same reason the hide is unconditional: any "is the finger
+        // still down?" check can be permanently stale. Firing mid-gesture is
+        // safe in practice — the edit menu only dismisses if its anchor
+        // moves while it is still presenting, which is far shorter than this.
+        const armBackstop = () => {
+          clearTimeout(backstopTimer)
+          backstopTimer = setTimeout(hideText, IOS_REVEAL_BACKSTOP_MS)
+        }
         const revealText = () => {
-          clearTimeout(hideTimer)
           input.style.setProperty(
             'text-indent',
             `${Math.max(0, pointerX)}px`,
             'important',
           )
-        }
-        const hideText = () => {
-          clearTimeout(hideTimer)
-          input.style.removeProperty('text-indent')
+          armBackstop()
         }
         const onPointerDown = (e: PointerEvent) => {
           isPointerDown = true
@@ -271,11 +299,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
         const onPointerUp = () => {
           isPointerDown = false
-          // The edit menu opens on release and survives the text re-hiding
-          // only once fully presented — hiding sooner (tested at 400ms)
-          // dismisses it mid-presentation.
-          clearTimeout(hideTimer)
-          hideTimer = setTimeout(hideText, 1500)
+          armBackstop()
         }
         // Long-press on an unfocused input: focus arrives while the pointer
         // is still down and the menu will anchor on release.
@@ -290,14 +314,21 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         input.addEventListener('focus', onFocus)
         input.addEventListener('input', hideText)
         input.addEventListener('blur', hideText)
+        // Scrolling dismisses the edit menu natively, so it's a reliable
+        // end-of-interaction signal.
+        window.addEventListener('scroll', hideText, {
+          capture: true,
+          passive: true,
+        })
         cleanupIOSReveal = () => {
-          clearTimeout(hideTimer)
+          clearTimeout(backstopTimer)
           input.removeEventListener('pointerdown', onPointerDown)
           input.removeEventListener('pointerup', onPointerUp)
           input.removeEventListener('pointercancel', onPointerUp)
           input.removeEventListener('focus', onFocus)
           input.removeEventListener('input', hideText)
           input.removeEventListener('blur', hideText)
+          window.removeEventListener('scroll', hideText, { capture: true })
         }
       }
 
