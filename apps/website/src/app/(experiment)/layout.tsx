@@ -4,6 +4,8 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { siteConfig } from '../../config/site'
 import '../globals.css'
 import './experiment.css'
+import './feature-bento.css'
+import './stats-odometer.css'
 
 const inter = Inter({
   subsets: ['latin'],

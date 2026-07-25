@@ -1,14 +1,17 @@
 import { ExternalLink } from 'lucide-react'
 
 import { ClerkParticles } from './_components/clerk-particles'
+import { CtaDaybreak } from './_components/cta-daybreak'
+import { FeatureBento } from './_components/feature-bento'
 import { SponsorBorderBeam } from './_components/sponsor-border-beam'
 import { StoryIso } from './_components/story-iso'
-import { StyleGallery } from './_components/gallery'
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
+import { SlotBgSwitcher } from './_components/slot-bg-switcher'
 import { SpottedMarquee } from './_components/spotted-marquee'
+import { StatsOdometer } from './_components/stats-odometer'
 import { UsedByMarquee } from './_components/used-by-marquee'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
@@ -64,57 +67,18 @@ function Logo() {
           p
         </div>
       </div>
-      <span
-        style={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}
-      >
+      <span style={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}>
         input-otp
       </span>
     </div>
   )
 }
 
-const FEATURES = [
-  {
-    id: '01',
-    title: 'Accessible by default',
-    desc: 'screen readers see the single real input it is — caret, selection, copy-paste and keyboard navigation behave natively',
-  },
-  {
-    id: '02',
-    title: 'Autofill that actually works',
-    desc: 'one-tap SMS codes on iOS and Android — autocomplete="one-time-code" is the default, platform quirks already handled',
-  },
-  {
-    id: '03',
-    title: 'Paste just works',
-    desc: 'paste the whole code, every slot fills',
-  },
-  {
-    id: '04',
-    title: 'Friendly to password managers',
-    desc: 'detects the badges injected by 1Password, LastPass, Dashlane and Bitwarden, and keeps them off your slots',
-  },
-  {
-    id: '05',
-    title: 'Bring your own styles',
-    desc: 'unstyled primitives, render slots your way',
-  },
-  {
-    id: '06',
-    title: 'Pattern validation',
-    desc: 'digits, alphanumeric, or custom regex',
-  },
-  {
-    id: '07',
-    title: 'Tiny and dependency-free',
-    desc: 'zero runtime dependencies, a few kilobytes over the wire, React 16.8+',
-  },
-]
-
 export function ExperimentView({ starCount }: { starCount: string | null }) {
   return (
     <div className="xp">
       <Preloader />
+      <SlotBgSwitcher />
 
       {/* Nav */}
       <header
@@ -165,125 +129,107 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
       >
         <HeroField />
         <div className="xp-hero-copy">
-        <h1
-          className="xp-hero-title"
-          style={{
-            margin: 0,
-            fontSize: 56,
-            fontWeight: 700,
-            letterSpacing: '-0.03em',
-            lineHeight: 1.05,
-            maxWidth: 740,
-            textWrap: 'balance',
-          }}
-        >
-          Stop wasting time building OTP inputs.
-        </h1>
-        <p
-          style={{
-            margin: '20px 0 0',
-            fontSize: 18,
-            lineHeight: 1.6,
-            color: '#a1a1aa',
-            maxWidth: 540,
-          }}
-        >
-          One-time passcode input for React. Unstyled, accessible, and
-          copy-paste friendly out of the box.
-        </p>
-
-        <HeroOtp />
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            marginTop: 26,
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-          }}
-        >
-          <a
-            href={GITHUB_URL}
+          <h1
+            className="xp-hero-title"
             style={{
-              background: '#fafafa',
-              color: '#09090b',
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '13px 26px',
-              borderRadius: 999,
+              margin: 0,
+              fontSize: 56,
+              fontWeight: 700,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+              maxWidth: 740,
+              textWrap: 'balance',
             }}
           >
-            Get started
-          </a>
-          <CopyCommand />
-        </div>
+            Stop wasting time building OTP inputs.
+          </h1>
+          <p
+            style={{
+              margin: '20px 0 0',
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: '#a1a1aa',
+              maxWidth: 540,
+            }}
+          >
+            One-time passcode input for React. Unstyled, accessible, and
+            copy-paste friendly out of the box.
+          </p>
 
-        <a
-          href={CLERK_URL}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 14,
-            marginTop: 22,
-            ...card,
-            borderRadius: 12,
-            padding: '13px 22px',
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/sponsors/clerk-wordmark-white-trimmed.svg"
-            alt="Clerk"
-            style={{ height: 17, width: 'auto' }}
-          />
-          <span style={{ fontSize: 13, color: '#a1a1aa' }}>
-            Looking for an authentication solution?{' '}
-            <span style={{ color: '#fafafa', fontWeight: 600 }}>
-              Get started with Clerk →
+          <HeroOtp />
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginTop: 26,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            <a
+              href={GITHUB_URL}
+              style={{
+                background: '#fafafa',
+                color: '#09090b',
+                fontSize: 14,
+                fontWeight: 600,
+                padding: '13px 26px',
+                borderRadius: 999,
+              }}
+            >
+              Get started
+            </a>
+            <CopyCommand />
+          </div>
+
+          <a
+            href={CLERK_URL}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginTop: 22,
+              ...card,
+              borderRadius: 12,
+              padding: '13px 22px',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/sponsors/clerk-wordmark-white-trimmed.svg"
+              alt="Clerk"
+              style={{ height: 17, width: 'auto' }}
+            />
+            <span style={{ fontSize: 13, color: '#a1a1aa' }}>
+              Looking for an authentication solution?{' '}
+              <span style={{ color: '#fafafa', fontWeight: 600 }}>
+                Get started with Clerk →
+              </span>
             </span>
-          </span>
-        </a>
+          </a>
         </div>
       </section>
 
       <UsedByMarquee />
 
-      {/* Stats */}
-      <section style={{ padding: '56px 40px', borderTop: border, textAlign: 'center' }}>
-        <div style={{ fontSize: 14, color: '#71717a' }}>
-          Trusted at scale<span style={{ color: '#3f3f46' }}>_</span>
-        </div>
-        <div
-          className="xp-stats"
-          style={{ display: 'flex', justifyContent: 'center', gap: 72, marginTop: 28 }}
-        >
-          {[
-            ['700M+', 'total downloads'],
-            ['33M', 'weekly downloads'],
-            ['shadcn/ui', 'featured component'],
-          ].map(([big, small]) => (
-            <div key={small}>
-              <div
-                style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.02em' }}
-              >
-                {big}
-              </div>
-              <div style={{ fontSize: 13, color: '#71717a', marginTop: 4 }}>
-                {small}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <StatsOdometer />
 
       <SpottedMarquee />
 
       {/* Sponsors */}
-      <section id="sponsors" style={{ padding: '56px 40px', borderTop: border }}>
+      <section
+        id="sponsors"
+        style={{ padding: '56px 40px', borderTop: border }}
+      >
         <h2
-          style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
+          style={{
+            margin: 0,
+            fontSize: 28,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+          }}
         >
           Our sponsors
         </h2>
@@ -292,15 +238,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           <span style={{ color: '#3f3f46' }}>_</span>
         </div>
 
-        <div
-          className="xp-grid-sponsors"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr',
-            gap: 20,
-            marginTop: 28,
-          }}
-        >
+        <div className="xp-sponsors-grid">
           <SponsorBorderBeam tier="diamond" duration={4.1}>
             <a
               href={CLERK_URL}
@@ -334,16 +272,8 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             href={GITHUB_SPONSORS_URL}
             target="_blank"
             rel="noreferrer"
-            className="xp-sponsor-cta"
+            className="xp-sponsor-cta xp-sponsor-cta--filler"
             aria-label="Become a sponsor"
-            style={{
-              border: '1px dashed #27272a',
-              borderRadius: 14,
-              display: 'grid',
-              placeItems: 'center',
-              color: '#3f3f46',
-              minHeight: 100,
-            }}
           >
             <span className="xp-sponsor-cta-plus" aria-hidden="true">
               +
@@ -353,16 +283,6 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               <ExternalLink size={12} strokeWidth={1.75} />
             </span>
           </a>
-        </div>
-        <div
-          className="xp-grid-3"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: 20,
-            marginTop: 20,
-          }}
-        >
           {SILVER_SPONSORS.map(
             ({ src, alt, href, logoHeight, beamDuration }) => (
               <SponsorBorderBeam
@@ -409,14 +329,6 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             rel="noreferrer"
             className="xp-sponsor-cta"
             aria-label="Become a sponsor"
-            style={{
-              border: '1px dashed #27272a',
-              borderRadius: 14,
-              display: 'grid',
-              placeItems: 'center',
-              color: '#3f3f46',
-              minHeight: 100,
-            }}
           >
             <span className="xp-sponsor-cta-plus" aria-hidden="true">
               +
@@ -429,44 +341,18 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         </div>
       </section>
 
-      {/* Features */}
-      <section style={{ padding: '56px 40px', borderTop: border }}>
-        <div
-          className="xp-mono"
-          style={{ fontSize: 13, color: '#71717a', marginBottom: 8 }}
-        >
-          ~/features
-        </div>
-        <div style={{ borderTop: border }}>
-          {FEATURES.map(f => (
-            <div
-              key={f.id}
-              style={{
-                display: 'flex',
-                gap: 24,
-                padding: '22px 0',
-                borderBottom: border,
-                alignItems: 'baseline',
-                flexWrap: 'wrap',
-              }}
-            >
-              <span className="xp-mono" style={{ color: '#71717a', fontSize: 13 }}>
-                {f.id}
-              </span>
-              <span style={{ fontSize: 15, fontWeight: 600, width: 260 }}>
-                {f.title}
-              </span>
-              <span style={{ fontSize: 14, color: '#a1a1aa' }}>{f.desc}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <FeatureBento />
 
       {/* How I built it */}
       <section id="how" style={{ padding: '56px 0 0', borderTop: border }}>
         <div style={{ padding: '0 40px' }}>
           <h2
-            style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
+            style={{
+              margin: 0,
+              fontSize: 28,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+            }}
           >
             How I built it
           </h2>
@@ -478,67 +364,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         <StoryIso />
       </section>
 
-      {/* Style gallery */}
-      <section style={{ padding: '56px 40px', borderTop: border }}>
-        <h2
-          style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
-        >
-          Unstyled by default. Styled by you.
-        </h2>
-        <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
-          Every input below is the same component with a different render prop —
-          they all type, paste and autofill for real
-          <span style={{ color: '#3f3f46' }}>_</span>
-        </div>
-        <StyleGallery className="mt-12" />
-      </section>
-
-      {/* CTA */}
-      <section
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 22,
-          padding: '72px 40px',
-          borderTop: border,
-          textAlign: 'center',
-        }}
-      >
-        <h2
-          style={{ margin: 0, fontSize: 34, fontWeight: 700, letterSpacing: '-0.02em' }}
-        >
-          Ship your verify screen today.
-        </h2>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <a
-            href={GITHUB_URL}
-            style={{
-              background: '#fafafa',
-              color: '#09090b',
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '12px 24px',
-              borderRadius: 999,
-            }}
-          >
-            Get started
-          </a>
-          <a
-            href={GITHUB_URL}
-            style={{
-              border: '1px solid #27272a',
-              color: '#fafafa',
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '12px 24px',
-              borderRadius: 999,
-            }}
-          >
-            GitHub
-          </a>
-        </div>
-      </section>
+      <CtaDaybreak starCount={starCount} />
 
       {/* Footer */}
       <footer

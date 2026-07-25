@@ -1,0 +1,1275 @@
+.xp-fb {
+  --fb-ink: #f4f4f5;
+  --fb-muted: #a1a1aa;
+  --fb-quiet: #71717a;
+  --fb-line: #242429;
+  --fb-line-strong: #34343b;
+  --fb-panel: #0d0d10;
+  --fb-green: #55d69a;
+  --fb-green-soft: rgba(85, 214, 154, 0.14);
+  --fb-red: #f87171;
+  --fb-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 68px 40px 56px;
+  border-top: 1px solid #1c1c1f;
+  color: var(--fb-ink);
+}
+
+.xp-fb button {
+  font: inherit;
+}
+
+.xp-fb code,
+.xp-fb-path,
+.xp-fb-card-index,
+.xp-fb .xp-fb-carousel-step {
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+}
+
+.xp-fb-intro {
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  align-items: end;
+  gap: 42px;
+  padding-bottom: 36px;
+}
+
+.xp-fb-path {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--fb-quiet);
+  font-size: 12px;
+}
+
+.xp-fb-intro h2 {
+  max-width: 700px;
+  margin: 0;
+  font-size: clamp(2.7rem, 6vw, 4.6rem);
+  font-weight: 680;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+}
+
+.xp-fb-intro-side > p {
+  max-width: 38ch;
+  margin: 0;
+  color: var(--fb-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.xp-fb-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(190px, auto);
+  gap: 12px;
+  animation: xp-fb-grid-in 440ms var(--fb-ease) both;
+}
+
+@keyframes xp-fb-grid-in {
+  from {
+    opacity: 0.25;
+    filter: blur(7px);
+    clip-path: inset(0 0 5% 0);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    clip-path: inset(0);
+  }
+}
+
+.xp-fb-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--fb-line);
+  border-radius: 14px;
+  background: radial-gradient(
+      circle at 80% 0%,
+      rgba(255, 255, 255, 0.028),
+      transparent 42%
+    ),
+    var(--fb-panel);
+  isolation: isolate;
+}
+
+.xp-fb-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.025),
+    transparent 30%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.xp-fb-card.xp-fb-is-paused *,
+.xp-fb-card.xp-fb-is-paused *::before,
+.xp-fb-card.xp-fb-is-paused *::after,
+.xp-fb-card.xp-fb-is-document-hidden *,
+.xp-fb-card.xp-fb-is-document-hidden *::before,
+.xp-fb-card.xp-fb-is-document-hidden *::after {
+  animation-play-state: paused !important;
+}
+
+.xp-fb-card-heading {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  padding: 24px 24px 0;
+}
+
+.xp-fb-card-index {
+  padding-top: 3px;
+  color: #55555f;
+  font-size: 10px;
+}
+
+.xp-fb-card-heading h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+}
+
+.xp-fb-card-heading p {
+  max-width: 52ch;
+  margin: 7px 0 0;
+  color: var(--fb-muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* Placed explicitly rather than by `span`: the two rows tile all 12 columns,
+   and stating the areas keeps that guarantee visible. Source order matches
+   this layout, so the numbering reads 01 → 05 left to right, top to bottom. */
+
+.xp-fb-comparison {
+  grid-area: 1 / 1 / 2 / 9;
+}
+
+.xp-fb-styles {
+  grid-area: 1 / 9 / 2 / 13;
+}
+
+.xp-fb-password {
+  grid-area: 2 / 1 / 3 / 5;
+}
+
+.xp-fb-pattern {
+  grid-area: 2 / 5 / 3 / 9;
+}
+
+.xp-fb-tiny {
+  grid-area: 2 / 9 / 3 / 13;
+}
+
+/* Single-input comparison */
+
+.xp-fb-comparison-table {
+  position: relative;
+  z-index: 2;
+  margin: 28px 24px 0;
+  border-block: 1px solid var(--fb-line);
+}
+
+.xp-fb-comparison-row {
+  display: grid;
+  grid-template-columns:
+    minmax(170px, 1.35fr) minmax(105px, 0.7fr)
+    minmax(125px, 0.8fr);
+  min-height: 70px;
+  align-items: center;
+  border-bottom: 1px solid var(--fb-line);
+}
+
+.xp-fb-comparison-row:last-child {
+  border-bottom: 0;
+}
+
+.xp-fb-comparison-row > span {
+  min-width: 0;
+  padding: 13px 16px;
+}
+
+.xp-fb-comparison-row > span + span {
+  border-left: 1px solid var(--fb-line);
+}
+
+.xp-fb-comparison-row strong,
+.xp-fb-comparison-row small {
+  display: block;
+}
+
+.xp-fb-comparison-row strong {
+  font-size: 13px;
+  font-weight: 570;
+}
+
+.xp-fb-comparison-row small {
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xp-fb-comparison-row--header {
+  min-height: 42px;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 9px;
+}
+
+.xp-fb-verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fb-quiet);
+  font-size: 11px;
+}
+
+.xp-fb-verdict > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Only surfaces once the table stacks and loses its column header. */
+.xp-fb-verdict b {
+  display: none;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.xp-fb-verdict i {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--fb-line-strong);
+  border-radius: 50%;
+  font-style: normal;
+}
+
+.xp-fb-verdict--yes {
+  color: #b9f5d4;
+}
+
+.xp-fb-verdict--yes i {
+  border-color: rgba(85, 214, 154, 0.36);
+  background: var(--fb-green-soft);
+  animation: xp-fb-check-arrive 5.4s var(--fb-ease) infinite;
+  animation-delay: calc(var(--i) * 160ms);
+  color: var(--fb-green);
+}
+
+@keyframes xp-fb-check-arrive {
+  0%,
+  8% {
+    opacity: 0.25;
+    filter: blur(3px);
+    transform: scale(0.72);
+  }
+  14%,
+  88% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+/* The spine is each card's slack-taker: when a taller neighbour stretches the
+   row, the extra height lands here instead of pooling under the card. */
+.xp-fb-input-spine {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: 98px;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 14px;
+  margin: 0 24px 20px;
+}
+
+.xp-fb-input-spine__label {
+  flex: 0 0 auto;
+  color: var(--fb-green);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10px;
+}
+
+.xp-fb-input-spine__pulse {
+  position: relative;
+  height: 1px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  background: var(--fb-line-strong);
+}
+
+.xp-fb-input-spine__pulse::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--fb-green), transparent);
+  content: '';
+  animation: xp-fb-signal-sweep 3s var(--fb-ease) infinite;
+  transform: translateX(-100%);
+}
+
+@keyframes xp-fb-signal-sweep {
+  0%,
+  15% {
+    transform: translateX(-110%);
+  }
+  55%,
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+.xp-fb-slots {
+  display: flex;
+  gap: 6px;
+}
+
+.xp-fb-slot {
+  display: grid;
+  width: 36px;
+  height: 46px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #38383f;
+  border-radius: 8px;
+  background: #101014;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.xp-fb-slot > span {
+  animation: xp-fb-digit-rise 5.4s var(--fb-ease) infinite;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes xp-fb-digit-rise {
+  0%,
+  8% {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(16px);
+  }
+  16%,
+  90% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.xp-fb-slots--compact .xp-fb-slot {
+  width: 25px;
+  height: 34px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* Password managers */
+
+.xp-fb-password-stage {
+  /* The visible input width. The diagram is this plus the 40px of room, and
+     it is that total which has to be centred and fit — sizing the window to
+     the full stage clipped the overhang off below ~1050px. */
+  --pw-input: min(230px, calc(100% - 40px));
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 48px);
+  min-height: 100px;
+  flex: 1 1 auto;
+  margin: 22px 24px 0;
+}
+
+/* Anchored to the stage's centre line rather than its top, so the assembly
+   stays put when the card stretches to a taller row. */
+.xp-fb-password-window {
+  position: absolute;
+  top: calc(50% - 42px);
+  left: calc(50% - 20px);
+  width: var(--pw-input);
+  height: 48px;
+  overflow: visible;
+  transform: translateX(-50%);
+}
+
+.xp-fb-password-input {
+  position: relative;
+  width: calc(100% + 40px);
+  height: 48px;
+}
+
+.xp-fb-password-input .xp-fb-slots {
+  position: absolute;
+  inset: 7px 40px 7px 0;
+  justify-content: center;
+}
+
+.xp-fb-password-badge {
+  position: absolute;
+  top: 11px;
+  right: 49px;
+  z-index: 3;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid #f5d88a;
+  border-radius: 8px;
+  background: #2a2518;
+  color: #f5d88a;
+  font-size: 10px;
+  animation: xp-fb-push-badge 4.8s var(--fb-ease) infinite;
+}
+
+/* The 40px of clipped room. Drawn rather than clipped away, so the badge is
+   seen landing in it. */
+.xp-fb-password-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  border-radius: 0 8px 8px 0;
+  border: 1px dashed rgba(85, 214, 154, 0.42);
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(85, 214, 154, 0.12) 0 2px,
+    transparent 2px 7px
+  );
+  animation: xp-fb-reveal-room 4.8s var(--fb-ease) infinite;
+}
+
+@keyframes xp-fb-reveal-room {
+  0%,
+  12%,
+  94%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  28%,
+  78% {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@keyframes xp-fb-push-badge {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  28%,
+  78% {
+    transform: translateX(40px);
+  }
+  94%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.xp-fb-measure {
+  position: absolute;
+  top: calc(50% + 19px);
+  height: 1px;
+  background: #4b4b53;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 8px;
+}
+
+.xp-fb-measure::before,
+.xp-fb-measure::after {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: inherit;
+  content: '';
+}
+
+.xp-fb-measure::before {
+  left: 0;
+}
+
+.xp-fb-measure::after {
+  right: 0;
+}
+
+.xp-fb-measure span {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.xp-fb-measure--base {
+  left: calc(50% - 20px - var(--pw-input) / 2);
+  width: var(--pw-input);
+}
+
+.xp-fb-measure--extra {
+  left: calc(50% - 20px + var(--pw-input) / 2);
+  width: 40px;
+  background: var(--fb-green);
+  color: var(--fb-green);
+  animation: xp-fb-measure-extra 4.8s var(--fb-ease) infinite;
+}
+
+@keyframes xp-fb-measure-extra {
+  0%,
+  12%,
+  94%,
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  28%,
+  78% {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* One declaration per line rather than one truncated line — the declarations
+   are the point of the card. */
+.xp-fb-mechanism-code {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px 14px;
+  margin: 16px 24px 20px;
+  color: #7f7f89;
+  font-size: 9px;
+  line-height: 1.8;
+}
+
+/* Styles carousel */
+
+.xp-fb-styles-viewport {
+  position: relative;
+  z-index: 2;
+  min-height: 152px;
+  flex: 1 1 auto;
+  margin: 22px 24px 0;
+  overflow: hidden;
+  border-block: 1px solid var(--fb-line);
+}
+
+/* State-driven rather than a staggered keyframe loop, so a click or an arrow
+   key can take over mid-cycle. Slides rest on the side they enter from; the
+   one being replaced leaves on the opposite side. */
+.xp-fb-style-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding-inline: 12px;
+  opacity: 0;
+  transition:
+    opacity 520ms var(--fb-ease),
+    filter 520ms var(--fb-ease),
+    transform 520ms var(--fb-ease);
+  pointer-events: none;
+}
+
+.xp-fb-style-slide[data-pos='next'] {
+  filter: blur(7px);
+  transform: translateX(28px);
+}
+
+.xp-fb-style-slide[data-pos='prev'] {
+  filter: blur(5px);
+  transform: translateX(-28px);
+}
+
+.xp-fb-style-slide[data-pos='current'] {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0);
+}
+
+.xp-fb-style-slide code {
+  color: var(--fb-quiet);
+  font-size: 9px;
+}
+
+.xp-fb-style-demo {
+  display: flex;
+  max-width: 100%;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Six slots have to survive a 3-column card, so they shrink from 36px rather
+   than overflowing the card edge. */
+.xp-fb-style-demo span {
+  position: relative;
+  display: grid;
+  width: 36px;
+  min-width: 0;
+  height: 45px;
+  place-items: center;
+  font-size: 16px;
+}
+
+.xp-fb-style-demo span i {
+  display: block;
+  width: 1px;
+  height: 19px;
+  background: var(--fb-ink);
+  animation: xp-fb-caret-blink 1s step-end infinite;
+}
+
+@keyframes xp-fb-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.xp-fb-style-demo--keycaps {
+  gap: 5px;
+}
+
+.xp-fb-style-demo--keycaps span {
+  border: 1px solid #44444b;
+  border-bottom-width: 3px;
+  border-radius: 7px;
+  background: #151519;
+}
+
+.xp-fb-style-demo--underline {
+  gap: 6px;
+}
+
+.xp-fb-style-demo--underline span {
+  border-bottom: 2px solid #3a3a41;
+}
+
+.xp-fb-style-demo--underline span:nth-child(3) {
+  border-color: var(--fb-ink);
+}
+
+.xp-fb-style-demo--grouped {
+  overflow: hidden;
+  border: 1px solid #3a3a41;
+  border-radius: 11px;
+  background: #121216;
+}
+
+.xp-fb-style-demo--grouped span + span {
+  border-left: 1px solid #2f2f35;
+}
+
+.xp-fb-style-demo--grouped span:nth-child(3) {
+  box-shadow: inset 0 0 0 1px var(--fb-ink);
+}
+
+.xp-fb-style-demo--masked {
+  gap: 5px;
+}
+
+.xp-fb-style-demo--masked span {
+  border: 1px solid #3a3a41;
+  border-radius: 8px;
+  font-size: 25px;
+}
+
+/* The progress bars are the control: each one names its style and doubles as
+   that slide's timer. */
+.xp-fb-carousel-progress {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 8px;
+  /* The steps carry their own vertical padding for a 24px+ hit area, so the
+     container gives back the space that padding adds. */
+  margin: 7px 24px 13px;
+}
+
+/* Scoped past `.xp-fb button { font: inherit }`, which would otherwise win on
+   specificity and blow the label up to body size. */
+.xp-fb .xp-fb-carousel-step {
+  display: grid;
+  gap: 7px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  padding: 11px 0;
+  color: #5c5c66;
+  cursor: pointer;
+  font-size: 9px;
+  letter-spacing: 0.01em;
+  text-align: left;
+  transition: color 180ms ease;
+}
+
+.xp-fb-carousel-step:hover {
+  color: #a8a8b2;
+}
+
+.xp-fb-carousel-step[aria-selected='true'] {
+  color: var(--fb-ink);
+}
+
+.xp-fb-carousel-step:focus-visible {
+  outline: 2px solid rgba(244, 244, 245, 0.9);
+  outline-offset: 4px;
+}
+
+.xp-fb-carousel-step__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xp-fb-carousel-step__track {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: #2a2a30;
+  transition: background 180ms ease;
+}
+
+.xp-fb-carousel-step:hover .xp-fb-carousel-step__track {
+  background: #3d3d45;
+}
+
+.xp-fb-carousel-step__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fb-green);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Only the selected step runs. Deselecting drops the animation, which snaps
+   the bar back to empty in one frame — it never animates backwards. */
+.xp-fb-carousel-step[aria-selected='true'] .xp-fb-carousel-step__fill {
+  animation: xp-fb-carousel-fill 3200ms linear forwards;
+}
+
+.xp-fb-styles[data-running='false'] .xp-fb-carousel-step__fill {
+  animation-play-state: paused;
+}
+
+/* The last tenth belongs to the hand-off, so the bar reads as filling right
+   through the transition rather than completing early and then rewinding. */
+@keyframes xp-fb-carousel-fill {
+  0% {
+    transform: scaleX(0);
+  }
+  84% {
+    transform: scaleX(0.9);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* Pattern validation */
+
+.xp-fb-diff {
+  position: relative;
+  z-index: 2;
+  margin: 22px 24px 0;
+  padding: 14px 0;
+  overflow: hidden;
+  border-block: 1px solid rgba(85, 214, 154, 0.24);
+  background: linear-gradient(90deg, rgba(85, 214, 154, 0.08), transparent 86%);
+  color: #b7f7d3;
+  font-size: 9px;
+  line-height: 1.9;
+}
+
+/* Wraps at spaces rather than truncating: the import line is wider than a
+   four-column card between 900px and ~1150px, and a half-cut string reads as
+   broken code. The `+` gutter keeps wrapped lines aligned. */
+.xp-fb-diff > div {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  padding: 0 12px;
+  white-space: pre-wrap;
+  animation: xp-fb-diff-scan 5s var(--fb-ease) infinite;
+}
+
+.xp-fb-diff > div:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.xp-fb-diff i {
+  color: var(--fb-green);
+  font-style: normal;
+}
+
+.xp-fb-diff-quiet {
+  color: #6f6f78;
+}
+
+.xp-fb-diff-quiet i {
+  color: #4b4b52;
+}
+
+@keyframes xp-fb-diff-scan {
+  0%,
+  10% {
+    clip-path: inset(0 100% 0 0);
+  }
+  32%,
+  90% {
+    clip-path: inset(0);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+.xp-fb-validation-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  flex: 1 1 auto;
+  align-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 76px;
+  padding: 0 24px 16px;
+}
+
+.xp-fb-validation-label {
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 8px;
+}
+
+.xp-fb-character-gate {
+  position: relative;
+  height: 44px;
+  overflow: hidden;
+}
+
+.xp-fb-character {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.xp-fb-character--bad {
+  color: var(--fb-red);
+  animation: xp-fb-reject-character 5s var(--fb-ease) infinite;
+}
+
+.xp-fb-character--good {
+  color: var(--fb-green);
+  animation: xp-fb-accept-character 5s var(--fb-ease) infinite;
+}
+
+.xp-fb-gate-line {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 62%;
+  width: 1px;
+  background: var(--fb-green);
+  box-shadow: 2px 0 8px rgba(85, 214, 154, 0.32);
+}
+
+@keyframes xp-fb-reject-character {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  18% {
+    opacity: 1;
+  }
+  36%,
+  100% {
+    opacity: 0;
+    transform: translateX(70px) translateY(18px) rotate(22deg);
+  }
+}
+
+@keyframes xp-fb-accept-character {
+  0%,
+  42% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+  }
+  70%,
+  88% {
+    opacity: 1;
+    transform: translateX(95px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(115px);
+  }
+}
+
+.xp-fb-validation-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #b7f7d3;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 9px;
+}
+
+.xp-fb-validation-result i {
+  color: var(--fb-green);
+  font-style: normal;
+}
+
+/* Package weight */
+
+.xp-fb-weight-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  /* The beam is capped rather than flexible: stretched across a wide card it
+     stopped reading as a scale and became a stray hairline. */
+  grid-template-columns: 60px minmax(24px, 170px) auto;
+  flex: 1 1 auto;
+  align-content: center;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 90px;
+  margin: 14px 24px 0;
+}
+
+.xp-fb-package-cube {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid #4a4a52;
+  border-radius: 10px;
+  background: #151519;
+  box-shadow: 5px 5px 0 #202026;
+  animation: xp-fb-package-weigh 4.5s var(--fb-ease) infinite;
+}
+
+.xp-fb-package-cube span {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10px;
+}
+
+@keyframes xp-fb-package-weigh {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translateY(-20px) rotate(-7deg);
+  }
+  28%,
+  82% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+}
+
+.xp-fb-scale-arm {
+  position: relative;
+  height: 44px;
+}
+
+.xp-fb-scale-arm::before {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: #5c5c66;
+  content: '';
+  animation: xp-fb-scale-settle 4.5s var(--fb-ease) infinite;
+  transform-origin: right;
+}
+
+/* The post has to reach the beam, or the arm reads as two loose hairlines. */
+.xp-fb-scale-arm span {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  width: 2px;
+  height: 30px;
+  background: #5c5c66;
+}
+
+.xp-fb-scale-arm span::after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 18px;
+  height: 1px;
+  background: #3d3d45;
+  content: '';
+  transform: translateX(-50%);
+}
+
+@keyframes xp-fb-scale-settle {
+  0%,
+  15% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(2deg);
+  }
+  42%,
+  82% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(-3deg);
+  }
+}
+
+.xp-fb-weight-readout {
+  padding-bottom: 5px;
+  text-align: right;
+}
+
+.xp-fb-weight-readout strong,
+.xp-fb-weight-readout span {
+  display: block;
+}
+
+.xp-fb-weight-readout strong {
+  color: var(--fb-green);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 24px;
+  font-weight: 520;
+  letter-spacing: -0.04em;
+}
+
+.xp-fb-weight-readout strong small {
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.xp-fb-weight-readout span {
+  margin-top: 4px;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 8px;
+}
+
+.xp-fb-package-facts {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 12px 24px 22px;
+  border-top: 1px solid var(--fb-line);
+}
+
+.xp-fb-package-facts div {
+  padding-top: 12px;
+}
+
+.xp-fb-package-facts div + div {
+  padding-left: 14px;
+  border-left: 1px solid var(--fb-line);
+}
+
+.xp-fb-package-facts dt {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+}
+
+.xp-fb-package-facts dd {
+  margin: 4px 0 0;
+  color: var(--fb-quiet);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+@media (max-width: 900px) {
+  .xp-fb-intro {
+    grid-template-columns: 1fr;
+  }
+
+  /* One column below 900px: the cards fall back to source order, which is
+     already the reading order. */
+  .xp-fb-grid > .xp-fb-card {
+    grid-area: auto;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .xp-fb {
+    padding: 56px 18px 44px;
+  }
+
+  .xp-fb-intro h2 {
+    font-size: clamp(2.7rem, 14vw, 4rem);
+  }
+
+  /* Three columns cannot survive a phone, and a sideways-scrolling comparison
+     hides the half that makes the argument. Each row stacks instead: claim on
+     top, both verdicts side by side underneath, each naming its own column. */
+  .xp-fb-comparison-row--header {
+    display: none;
+  }
+
+  .xp-fb-comparison-row {
+    min-width: 0;
+    grid-template-columns: 1fr 1fr;
+    min-height: 0;
+    padding: 16px 0 18px;
+  }
+
+  .xp-fb-comparison-row > span {
+    padding: 0 16px;
+  }
+
+  .xp-fb-comparison-row > span:first-child {
+    grid-column: 1 / -1;
+    padding-bottom: 14px;
+  }
+
+  .xp-fb-comparison-row > span + span {
+    border-left: 0;
+  }
+
+  .xp-fb-verdict {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-inline: 16px;
+  }
+
+  .xp-fb-verdict > span {
+    flex-direction: row;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .xp-fb-verdict b {
+    display: block;
+  }
+
+  .xp-fb-input-spine {
+    flex-wrap: wrap;
+    padding-block: 18px;
+  }
+
+  .xp-fb-input-spine__pulse {
+    min-width: 100px;
+  }
+
+  .xp-fb-slots--compact .xp-fb-slot {
+    width: 23px;
+  }
+
+  .xp-fb-style-demo span {
+    width: 30px;
+  }
+
+  .xp-fb-validation-stage {
+    grid-template-columns: 70px 1fr;
+    row-gap: 4px;
+  }
+
+  .xp-fb-validation-result {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-fb *,
+  .xp-fb *::before,
+  .xp-fb *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* The carousel stops advancing itself but still answers the tabs, so the
+     slides keep their positions and simply swap without moving. */
+  .xp-fb-style-slide {
+    filter: none;
+    transform: none;
+  }
+
+  /* Reduced motion holds each mechanism at its resolved state: the badge has
+     already been pushed into the room that was made for it. */
+  .xp-fb-password-badge {
+    transform: translateX(40px);
+  }
+
+  .xp-fb-password-mask,
+  .xp-fb-measure--extra {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .xp-fb-carousel-step[aria-selected='true'] .xp-fb-carousel-step__fill {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .xp-fb-character--bad {
+    display: none;
+  }
+}

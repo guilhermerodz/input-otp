@@ -367,8 +367,7 @@ html {
   /* Two mask layers, intersected: an ellipse that keeps the field faint over
      the centre (where the OTP input sits), strongest in a mid ring, and gone
      at the far edges — plus the bottom fade into the next section. */
-  mask-image:
-    radial-gradient(
+  mask-image: radial-gradient(
       ellipse 78% 98% at 50% 52%,
       rgba(0, 0, 0, 0.04) 20%,
       rgba(0, 0, 0, 0.2) 48%,
@@ -376,8 +375,7 @@ html {
     ),
     linear-gradient(to bottom, #000 78%, transparent 100%);
   mask-composite: intersect;
-  -webkit-mask-image:
-    radial-gradient(
+  -webkit-mask-image: radial-gradient(
       ellipse 78% 98% at 50% 52%,
       rgba(0, 0, 0, 0.04) 20%,
       rgba(0, 0, 0, 0.2) 48%,
@@ -385,6 +383,19 @@ html {
     ),
     linear-gradient(to bottom, #000 78%, transparent 100%);
   -webkit-mask-composite: source-in;
+  /* Fades up once motes has painted its first frame (see HeroField). */
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-hero-field[data-ready] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-hero-field {
+    transition-duration: 0.01ms;
+  }
 }
 
 .xp-hero-copy {
@@ -419,6 +430,226 @@ html {
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+/* ————— Hero slot background candidates —————
+   Five subtle to-bottom gradients on the hero slots only (.xp-otp-spot is
+   the hero container), swapped live by SlotBgSwitcher via a data attribute
+   on <html>. Drop the switcher and the five rules below once one is chosen.
+
+   Every stop is translucent, so the page — and the motes field behind it —
+   reads through the whole slot rather than only where a gradient runs out.
+   Alphas are picked against the page's #09090b: rgba(20,20,25,0.72) lands
+   near #111115 composited, a touch above the old flat #0c0c0e instead of
+   the #17171b that made the first pass read as lit. Nothing here composites
+   the backdrop (no blur, no filters) — these are plain paint. */
+
+/* Dim along the top edge, thinning out to nothing at the bottom. */
+[data-slot-bg='lift'] .xp-otp-spot .xp-slot {
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 25, 0.72) 0%,
+    rgba(17, 17, 22, 0.5) 45%,
+    rgba(17, 17, 22, 0) 100%
+  );
+}
+
+/* The mirror: open at the top, gathering into a floor at the bottom. */
+[data-slot-bg='well'] .xp-otp-spot .xp-slot {
+  background: linear-gradient(
+    180deg,
+    rgba(17, 17, 22, 0) 0%,
+    rgba(17, 17, 22, 0.5) 55%,
+    rgba(20, 20, 25, 0.72) 100%
+  );
+}
+
+/* An even veil: alpha holds, only the tint shifts — top sits above the page
+   tone, bottom settles onto it. The steadiest of the five. */
+[data-slot-bg='sheet'] .xp-otp-spot .xp-slot {
+  background: linear-gradient(
+    180deg,
+    rgba(21, 21, 26, 0.68) 0%,
+    rgba(10, 10, 13, 0.68) 100%
+  );
+}
+
+/* The field's own cool accent washed over the top of a translucent base. */
+[data-slot-bg='frost'] .xp-otp-spot .xp-slot {
+  background: linear-gradient(
+      180deg,
+      rgba(221, 234, 254, 0.055) 0%,
+      rgba(221, 234, 254, 0.012) 58%,
+      rgba(221, 234, 254, 0) 100%
+    ),
+    rgba(11, 11, 15, 0.62);
+}
+
+/* Not a ramp but an edge: a hairline of specular on the top bevel, then the
+   fill drops away immediately and keeps thinning. */
+[data-slot-bg='seam'] .xp-otp-spot .xp-slot {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(19, 19, 24, 0.62) 10%,
+    rgba(16, 16, 20, 0.38) 58%,
+    rgba(16, 16, 20, 0.1) 100%
+  );
+}
+
+/* The switcher itself — a dev control, docked bottom-centre. */
+.xp-bgswitch {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #27272a;
+  border-radius: 999px;
+  /* Opaque, not frosted: it sits fixed over a scrolling page, and a
+     backdrop blur there costs a composite every frame while you scroll. */
+  background: #0b0b0d;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
+}
+
+.xp-bgswitch-title {
+  padding: 0 8px 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #52525b;
+}
+
+.xp-bgswitch-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  color: #a1a1aa;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.xp-bgswitch-btn:hover {
+  color: #fafafa;
+  background: #18181b;
+}
+
+.xp-bgswitch-btn--on {
+  color: #fafafa;
+  border-color: #3f3f46;
+  background: #18181b;
+}
+
+/* Each chip previews the shape of its variant. Deliberately exaggerated —
+   the real gradients are too faint to survive 12×16px, so read these as
+   labels and judge the gradients on the slots. */
+.xp-bgswitch-chip {
+  width: 12px;
+  height: 16px;
+  border: 1px solid #3f3f46;
+  border-radius: 3px;
+}
+
+.xp-bgswitch-chip--off {
+  background: #0c0c0e;
+}
+
+.xp-bgswitch-chip--lift {
+  background: linear-gradient(180deg, #1c1c22 0%, rgba(9, 9, 11, 0) 100%);
+}
+
+.xp-bgswitch-chip--well {
+  background: linear-gradient(180deg, rgba(9, 9, 11, 0) 0%, #1c1c22 100%);
+}
+
+.xp-bgswitch-chip--sheet {
+  background: linear-gradient(180deg, #1a1a20 0%, #0a0a0d 100%);
+}
+
+.xp-bgswitch-chip--frost {
+  background: linear-gradient(
+      180deg,
+      rgba(221, 234, 254, 0.16) 0%,
+      rgba(221, 234, 254, 0) 100%
+    ),
+    #0b0b0e;
+}
+
+.xp-bgswitch-chip--seam {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.5) 8%,
+    rgba(22, 22, 28, 0.8) 9%,
+    rgba(16, 16, 20, 0.15) 100%
+  );
+}
+
+@media (max-width: 900px) {
+  .xp-bgswitch {
+    gap: 2px;
+    padding: 5px 6px;
+  }
+
+  .xp-bgswitch-title {
+    display: none;
+  }
+
+  .xp-bgswitch-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+}
+
+/* ————— Hero-only cursor spotlight —————
+   The pointer is a light source and the slot rims catch it. The gain is
+   baked per slot (--xp-lit, set from JS): the outer slots reflect nearly
+   all of it, the middle pair much less — the background field already
+   lights the hero from the sides, so the centre reads as the dimmest
+   part of the row and a rim that lit up evenly would break that. */
+.xp-otp-spot .xp-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    var(--xp-reach, 240px) circle at var(--xp-mx, -9999px) var(--xp-my, -9999px),
+    rgba(232, 240, 255, calc(0.95 * var(--xp-lit, 0))) 0%,
+    rgba(226, 236, 255, calc(0.42 * var(--xp-lit, 0))) 30%,
+    rgba(214, 228, 255, 0) 72%
+  );
+  /* Ring only: punch the fill out and keep the 1.5px rim. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: var(--xp-spot, 0);
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-otp-spot .xp-slot::after {
+    display: none;
+  }
 }
 
 /* New digits slide up into the slot (after Luxe UI's input-otp). */
@@ -612,6 +843,22 @@ html {
 
 /* Sponsor tiers ---------------------------------------------------------- */
 
+/* One grid for both tiers. Two stacked grids with different track counts
+   (2fr/1fr over 1fr/1fr/1fr) never line up: the fr units split a different
+   number of gaps, so the diamond card lands ~7px short of the two silver
+   cards under it. Spanning columns inside a single grid is the only way the
+   edges actually agree. */
+.xp-sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
+  grid-column: span 2;
+}
+
 .xp-sponsor-beam-wrap,
 .xp-sponsor-beam-wrap > .xp-sponsor-card {
   height: 100%;
@@ -676,7 +923,13 @@ html {
 }
 
 .xp-sponsor-cta {
+  display: grid;
+  place-items: center;
+  min-height: 100px;
+  border: 1px dashed #27272a;
+  border-radius: 14px;
   overflow: hidden;
+  color: #3f3f46;
 }
 
 .xp-sponsor-cta-plus,
@@ -842,7 +1095,10 @@ html {
 
 /* The shadow is a stack of five, each roughly double the last in blur and
    offset: one big soft shadow reads as fog, a stack reads as a card sitting
-   above the page. */
+   above the page. --ox/--oy are the cursor in this card's own coordinates,
+   written by the component every frame, so the card grows out of the pointer
+   and collapses back into it — including when it has been flipped underneath
+   the cursor or slid sideways to clear an edge. */
 .xp-usedby-shot-card {
   width: 420px;
   aspect-ratio: 16 / 9;
@@ -856,7 +1112,8 @@ html {
     0 8px 16px rgba(0, 0, 0, 0.28),
     0 18px 36px rgba(0, 0, 0, 0.26),
     0 36px 72px rgba(0, 0, 0, 0.24);
-  animation: xp-usedby-shot-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+  will-change: transform, opacity;
 }
 
 .xp-usedby-shot img {
@@ -866,32 +1123,56 @@ html {
   display: block;
 }
 
-/* It arrives from the side it is anchored to, so a flipped card does not
-   appear to come from the wrong direction. */
+/* Out of the pointer: a hard scale up off a decelerating curve, with the blur
+   resolving a little ahead of the size so it reads as coming into focus rather
+   than being inflated. */
+.xp-usedby-shot-card[data-state='open'] {
+  animation: xp-usedby-shot-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes xp-usedby-shot-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
+    transform: scale(0.26);
+    filter: blur(7px);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
+    filter: blur(0);
   }
 }
 
-@keyframes xp-usedby-shot-in-below {
+/* And back into it, quicker and on an accelerating curve — leaving should feel
+   like the card is being pulled back to the cursor, not drifting away. */
+.xp-usedby-shot-card[data-state='closed'] {
+  animation: xp-usedby-shot-out 150ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
+}
+
+@keyframes xp-usedby-shot-out {
   from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.97);
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
   }
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    opacity: 0;
+    transform: scale(0.26);
+    filter: blur(5px);
   }
 }
 
-.xp-usedby-shot[data-side='bottom'] .xp-usedby-shot-card {
-  animation-name: xp-usedby-shot-in-below;
+/* Not `animation: none`: the closed card unmounts on animationend, and an
+   animation that never runs never ends. */
+@media (prefers-reduced-motion: reduce) {
+  .xp-usedby-shot-card[data-state='open'],
+  .xp-usedby-shot-card[data-state='closed'] {
+    animation-duration: 1ms;
+  }
 }
 
 /* Junk is set in the mono face at the ratio where its fixed advance lands on
@@ -993,6 +1274,8 @@ html {
     height: 58px;
     font-size: 26px;
     border-radius: 10px;
+    /* Smaller slots need a tighter light or the whole row lights at once. */
+    --xp-reach: 130px;
   }
 
   .xp-caret {
@@ -1008,9 +1291,19 @@ html {
     flex-wrap: wrap;
   }
 
-  .xp-grid-3,
-  .xp-grid-sponsors {
-    grid-template-columns: 1fr !important;
+  .xp-sponsors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
+    grid-column: auto;
+  }
+
+  /* One column means the two "+" slots stack into a repeat. The top one only
+     exists to fill the diamond row's third track, so drop it and let the
+     column read sponsors first, invitation last. */
+  .xp-sponsor-cta--filler {
+    display: none;
   }
 
   .xp-nav-links {
@@ -1309,5 +1602,281 @@ html {
     .xp-sp-belt {
       padding-inline: 20px;
     }
+  }
+}
+
+/* Closing CTA ------------------------------------------------------------ */
+
+.xp-cta {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #1c1c1f;
+  padding: 96px 40px 124px;
+  text-align: center;
+}
+
+.xp-cta-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.xp-cta-title {
+  margin: 0;
+  max-width: 620px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.xp-cta-sub {
+  margin: -4px 0 0;
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #a1a1aa;
+  text-wrap: pretty;
+}
+
+.xp-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* The hero's field, turned over: brightest along the top border, gone by the
+   time it reaches the wordmark. The copy sits inside it rather than below it,
+   so the ceiling on the alpha is the same low one the hero uses — any higher
+   and the field stops being weather and starts being wallpaper. */
+.xp-cta-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: radial-gradient(
+      ellipse 95% 76% at 50% -12%,
+      rgba(0, 0, 0, 0.26) 18%,
+      rgba(0, 0, 0, 0.13) 58%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, #000 30%, transparent 76%);
+  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(
+      ellipse 95% 76% at 50% -12%,
+      rgba(0, 0, 0, 0.26) 18%,
+      rgba(0, 0, 0, 0.13) 58%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, #000 30%, transparent 76%);
+  -webkit-mask-composite: source-in;
+  /* Fades up once motes has painted its first frame (see CtaDaybreak). */
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-cta-field[data-ready] {
+  opacity: 1;
+}
+
+/* The package name in outline, sunk below the footer border and fading out
+   upward, so the letters rise from the border rather than sit behind the copy.
+   Nine characters, so it is never allowed to break. */
+.xp-cta-mark {
+  position: absolute;
+  left: 50%;
+  bottom: -0.3em;
+  translate: -50% 0;
+  font-size: clamp(52px, 13.2vw, 158px);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px #2c2c33;
+  mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The light already arrives from above, so the glow off the bottom border is
+   only here to lift the wordmark off it — not to be a second sun. */
+.xp-cta-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -170px;
+  translate: -50% 0;
+  width: 130%;
+  height: 360px;
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgba(200, 222, 255, 0.36),
+    rgba(140, 170, 255, 0.13) 45%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* The border itself, with a light running the length of it. */
+.xp-cta-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(221, 234, 254, 0.55) 22%,
+    #fafafa 50%,
+    rgba(221, 234, 254, 0.55) 78%,
+    transparent
+  );
+  mask-image: linear-gradient(to right, transparent, #000 12%, transparent 24%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    transparent 24%
+  );
+  mask-size: 300% 100%;
+  -webkit-mask-size: 300% 100%;
+  animation: xp-cta-scan 7s linear infinite;
+}
+
+@keyframes xp-cta-scan {
+  from {
+    mask-position: -100% 0;
+    -webkit-mask-position: -100% 0;
+  }
+  to {
+    mask-position: 200% 0;
+    -webkit-mask-position: 200% 0;
+  }
+}
+
+/* Keycaps: a cap with a bottom edge, which it travels when pressed. Both
+   colour rules carry the .xp prefix — `.xp a` sets colour: inherit, which
+   would otherwise paint the primary label white on a white cap, and
+   `.xp a:hover` would drop the whole cap to 0.8. */
+.xp-cta-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    background 200ms ease,
+    border-color 200ms ease;
+}
+
+.xp .xp-cta-key,
+.xp .xp-cta-key:hover {
+  opacity: 1;
+}
+
+.xp .xp-cta-key--primary {
+  background: #fafafa;
+  color: #09090b;
+  box-shadow:
+    0 4px 0 #a1a1aa,
+    0 8px 18px -8px rgba(0, 0, 0, 0.9);
+}
+
+.xp .xp-cta-key--primary:hover {
+  background: #fff;
+}
+
+.xp .xp-cta-key--ghost {
+  background: #101013;
+  color: #fafafa;
+  border: 1px solid #27272a;
+  box-shadow:
+    0 4px 0 #1c1c1f,
+    0 8px 18px -10px rgba(0, 0, 0, 0.9);
+}
+
+.xp .xp-cta-key--ghost:hover {
+  border-color: #3f3f46;
+  background: #16161a;
+}
+
+.xp-cta-key:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.xp-cta-key:focus-visible {
+  outline: 2px solid #ddeafe;
+  outline-offset: 3px;
+}
+
+.xp-cta-key-glyph {
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: rgba(9, 9, 11, 0.09);
+  color: #52525b;
+}
+
+.xp .xp-cta-key--star {
+  gap: 8px;
+  color: #d4d4d8;
+}
+
+.xp .xp-cta-key--star span {
+  color: #eab308;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-cta-field {
+    transition-duration: 0.01ms;
+  }
+
+  .xp-cta-line {
+    animation: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .xp-cta {
+    padding: 76px 22px 104px;
+  }
+
+  .xp-cta-title {
+    font-size: 28px;
+  }
+
+  /* The section is shorter here, so the mask's bright top zone reaches much
+     further down the copy. Take the whole field back rather than re-cutting
+     the mask. */
+  .xp-cta-field[data-ready] {
+    opacity: 0.68;
+  }
+
+  .xp-cta-row {
+    flex-direction: column;
+    align-self: stretch;
+  }
+
+  .xp-cta-key {
+    justify-content: center;
+    width: 100%;
   }
 }

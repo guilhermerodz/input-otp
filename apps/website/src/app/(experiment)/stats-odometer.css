@@ -1,0 +1,193 @@
+/* Styles for the "trusted at scale" odometer.
+
+   The counter changes every frame, so nothing here animates a layout property:
+   the drums translate and nothing else. The only thing the browser recalculates
+   sixty times a second is a transform. */
+
+.xp-st-section {
+  padding: 56px 40px 60px;
+  border-top: 1px solid #1c1c1f;
+  text-align: center;
+}
+
+.xp-st-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: #71717a;
+}
+
+.xp-st-caption {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #a1a1aa;
+}
+
+.xp-st-dim {
+  color: #52525b;
+}
+
+/* Present to a screen reader, gone from the page: the moving digits are
+   decoration, and a number re-read sixty times a second is not a reading. */
+.xp-st-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The drums ---------------------------------------------------------------- */
+
+.xp-st-odo {
+  --st-cell: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 22px;
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  /* The drums are cut off by their own columns; this keeps the row's height
+     honest to one cell rather than eleven. */
+  height: var(--st-cell);
+}
+
+.xp-st-odo-group {
+  display: flex;
+  align-items: flex-start;
+}
+
+.xp-st-odo-sep {
+  align-self: flex-end;
+  padding: 0 2px 8px;
+  color: #3f3f46;
+}
+
+.xp-st-odo-col {
+  position: relative;
+  width: 0.66em;
+  height: var(--st-cell);
+  overflow: hidden;
+  /* Top and bottom of the window fall off, so a drum reads as a cylinder
+     turning behind a slot rather than a list scrolling. */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 26%,
+    #000 74%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 74%, transparent 100%);
+}
+
+.xp-st-odo-drum {
+  display: block;
+  will-change: transform;
+}
+
+.xp-st-odo-drum > span {
+  display: grid;
+  place-items: center;
+  height: var(--st-cell);
+}
+
+/* Five and a half turns a second and half a turn a second. Neither is a digit
+   anyone reads, and pretending otherwise is what makes a live counter look
+   fake — so they smear the way a wheel that fast actually would. */
+.xp-st-odo-col[data-spin='fast'] {
+  filter: blur(2.4px);
+  opacity: 0.82;
+}
+
+.xp-st-odo-col[data-spin='soft'] {
+  filter: blur(0.7px);
+  opacity: 0.94;
+}
+
+/* The link ----------------------------------------------------------------- */
+
+.xp-st-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.xp-st-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border: 1px solid #1f1f23;
+  border-radius: 999px;
+  background: #0c0c0e;
+  font-size: 13px;
+  color: #a1a1aa;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.xp-st-chip b {
+  color: #fafafa;
+  font-weight: 600;
+}
+
+/* Beats the page-wide `.xp a:hover { opacity: .8 }` — the one link in the
+   section should light up when it is the thing under the cursor, not dim. */
+.xp a.xp-st-chip:hover {
+  opacity: 1;
+  border-color: #3f3f46;
+  background: #101014;
+}
+
+.xp-st-chip:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.xp-st-shadcn {
+  width: 14px;
+  height: 14px;
+  stroke: #fafafa;
+  stroke-width: 26;
+  stroke-linecap: round;
+}
+
+.xp-st-arrow {
+  color: #52525b;
+  font-size: 12px;
+  transition: transform 0.15s ease;
+}
+
+.xp-st-chip:hover .xp-st-arrow {
+  transform: translate(1px, -1px);
+  color: #a1a1aa;
+}
+
+/* Reduced motion ------------------------------------------------------------
+   The clock never ticks past its first frame here, so every drum is parked on
+   its digit. Nothing moves; nothing is missing. */
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-st-odo-col[data-spin] {
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-st-section {
+    padding: 44px 20px 48px;
+  }
+
+  /* Nine drums have to fit a phone, so the whole row steps down rather than
+     dropping a digit — a counter missing its hundred-millions is not one. */
+  .xp-st-odo {
+    --st-cell: 42px;
+    font-size: 34px;
+  }
+}
