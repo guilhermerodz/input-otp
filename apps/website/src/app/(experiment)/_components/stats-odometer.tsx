@@ -9,27 +9,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import type { DownloadStats } from '../_data/npm-downloads'
 import { canReplayIntro, replayIntro } from './preloader'
 
-/* Read off the npm registry API on 2026-07-24: every daily figure summed from
-   the first publish through 2026-07-23, and the last full week. Two of those
-   days came back as 0 — registry gaps, not quiet days — so the total is a
-   floor, which is the side to be wrong on. The counter extrapolates from these
-   two numbers; npm reports daily, not per install, so the digits are a model of
-   a real rate rather than a feed. Re-read both when they go stale. */
-const ANCHOR_AT = Date.parse('2026-07-24T00:00:00Z')
-const ANCHOR_TOTAL = 761_799_962
-const WEEKLY = 32_942_964
-
-const PER_SECOND = WEEKLY / (7 * 24 * 60 * 60)
-
-/* Rounded off the anchor rather than written out, so refreshing the week's
-   figure moves the headline with it. */
-const WEEKLY_SHORT = `${Math.round(WEEKLY / 1e6)}M`
-
-/* Holds until the total crosses a billion, which is years out and will mean
-   re-reading the anchor anyway. */
-const DIGITS = String(ANCHOR_TOTAL).length
+/* The two figures behind everything below — the running total as of a known
+   instant, and the last seven days — arrive from npm-stat on the server and are
+   refreshed every 12 hours (see _data/npm-downloads.ts). npm reports daily, not
+   per install, so the digits are a model of a real rate rather than a feed. */
 
 /* Fixed locale: this renders on the server too, and a count that groups
    differently on the two passes is a hydration mismatch. */
@@ -40,10 +26,6 @@ const SHADCN_URL = 'https://ui.shadcn.com/docs/components/input-otp'
 /* How long the first paint's figure takes to catch up to the live one. */
 const SPIN_MS = 1400
 
-function totalAt(ms: number) {
-  return ANCHOR_TOTAL + ((ms - ANCHOR_AT) / 1000) * PER_SECOND
-}
-
 /* `still` marks the one frame reduced motion gets: nothing will move after it,
    so anything that would normally be caught mid-motion has to be drawn at rest
    instead. */
@@ -53,10 +35,15 @@ type Frame = { total: number; still?: boolean }
    changes every single frame, and re-rendering React sixty times a second to
    move one digit is not a trade worth making.
 
-   The server has no clock it can share, so the markup ships ANCHOR_TOTAL and
-   the loop eases from there up to the live figure over the first moment on
+   The server has no clock it can share, so the markup ships the anchor total
+   and the loop eases from there up to the live figure over the first moment on
    screen — the catch-up is the reveal, not a glitch to hide. */
-function useDownloadClock(onFrame: (frame: Frame) => void) {
+function useDownloadClock(
+  anchorAt: number,
+  anchorTotal: number,
+  perSecond: number,
+  onFrame: (frame: Frame) => void,
+) {
   const hostRef = useRef<HTMLElement>(null)
   const latest = useRef(onFrame)
   latest.current = onFrame
@@ -65,7 +52,7 @@ function useDownloadClock(onFrame: (frame: Frame) => void) {
     const host = hostRef.current
     if (!host) return
 
-    const live = totalAt(Date.now())
+    const live = anchorTotal + ((Date.now() - anchorAt) / 1000) * perSecond
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       latest.current({ total: live, still: true })
@@ -80,9 +67,11 @@ function useDownloadClock(onFrame: (frame: Frame) => void) {
       const t = now - startedAt
       /* Real elapsed time, not accumulated frames: scrolling the section away
          stops the loop but not the installs, so coming back catches up. */
-      const since = (t / 1000) * PER_SECOND
+      const since = (t / 1000) * perSecond
       const spin = t < SPIN_MS ? 1 - (1 - t / SPIN_MS) ** 3 : 1
-      latest.current({ total: ANCHOR_TOTAL + (live - ANCHOR_TOTAL) * spin + since })
+      latest.current({
+        total: anchorTotal + (live - anchorTotal) * spin + since,
+      })
       raf = requestAnimationFrame(loop)
     }
 
@@ -101,7 +90,7 @@ function useDownloadClock(onFrame: (frame: Frame) => void) {
       if (raf) cancelAnimationFrame(raf)
       observer.disconnect()
     }
-  }, [])
+  }, [anchorAt, anchorTotal, perSecond])
 
   return hostRef
 }
@@ -120,8 +109,8 @@ const CELLS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
    numbers for four minutes just looks broken. */
 const TURN_MS = 320
 
-function drumAt(total: number, power: number, still = false) {
-  const perSecond = PER_SECOND / 10 ** power
+function drumAt(total: number, power: number, rate: number, still = false) {
+  const perSecond = rate / 10 ** power
   const x = total / 10 ** power
   if (still) return Math.floor(x) % 10
   if (perSecond > 2.5) return x % 10
@@ -131,8 +120,8 @@ function drumAt(total: number, power: number, still = false) {
   return digit + (frac > 1 - turn ? (frac - (1 - turn)) / turn : 0)
 }
 
-function drumSpin(power: number) {
-  const speed = PER_SECOND / 10 ** power
+function drumSpin(power: number, rate: number) {
+  const speed = rate / 10 ** power
   if (speed > 20) return 'fast'
   if (speed > 2.5) return 'soft'
   return 'still'
@@ -142,7 +131,19 @@ function shift(position: number) {
   return `translate3d(0, calc(var(--st-cell) * ${-position}), 0)`
 }
 
-export function StatsOdometer() {
+export function StatsOdometer({ downloads }: { downloads: DownloadStats }) {
+  const { anchorAt, total: anchorTotal, weekly } = downloads
+
+  const perSecond = weekly / (7 * 24 * 60 * 60)
+
+  /* Rounded off the live figure rather than written out, so a refreshed week
+     moves the headline with it. */
+  const weeklyShort = `${Math.round(weekly / 1e6)}M`
+
+  /* One drum per digit of the anchor. Grows on its own the day the total
+     crosses a billion. */
+  const digits = String(Math.floor(anchorTotal)).length
+
   const drums = useRef<(HTMLSpanElement | null)[]>([])
 
   /* The number is the way back into the intro — the only one. Rendered
@@ -152,10 +153,13 @@ export function StatsOdometer() {
   const [replayable, setReplayable] = useState(false)
   useEffect(() => setReplayable(canReplayIntro()), [])
 
-  const hostRef = useDownloadClock(frame => {
-    for (let j = 0; j < DIGITS; j++) {
+  const hostRef = useDownloadClock(anchorAt, anchorTotal, perSecond, frame => {
+    for (let j = 0; j < digits; j++) {
       const drum = drums.current[j]
-      if (drum) drum.style.transform = shift(drumAt(frame.total, DIGITS - 1 - j, frame.still))
+      if (drum)
+        drum.style.transform = shift(
+          drumAt(frame.total, digits - 1 - j, perSecond, frame.still),
+        )
     }
   })
 
@@ -170,24 +174,29 @@ export function StatsOdometer() {
         className="xp-st-odo-btn"
         onClick={replayIntro}
         disabled={!replayable}
-        aria-label="Replay the 700M downloads intro"
+        aria-label="Replay the downloads intro"
         title="Replay the intro"
       >
         <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
-          {Array.from({ length: DIGITS }, (_, j) => {
-            const power = DIGITS - 1 - j
+          {Array.from({ length: digits }, (_, j) => {
+            const power = digits - 1 - j
             return (
               <span className="xp-st-odo-group" key={power}>
                 {j > 0 && power % 3 === 2 && (
                   <span className="xp-st-odo-sep">,</span>
                 )}
-                <span className="xp-st-odo-col" data-spin={drumSpin(power)}>
+                <span
+                  className="xp-st-odo-col"
+                  data-spin={drumSpin(power, perSecond)}
+                >
                   <span
                     className="xp-st-odo-drum"
                     ref={el => {
                       drums.current[j] = el
                     }}
-                    style={{ transform: shift(drumAt(ANCHOR_TOTAL, power)) }}
+                    style={{
+                      transform: shift(drumAt(anchorTotal, power, perSecond)),
+                    }}
                   >
                     {CELLS.map((n, i) => (
                       <span key={i}>{n}</span>
@@ -201,20 +210,29 @@ export function StatsOdometer() {
       </button>
       {/* The drums are decoration to a screen reader; this is the number. */}
       <p className="xp-st-sr">
-        {NUMBER.format(ANCHOR_TOTAL)} total downloads, growing by about{' '}
-        {Math.round(PER_SECOND)} a second.
+        {NUMBER.format(anchorTotal)} total downloads, growing by about{' '}
+        {Math.round(perSecond)} a second.
       </p>
 
       <div className="xp-st-caption" data-rv="lede">
         total downloads
-        <span className="xp-st-dim">{` · ${WEEKLY_SHORT} weekly`}</span>
+        <span className="xp-st-dim">{` · ${weeklyShort} weekly`}</span>
       </div>
 
       <div className="xp-st-row" data-rv="chrome">
         {/* Their own mark, so the chip reads as the shadcn/ui docs before anyone
             reads the words — and the whole thing is the link out. */}
-        <a className="xp-st-chip" href={SHADCN_URL} target="_blank" rel="noreferrer">
-          <svg className="xp-st-shadcn" viewBox="0 0 256 256" aria-hidden="true">
+        <a
+          className="xp-st-chip"
+          href={SHADCN_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <svg
+            className="xp-st-shadcn"
+            viewBox="0 0 256 256"
+            aria-hidden="true"
+          >
             <line x1="208" y1="128" x2="128" y2="208" />
             <line x1="192" y1="40" x2="40" y2="192" />
           </svg>

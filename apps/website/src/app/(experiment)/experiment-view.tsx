@@ -16,6 +16,7 @@ import { Preloader } from './_components/preloader'
 import { SpottedMarquee } from './_components/spotted-marquee'
 import { StatsOdometer } from './_components/stats-odometer'
 import { UsedByMarquee } from './_components/used-by-marquee'
+import { milestoneLabel, type DownloadStats } from './_data/npm-downloads'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
@@ -83,11 +84,17 @@ function Logo() {
   )
 }
 
-export function ExperimentView({ starCount }: { starCount: string | null }) {
+export function ExperimentView({
+  starCount,
+  downloads,
+}: {
+  starCount: string | null
+  downloads: DownloadStats
+}) {
   return (
     <RevealRoot>
     <div className="xp">
-      <Preloader />
+      <Preloader milestone={milestoneLabel(downloads.total)} />
 
       {/* Nav */}
       <header
@@ -228,7 +235,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
 
       <UsedByMarquee />
 
-      <StatsOdometer />
+      <StatsOdometer downloads={downloads} />
 
       <SpottedMarquee />
 
