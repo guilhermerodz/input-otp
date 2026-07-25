@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 
 import { RevealRoot } from './_reveal/reveal-root'
-import { VariantSwitch } from './_reveal/variant-switch'
 
 import { ClerkParticles } from './_components/clerk-particles'
 import { CtaDaybreak } from './_components/cta-daybreak'
@@ -78,18 +77,11 @@ function Logo() {
   )
 }
 
-export function ExperimentView({
-  starCount,
-  variant,
-}: {
-  starCount: string | null
-  variant: number
-}) {
+export function ExperimentView({ starCount }: { starCount: string | null }) {
   return (
-    <RevealRoot variant={variant}>
+    <RevealRoot>
     <div className="xp">
       <Preloader />
-      <VariantSwitch current={variant} />
 
       {/* Nav */}
       <header
