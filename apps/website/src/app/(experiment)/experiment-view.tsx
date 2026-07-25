@@ -8,6 +8,7 @@ import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
+import { SpottedMarquee } from './_components/spotted-marquee'
 import { UsedByMarquee } from './_components/used-by-marquee'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
@@ -68,55 +69,6 @@ function Logo() {
       >
         input-otp
       </span>
-    </div>
-  )
-}
-
-function Testimonial(props: {
-  initials: string
-  name: string
-  handle: string
-  quote: React.ReactNode
-  views: string
-}) {
-  return (
-    <div
-      style={{
-        ...card,
-        padding: 26,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            background: '#18181b',
-            border: '1px solid #27272a',
-            display: 'grid',
-            placeItems: 'center',
-            fontSize: 14,
-            fontWeight: 600,
-            color: '#a1a1aa',
-          }}
-        >
-          {props.initials}
-        </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>{props.name}</div>
-          <div style={{ fontSize: 12.5, color: '#71717a' }}>{props.handle}</div>
-        </div>
-      </div>
-      <div style={{ fontSize: 15, lineHeight: 1.6, color: '#e4e4e7' }}>
-        {props.quote}
-      </div>
-      <div style={{ fontSize: 12.5, color: '#71717a', marginTop: 'auto' }}>
-        {props.views} views
-      </div>
     </div>
   )
 }
@@ -326,68 +278,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         </div>
       </section>
 
-      {/* Spotted by the best */}
-      <section style={{ padding: '56px 40px', borderTop: border }}>
-        <h2
-          style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}
-        >
-          Spotted by the best
-        </h2>
-        <div style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
-          People we admire, admiring back
-          <span style={{ color: '#3f3f46' }}>_</span>
-        </div>
-        <div
-          className="xp-grid-3"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: 20,
-            marginTop: 28,
-          }}
-        >
-          <Testimonial
-            initials="GR"
-            name="Guillermo Rauch"
-            handle="@rauchg · CEO, Vercel"
-            quote={
-              <>
-                This React OTP input 🔥
-                <br />
-                <span style={{ color: '#71717a' }}>input-otp.rodz.dev</span>
-              </>
-            }
-            views="252.6K"
-          />
-          <Testimonial
-            initials="EK"
-            name="Emil Kowalski"
-            handle="@emilkowalski · Design Engineer, author of animations.dev"
-            quote={
-              <>
-                Some of my favorite UI libraries:{' '}
-                <span
-                  style={{
-                    background: '#1e2936',
-                    borderRadius: 3,
-                    padding: '1px 3px',
-                  }}
-                >
-                  input-otp for one-time passwords.
-                </span>
-              </>
-            }
-            views="225.6K"
-          />
-          <Testimonial
-            initials="C"
-            name="Colin Sidoti"
-            handle="@tweetsbycolin · Co-founder & CEO, Clerk"
-            quote="🙌 fantastic library!"
-            views="659"
-          />
-        </div>
-      </section>
+      <SpottedMarquee />
 
       {/* Sponsors */}
       <section id="sponsors" style={{ padding: '56px 40px', borderTop: border }}>

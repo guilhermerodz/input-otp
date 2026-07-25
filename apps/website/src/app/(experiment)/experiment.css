@@ -894,3 +894,297 @@ html {
     font-size: 13px;
   }
 }
+
+/* Spotted by --------------------------------------------------------------- */
+
+.xp-sp-section {
+  padding: 56px 0;
+  border-top: 1px solid #1c1c1f;
+}
+
+.xp-sp-title {
+  margin: 0 40px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.xp-sp-sub {
+  margin: 6px 40px 30px;
+  color: #71717a;
+  font-size: 14px;
+}
+
+/* The card borrows x.com's dark palette rather than the page's greys: #1d9bf0
+   for links and the check, #71767b for the metadata. Two colours are enough to
+   place a card as a tweet before anyone reads a word of it, and both sit
+   comfortably on the site's near-black. */
+.xp-tw {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  /* The last row takes the slack, so a card stretched to the height of the
+     tallest on the belt grows between the body and the metadata line rather
+     than under it. */
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas:
+    'avatar head x'
+    'reply reply reply'
+    'body body body'
+    'foot foot foot';
+  column-gap: 11px;
+  padding: 18px 20px 16px;
+  border: 1px solid #1f1f23;
+  border-radius: 16px;
+  background: #0c0c0e;
+  color: #e7e9ea;
+  text-align: left;
+}
+
+/* Beats the page-wide `.xp a:hover { opacity: .8 }` — a card that dims on hover
+   reads as disabled, not as a link. */
+.xp a.xp-tw:hover {
+  opacity: 1;
+  border-color: #2f3336;
+  background: #101014;
+}
+
+.xp-tw:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.xp-tw-avatar {
+  grid-area: avatar;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.xp-tw-head {
+  grid-area: head;
+  min-width: 0;
+}
+
+.xp-tw-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.xp-tw-realname {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.xp-tw-check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: #1d9bf0;
+}
+
+/* The account's affiliation badge, at the size x.com renders it: a hair over
+   the cap height of the name beside it. */
+.xp-tw-badge {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-left: 1px;
+  border-radius: 3px;
+}
+
+.xp-tw-handle {
+  color: #71767b;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.xp-tw-x {
+  grid-area: x;
+  width: 16px;
+  height: 16px;
+  fill: #52525b;
+  transition: fill 200ms ease;
+}
+
+.xp-tw:hover .xp-tw-x {
+  fill: #e7e9ea;
+}
+
+.xp-tw-replying {
+  grid-area: reply;
+  margin-top: 12px;
+  color: #71767b;
+  font-size: 14px;
+}
+
+.xp-tw-body {
+  grid-area: body;
+  margin: 12px 0 0;
+  font-size: 15px;
+  /* The lines are real newlines, so the body wraps and breaks exactly where the
+     post does. */
+  white-space: pre-wrap;
+  line-height: 1.47;
+  overflow-wrap: break-word;
+}
+
+.xp-tw-blue {
+  color: #1d9bf0;
+}
+
+/* x.com's search highlight, which is how the line that names the library reads
+   on the post itself. */
+.xp-tw-mark {
+  border-radius: 3px;
+  padding: 1px 3px;
+  background: #1e2936;
+}
+
+.xp-tw-more {
+  display: block;
+  margin-top: 2px;
+  color: #1d9bf0;
+  font-size: 15px;
+}
+
+.xp-tw-foot {
+  grid-area: foot;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 14px;
+  color: #71767b;
+  font-size: 13px;
+}
+
+.xp-tw-date {
+  white-space: nowrap;
+}
+
+.xp-tw-metrics {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.xp-tw-metric {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.xp-sp-band {
+  position: relative;
+  padding: 4px 0 8px;
+  overflow: hidden;
+}
+
+/* Both ends are feathered on this static layer, never on the track: a mask on
+   the track would ride along with the travel. */
+.xp-sp-viewport {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+}
+
+/* Two identical belts. The offset is written here from the component, one belt
+   width per pass, so the seam never shows — see spotted-marquee.tsx for why the
+   travel is not a keyframe animation. */
+.xp-sp-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.xp-sp-belt {
+  display: flex;
+  /* Stretched, so every card on the row ends on the same metadata line however
+     long the post is. */
+  align-items: stretch;
+  gap: 18px;
+  padding-right: 18px;
+}
+
+.xp-sp-belt .xp-tw {
+  width: 344px;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The component leaves the belt alone at this setting, so it only has to be
+     laid out as a static row. */
+  .xp-sp-track {
+    width: 100%;
+    will-change: auto;
+  }
+
+  .xp-sp-belt {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 40px;
+    row-gap: 18px;
+  }
+
+  .xp-sp-belt[aria-hidden='true'] {
+    display: none;
+  }
+
+  /* A pass carries the list twice so it can outrun its own viewport. Standing
+     still it is just a row, and a row only needs the list once. */
+  .xp-sp-belt > .xp-tw:nth-child(n + 4) {
+    display: none;
+  }
+
+  .xp-sp-viewport {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-sp-section {
+    padding: 40px 0;
+  }
+
+  .xp-sp-title {
+    margin-inline: 20px;
+    font-size: 24px;
+  }
+
+  .xp-sp-sub {
+    margin-inline: 20px;
+  }
+
+  .xp-sp-belt .xp-tw {
+    width: 300px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xp-sp-belt {
+      padding-inline: 20px;
+    }
+  }
+}
