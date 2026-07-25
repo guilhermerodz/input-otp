@@ -726,12 +726,12 @@ html {
 /* Used by ---------------------------------------------------------------- */
 
 .xp-usedby-section {
-  padding: 42px 0 44px;
+  padding: 46px 0 50px;
   border-top: 1px solid #1c1c1f;
 }
 
 .xp-usedby-eyebrow {
-  margin-bottom: 26px;
+  margin-bottom: 30px;
   color: #71717a;
   font-size: 11px;
   font-weight: 500;
@@ -739,80 +739,39 @@ html {
   text-align: center;
 }
 
-/* The band: hairlines above and below over the same panel fill the cards use,
-   so the belt reads as an inset strip instead of floating logos. */
-.xp-usedby-band {
-  position: relative;
-  padding: 22px 0;
-  border-top: 1px solid #17171a;
-  border-bottom: 1px solid #17171a;
-  background: #0c0c0e;
-  overflow: hidden;
-}
-
-/* Both ends are feathered so logos arrive and leave instead of being cut off.
-   The fade lives on this static layer, never on the band: an alpha ramp over a
-   fill this dark bands in 8-bit, and never on the track either, since a mask
-   would ride along with the animation. */
-.xp-usedby-viewport {
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 13%,
-    #000 87%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 13%,
-    #000 87%,
-    transparent
-  );
-}
-
-/* Two identical belts. The offset is written here from the component, one belt
-   width per pass, so the seam never shows — see used-by-marquee.tsx for why the
-   travel is not a keyframe animation. */
-.xp-usedby-track {
-  display: flex;
-  width: max-content;
-  will-change: transform;
-}
-
-.xp-usedby-belt {
-  display: flex;
+/* Thirds, not a flex row: each lockup owns its own column, so a name changing
+   length — or scrambling into junk — never nudges the other two. */
+.xp-usedby-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   align-items: center;
-}
-
-/* The gap after the separator is the cell's own padding, not a flex gap on the
-   belt: cells then tile identically and the two belts meet at exactly the same
-   rhythm as the logos inside one. */
-.xp-usedby-cell {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  padding-right: 32px;
+  padding: 0 40px;
 }
 
 .xp-usedby-item {
   display: flex;
   align-items: center;
-  gap: 11px;
+  justify-self: center;
+  gap: 12px;
   color: #fafafa;
-  opacity: 0.5;
+  opacity: 0.62;
   transition: opacity 220ms ease;
 }
 
-/* Scoped through the band so these win over the page-wide `.xp a:hover`. */
-.xp-usedby-band .xp-usedby-item:hover,
-.xp-usedby-band .xp-usedby-item:focus-visible {
+.xp-usedby-mark {
+  height: calc(var(--mark-h) * 1.2);
+  width: auto;
+}
+
+/* Scoped through the row so these win over the page-wide `.xp a:hover`. */
+.xp-usedby-row .xp-usedby-item:hover,
+.xp-usedby-row .xp-usedby-item:focus-visible {
   opacity: 1;
 }
 
-/* Stopping on the band picks one company out of the row. */
-.xp-usedby-band:hover .xp-usedby-item:not(:hover),
-.xp-usedby-band:focus-within .xp-usedby-item:not(:focus-visible) {
+/* Reading one company sends the other two back. */
+.xp-usedby-row:hover .xp-usedby-item:not(:hover),
+.xp-usedby-row:focus-within .xp-usedby-item:not(:focus-visible) {
   opacity: 0.26;
 }
 
@@ -829,41 +788,57 @@ html {
   white-space: nowrap;
 }
 
-.xp-usedby-sep {
-  color: #27272a;
-  font-size: 13px;
-  user-select: none;
+/* Stepped, never eased: the tear should read as dropped frames, not motion.
+   The swap happens under the noise, around the middle of this. */
+.xp-usedby-tear {
+  animation: xp-usedby-tear 500ms steps(1, end) both;
+}
+
+@keyframes xp-usedby-tear {
+  0% {
+    transform: translateX(0);
+    clip-path: inset(0 0 0 0);
+  }
+  10% {
+    opacity: 0.55;
+    transform: translateX(-5px);
+    clip-path: inset(46% 0 34% 0);
+  }
+  22% {
+    opacity: 0.85;
+    transform: translateX(4px);
+    clip-path: inset(10% 0 68% 0);
+  }
+  34% {
+    opacity: 0.25;
+    transform: translateX(-3px);
+    clip-path: inset(72% 0 6% 0);
+  }
+  46% {
+    opacity: 0.9;
+    transform: translateX(7px);
+    clip-path: inset(28% 0 52% 0);
+  }
+  58% {
+    opacity: 0.4;
+    transform: translateX(-2px);
+    clip-path: inset(0 0 0 0);
+  }
+  72% {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* The component leaves the belt alone at this setting, so it only has to be
-     laid out as a static row. */
-  .xp-usedby-track {
-    width: 100%;
-    will-change: auto;
-  }
-
-  .xp-usedby-belt {
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 18px;
-  }
-
-  .xp-usedby-belt[aria-hidden='true'] {
-    display: none;
-  }
-
-  /* No belt to join, so the row ends on a logo. */
-  .xp-usedby-cell:last-child {
-    padding-right: 0;
-  }
-
-  .xp-usedby-cell:last-child .xp-usedby-sep {
-    display: none;
-  }
-
-  .xp-usedby-band {
-    padding: 22px 24px;
+  /* The component leaves the row alone at this setting; kill the tear too, in
+     case a swap was already in flight when it was turned on. */
+  .xp-usedby-tear {
+    animation: none;
   }
 }
 
@@ -898,15 +873,24 @@ html {
   }
 
   .xp-usedby-section {
-    padding: 34px 0 36px;
+    padding: 36px 0 38px;
   }
 
-  .xp-usedby-cell {
-    gap: 24px;
-    padding-right: 24px;
+  /* Three lockups have to share a phone's width, so the whole row steps down
+     a size rather than dropping a company. */
+  .xp-usedby-row {
+    padding: 0 12px;
+  }
+
+  .xp-usedby-item {
+    gap: 7px;
+  }
+
+  .xp-usedby-mark {
+    height: calc(var(--mark-h) * 0.95);
   }
 
   .xp-usedby-name {
-    font-size: 15px;
+    font-size: 13px;
   }
 }

@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-/* Monochrome logo wall on a loop. Marks are trimmed brand glyphs paired with
-   the name in the site's own type, so nine different logos read as one row
-   instead of nine competing lockups. Hover anywhere pauses the belt; hover a
-   single company brings it to full white. */
+/* Nine companies, three on screen. Every few seconds one of them — never all
+   three — tears itself apart, swaps underneath the noise and comes back as
+   another, its name scrambling through junk characters on the way. The row
+   itself never moves, so the section can sit under the hero without competing
+   with it, and a logo is never a moving target to click. */
 
-export const COMPANIES = [
+const COMPANIES = [
   {
     name: 'Vercel',
     src: '/logos/vercel.svg',
@@ -61,121 +62,95 @@ export const COMPANIES = [
   },
 ] as const
 
-/* Belt speed, px per second. */
-const SPEED = 31
+/* Each cell only ever advances by the number of cells, so every cell owns its
+   own third of the list and the three on screen are always distinct. Holds as
+   long as the list divides evenly by CELLS. */
+const CELLS = 3
+const SWAP_EVERY = 2400
+const GLITCH_BEFORE = 240
+const GLITCH_AFTER = 260
+const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*/<>_'
 
-/* One pass of the belt. The track holds two of these and slides the width of
-   exactly one, so the seam never shows. The clone is decoration: hidden from
-   assistive tech and skipped by the tab order. */
-function Belt({
-  clone = false,
-  innerRef,
-}: {
-  clone?: boolean
-  innerRef?: React.Ref<HTMLDivElement>
-}) {
-  return (
-    <div
-      className="xp-usedby-belt"
-      ref={innerRef}
-      aria-hidden={clone || undefined}
-    >
-      {COMPANIES.map(company => (
-        <div className="xp-usedby-cell" key={company.name}>
-          <a
-            className="xp-usedby-item"
-            href={company.href}
-            target="_blank"
-            rel="noreferrer"
-            tabIndex={clone ? -1 : undefined}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={company.src}
-              alt=""
-              style={{ height: company.height, width: 'auto' }}
-            />
-            <span className="xp-usedby-name">{company.name}</span>
-          </a>
-          <span className="xp-usedby-sep xp-mono" aria-hidden="true">
-            /
-          </span>
-        </div>
-      ))}
-    </div>
-  )
+/* The name dissolves into junk for the length of the tear, then resolves as
+   the real one — the swap reads as a decode rather than a cut. */
+function ScrambledName({ name, active }: { name: string; active: boolean }) {
+  const [text, setText] = useState(name)
+
+  useEffect(() => {
+    if (!active) {
+      setText(name)
+      return
+    }
+    const roll = () =>
+      setText(
+        Array.from(name, () =>
+          NOISE.charAt(Math.floor(Math.random() * NOISE.length)),
+        ).join(''),
+      )
+    roll()
+    const id = setInterval(roll, 55)
+    return () => clearInterval(id)
+  }, [active, name])
+
+  return <span className="xp-usedby-name">{text}</span>
 }
 
 export function UsedByMarquee() {
-  const bandRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const beltRef = useRef<HTMLDivElement>(null)
-  const paused = useRef(false)
+  const rowRef = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState([0, 1, 2])
+  const [glitching, setGlitching] = useState(-1)
+  const turn = useRef(0)
+  /* Pointer or keyboard focus on the row: whoever is reading it decides when
+     it moves on. */
+  const held = useRef(false)
+  const onScreen = useRef(true)
 
-  /* The belt is driven here rather than by a CSS animation on purpose. A
-     keyframe animation on a transform runs on the compositor, and its clock
-     drifts from the main thread's whenever the tab is backgrounded — the next
-     thing that touches the subtree (pausing it, or just repainting an opacity
-     on hover) resyncs the two and the row visibly jumps. Advancing the offset
-     ourselves means there is a single source of truth for where the belt is,
-     so pausing is exactly where it was. */
   useEffect(() => {
-    const band = bandRef.current
-    const track = trackRef.current
-    const belt = beltRef.current
-    if (!band || !track || !belt) return
+    const row = rowRef.current
+    if (!row) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    let offset = 0
-    let prev = 0
-    let frame = 0
+    let swapTimer: ReturnType<typeof setTimeout>
+    let settleTimer: ReturnType<typeof setTimeout>
 
-    const step = (now: number) => {
-      /* A long gap — hidden tab, blocked main thread — must not teleport the
-         belt, so a frame is charged at most a frame's worth of travel. */
-      const dt = prev ? Math.min(now - prev, 32) : 0
-      prev = now
-      /* Wrapping by the belt's *current* width is invisible either way — the
-         second belt sits exactly one width to the right — so a relayout mid
-         travel (a font landing, a breakpoint) costs nothing here. */
-      const width = belt.offsetWidth
-      if (!paused.current && width > 0) {
-        offset = (offset + (dt / 1000) * SPEED) % width
-        track.style.transform = `translate3d(${-offset}px, 0, 0)`
-      }
-      frame = requestAnimationFrame(step)
-    }
+    const cycle = setInterval(() => {
+      if (held.current || !onScreen.current) return
+      const cell = turn.current % CELLS
+      turn.current += 1
 
-    const start = () => {
-      if (frame) return
-      prev = 0
-      frame = requestAnimationFrame(step)
-    }
+      setGlitching(cell)
+      swapTimer = setTimeout(() => {
+        setShown(current =>
+          current.map((index, i) =>
+            i === cell ? (index + CELLS) % COMPANIES.length : index,
+          ),
+        )
+      }, GLITCH_BEFORE)
+      settleTimer = setTimeout(
+        () => setGlitching(-1),
+        GLITCH_BEFORE + GLITCH_AFTER,
+      )
+    }, SWAP_EVERY)
 
-    const stop = () => {
-      if (!frame) return
-      cancelAnimationFrame(frame)
-      frame = 0
-    }
-
-    /* Nothing to animate while the strip is off screen. */
+    /* Nothing to swap through while the section is off screen. */
     const observer = new IntersectionObserver(entries => {
-      if (entries[entries.length - 1].isIntersecting) start()
-      else stop()
+      onScreen.current = entries[entries.length - 1].isIntersecting
     })
-    observer.observe(band)
+    observer.observe(row)
 
     return () => {
+      clearInterval(cycle)
+      clearTimeout(swapTimer)
+      clearTimeout(settleTimer)
       observer.disconnect()
-      stop()
     }
   }, [])
 
   const hold = () => {
-    paused.current = true
+    held.current = true
   }
   const release = () => {
-    paused.current = false
+    held.current = false
   }
 
   return (
@@ -184,20 +159,37 @@ export function UsedByMarquee() {
         USED BY<span style={{ color: '#3f3f46' }}>_</span>
       </div>
       <div
-        className="xp-usedby-band"
-        ref={bandRef}
+        className="xp-usedby-row"
+        ref={rowRef}
         onPointerEnter={hold}
         onPointerLeave={release}
-        /* Keyboard users need the target to stop moving too. */
         onFocus={hold}
         onBlur={release}
       >
-        <div className="xp-usedby-viewport">
-          <div className="xp-usedby-track" ref={trackRef}>
-            <Belt innerRef={beltRef} />
-            <Belt clone />
-          </div>
-        </div>
+        {shown.map((index, cell) => {
+          const company = COMPANIES[index]
+          const torn = glitching === cell
+          return (
+            <a
+              key={cell}
+              className={`xp-usedby-item${torn ? ' xp-usedby-tear' : ''}`}
+              href={company.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="xp-usedby-mark"
+                src={company.src}
+                alt=""
+                style={
+                  { '--mark-h': `${company.height}px` } as React.CSSProperties
+                }
+              />
+              <ScrambledName name={company.name} active={torn} />
+            </a>
+          )
+        })}
       </div>
     </section>
   )

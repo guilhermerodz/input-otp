@@ -8,7 +8,7 @@ import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
-import { UsedByVariants } from './_components/used-by-variants'
+import { UsedByMarquee } from './_components/used-by-marquee'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
@@ -296,7 +296,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         </div>
       </section>
 
-      <UsedByVariants />
+      <UsedByMarquee />
 
       {/* Stats */}
       <section style={{ padding: '56px 40px', borderTop: border, textAlign: 'center' }}>
