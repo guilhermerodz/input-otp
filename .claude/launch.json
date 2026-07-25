@@ -19,6 +19,34 @@
         "3041"
       ],
       "port": 3041
+    },
+    {
+      "name": "website-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/landing-nits/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3042"
+      ],
+      "port": 3042
+    },
+    {
+      "name": "docs-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/docs-revamp/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3057"
+      ],
+      "port": 3057
     }
   ]
 }
