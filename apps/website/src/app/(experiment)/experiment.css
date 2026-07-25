@@ -1690,45 +1690,49 @@ html {
   opacity: 1;
 }
 
-/* The package name in outline, sunk below the footer border and fading out
-   upward, so the letters rise from the border rather than sit behind the copy.
-   Nine characters, so it is never allowed to break. */
+/* The package name filled, sunk below the footer border, and taken over by the
+   particle shader once it is on screen (see ParticleWordmark). Nine
+   characters, so it is never allowed to break. The em here is the clamped
+   size, so how deep the letters sit scales with them. */
 .xp-cta-mark {
   position: absolute;
   left: 50%;
   bottom: -0.3em;
   translate: -50% 0;
   font-size: clamp(52px, 13.2vw, 158px);
-  font-weight: 700;
-  letter-spacing: -0.05em;
   line-height: 1;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1px #2c2c33;
-  mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 6%, #000 76%);
   pointer-events: none;
   user-select: none;
 }
 
-/* The light already arrives from above, so the glow off the bottom border is
-   only here to lift the wordmark off it — not to be a second sun. */
-.xp-cta-glow {
+/* The DOM copy: what layout, no-JS and reduced motion get, and what the
+   canvas is measured against. A block with line-height 1, so its baseline is
+   predictable from the font metrics — an inline box would be sized by the
+   font instead, and the canvas would land in the wrong place. */
+.xp-cta-mark-text {
+  display: block;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  /* Matches MARK_ALPHA, which is what the particles are drawn at. */
+  color: rgba(255, 255, 255, 0.14);
+  transition: opacity 250ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-text {
+  opacity: 0;
+}
+
+/* Positioned from the measured ink box, so the two copies sit on top of each
+   other and the handover doesn't move the letters. */
+.xp-cta-mark-canvas {
   position: absolute;
-  left: 50%;
-  bottom: -170px;
-  translate: -50% 0;
-  width: 130%;
-  height: 360px;
-  background: radial-gradient(
-    ellipse 50% 50% at 50% 50%,
-    rgba(200, 222, 255, 0.36),
-    rgba(140, 170, 255, 0.13) 45%,
-    transparent 72%
-  );
-  filter: blur(6px);
-  opacity: 0.55;
-  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-canvas {
+  opacity: 1;
 }
 
 /* The border itself, with a light running the length of it. */
