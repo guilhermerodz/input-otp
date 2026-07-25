@@ -66,10 +66,34 @@ const COMPANIES = [
    own third of the list and the three on screen are always distinct. Holds as
    long as the list divides evenly by CELLS. */
 const CELLS = 3
-const SWAP_EVERY = 2400
+/* How often a cell turns over. The tear itself is the two constants below and
+   is deliberately not tied to this one — the row can cycle faster without the
+   glitch getting twitchier. */
+const SWAP_EVERY = 1500
 const GLITCH_BEFORE = 240
 const GLITCH_AFTER = 260
 const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*/<>_'
+
+/* Proof each company actually ships it: a 16:9 screenshot per company, keyed
+   off the logo's filename. Anything missing from the folder simply never
+   opens — see the onError below. */
+const shotFor = (src: string) =>
+  src.replace('/logos/', '/used-by/').replace('.svg', '.png')
+
+function Lockup({ company }: { company: (typeof COMPANIES)[number] }) {
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="xp-usedby-mark"
+        src={company.src}
+        alt=""
+        style={{ '--mark-h': `${company.height}px` } as React.CSSProperties}
+      />
+      <span className="xp-usedby-name">{company.name}</span>
+    </>
+  )
+}
 
 /* The name dissolves into junk for the length of the tear, then resolves as
    the real one — the swap reads as a decode rather than a cut. */
@@ -92,13 +116,21 @@ function ScrambledName({ name, active }: { name: string; active: boolean }) {
     return () => clearInterval(id)
   }, [active, name])
 
-  return <span className="xp-usedby-name">{text}</span>
+  return (
+    <span className={`xp-usedby-name${active ? ' xp-usedby-name--junk' : ''}`}>
+      {text}
+    </span>
+  )
 }
 
 export function UsedByMarquee() {
   const rowRef = useRef<HTMLDivElement>(null)
   const [shown, setShown] = useState([0, 1, 2])
   const [glitching, setGlitching] = useState(-1)
+  /* Which cell is showing its screenshot, and which screenshots turned out not
+     to exist — a company with no file in the folder just never opens one. */
+  const [previewing, setPreviewing] = useState(-1)
+  const [missing, setMissing] = useState<string[]>([])
   const turn = useRef(0)
   /* Pointer or keyboard focus on the row: whoever is reading it decides when
      it moves on. */
@@ -151,6 +183,18 @@ export function UsedByMarquee() {
   }
   const release = () => {
     held.current = false
+    setPreviewing(-1)
+  }
+
+  /* Only worth fetching a screenshot where there is a pointer to open it with
+     and room to put it. */
+  const canPreview = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover)').matches &&
+    window.innerWidth > 720
+
+  const open = (cell: number) => {
+    if (canPreview()) setPreviewing(cell)
   }
 
   return (
@@ -170,24 +214,58 @@ export function UsedByMarquee() {
           const company = COMPANIES[index]
           const torn = glitching === cell
           return (
-            <a
-              key={cell}
-              className={`xp-usedby-item${torn ? ' xp-usedby-tear' : ''}`}
-              href={company.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="xp-usedby-mark"
-                src={company.src}
-                alt=""
-                style={
-                  { '--mark-h': `${company.height}px` } as React.CSSProperties
-                }
-              />
-              <ScrambledName name={company.name} active={torn} />
-            </a>
+            <div className="xp-usedby-cell" key={cell}>
+              {/* A column only ever shows its own third of the list, so it only
+                  has to be as wide as the widest of those three. Stacking them
+                  here, hidden, sizes the column from the data instead of from a
+                  number that would rot the moment the list changes — and since
+                  this never changes, neither does the column. */}
+              <div className="xp-usedby-sizer" aria-hidden="true">
+                {COMPANIES.filter((_, i) => i % CELLS === cell).map(
+                  candidate => (
+                    <span className="xp-usedby-item" key={candidate.name}>
+                      <Lockup company={candidate} />
+                    </span>
+                  ),
+                )}
+              </div>
+              {previewing === cell && !missing.includes(company.name) && (
+                <span className="xp-usedby-shot" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={shotFor(company.src)}
+                    alt=""
+                    decoding="async"
+                    onError={() =>
+                      setMissing(names =>
+                        names.includes(company.name)
+                          ? names
+                          : [...names, company.name],
+                      )
+                    }
+                  />
+                </span>
+              )}
+              <a
+                className={`xp-usedby-item${torn ? ' xp-usedby-tear' : ''}`}
+                href={company.href}
+                target="_blank"
+                rel="noreferrer"
+                onPointerEnter={() => open(cell)}
+                onFocus={() => open(cell)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="xp-usedby-mark"
+                  src={company.src}
+                  alt=""
+                  style={
+                    { '--mark-h': `${company.height}px` } as React.CSSProperties
+                  }
+                />
+                <ScrambledName name={company.name} active={torn} />
+              </a>
+            </div>
           )
         })}
       </div>

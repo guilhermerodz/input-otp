@@ -739,27 +739,54 @@ html {
   text-align: center;
 }
 
-/* Thirds, not a flex row: each lockup owns its own column, so a name changing
-   length — or scrambling into junk — never nudges the other two. */
+/* Columns sized to their own contents and pushed together in the middle, not
+   thirds of the full width: the lockups sit as close as the widest of them
+   allows. Each column is held open by a hidden stack of everything it can
+   show (see the component), so a name changing length — or scrambling into
+   junk — still never nudges the other two. */
 .xp-usedby-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
   align-items: center;
-  padding: 0 40px;
+  column-gap: 30px;
+  padding: 0 24px;
+}
+
+.xp-usedby-cell {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+}
+
+/* Sizer and link share one cell — the sizer sets the width, the link is what
+   you see. The screenshot is positioned out of flow, so it is left out. */
+.xp-usedby-cell > .xp-usedby-sizer,
+.xp-usedby-cell > .xp-usedby-item {
+  grid-area: 1 / 1;
+}
+
+.xp-usedby-sizer {
+  display: flex;
+  flex-direction: column;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .xp-usedby-item {
   display: flex;
   align-items: center;
-  justify-self: center;
-  gap: 12px;
+  gap: 16px;
   color: #fafafa;
   opacity: 0.62;
   transition: opacity 220ms ease;
 }
 
 .xp-usedby-mark {
-  height: calc(var(--mark-h) * 1.2);
+  height: calc(var(--mark-h) * 2.4);
   width: auto;
 }
 
@@ -782,10 +809,62 @@ html {
 }
 
 .xp-usedby-name {
-  font-size: 17px;
+  font-size: 30px;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
+}
+
+/* Hover proof: a 16:9 screenshot of the company's own product using the
+   input, floated above the lockup. The frame carries the shadow as a stack of
+   five, each roughly double the last in blur and offset — one big soft shadow
+   reads as fog, a stack reads as a card sitting above the page. */
+.xp-usedby-shot {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 22px);
+  z-index: 5;
+  width: 420px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0c0c0e;
+  box-shadow:
+    0 0 0 1px rgba(250, 250, 250, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.32),
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.28),
+    0 18px 36px rgba(0, 0, 0, 0.26),
+    0 36px 72px rgba(0, 0, 0, 0.24);
+  /* Never in the way of the hover that opened it. */
+  pointer-events: none;
+  animation: xp-usedby-shot-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.xp-usedby-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@keyframes xp-usedby-shot-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Junk is set in the mono face at the ratio where its fixed advance lands on
+   Inter's average one, so a name dissolving cannot swell past its column. */
+.xp-usedby-name--junk {
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+  font-size: 0.88em;
+  letter-spacing: 0;
 }
 
 /* Stepped, never eased: the tear should read as dropped frames, not motion.
@@ -843,6 +922,35 @@ html {
 }
 
 @media (max-width: 900px) {
+  .xp-usedby-shot {
+    width: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  .xp-usedby-section {
+    padding: 36px 0 38px;
+  }
+
+  .xp-usedby-row {
+    column-gap: 12px;
+    padding: 0 12px;
+  }
+
+  .xp-usedby-item {
+    gap: 8px;
+  }
+
+  .xp-usedby-mark {
+    height: calc(var(--mark-h) * 1.5);
+  }
+
+  .xp-usedby-name {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 900px) {
   .xp-slot {
     width: 44px;
     height: 58px;
@@ -872,9 +980,7 @@ html {
     display: none !important;
   }
 
-  .xp-usedby-section {
-    padding: 36px 0 38px;
-  }
+}
 
   /* Three lockups have to share a phone's width, so the whole row steps down
      a size rather than dropping a company. */
