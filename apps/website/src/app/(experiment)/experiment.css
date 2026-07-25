@@ -1012,11 +1012,17 @@ html {
   bottom: 18px;
 }
 
-.xp-sponsor-card:hover {
+/* [data-tilting] alongside :hover throughout — the tilt component decides that
+   flag from the card's resting box plus a safe area, while :hover is hit-tested
+   against the rotated geometry, which pulls a few px inside that box. Without
+   it the glow would blink off in the strip where the card is still tilting. */
+.xp-sponsor-card:hover,
+[data-tilting] .xp-sponsor-card {
   box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.035);
 }
 
-.xp-sponsor-card:hover .xp-sponsor-tier-label {
+.xp-sponsor-card:hover .xp-sponsor-tier-label,
+[data-tilting] .xp-sponsor-card .xp-sponsor-tier-label {
   color: #8f9aa6;
   opacity: 0.88;
 }
@@ -1066,12 +1072,14 @@ html {
 }
 
 .xp-sponsor-cta:hover .xp-sponsor-cta-plus,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-plus,
 .xp-sponsor-cta:focus-visible .xp-sponsor-cta-plus {
   opacity: 0;
   filter: blur(6px);
 }
 
 .xp-sponsor-cta:hover .xp-sponsor-cta-label,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-label,
 .xp-sponsor-cta:focus-visible .xp-sponsor-cta-label {
   opacity: 1;
   filter: blur(0);
