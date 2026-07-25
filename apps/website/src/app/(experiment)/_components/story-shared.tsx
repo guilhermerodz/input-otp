@@ -33,8 +33,8 @@ export const SENTENCES: React.ReactNode[] = [
     Caret, selection, copy-paste — still native. The slots just follow along.
   </>,
   <>
-    Then I absorbed the quirks: SMS autofill, mobile keyboards,
-    password-manager badges, WebKit&apos;s opinions.
+    Then I absorbed the quirks: SMS autofill, mobile keyboards, password-manager
+    badges, WebKit&apos;s opinions.
   </>,
   <>Boom — input-otp. Go ahead, type in it.</>,
 ]
@@ -63,8 +63,11 @@ function easeInOut(t: number) {
 export function useStoryScrub(
   trackRef: React.RefObject<HTMLDivElement>,
   sceneRef: React.RefObject<HTMLDivElement>,
+  onFrame?: (p: number) => void,
 ) {
   const [step, setStep] = React.useState(0)
+  const frameRef = React.useRef(onFrame)
+  frameRef.current = onFrame
 
   React.useEffect(() => {
     let raf = 0
@@ -125,15 +128,18 @@ export function useStoryScrub(
       for (let i = 0; i < BEATS; i++) {
         const edge = i / BEATS
         const nextEdge = (i + 1) / BEATS
-        const enter =
-          i === 0 ? 1 : easeOut(seg(p, edge - 0.012, edge + 0.045))
+        const enter = i === 0 ? 1 : easeOut(seg(p, edge - 0.012, edge + 0.045))
         const passed =
-          i === BEATS - 1 ? 0 : easeOut(seg(p, nextEdge + 0.005, nextEdge + 0.05))
+          i === BEATS - 1
+            ? 0
+            : easeOut(seg(p, nextEdge + 0.005, nextEdge + 0.05))
         const bright = Math.max(0.08, 0.08 + 0.92 * enter - 0.6 * passed)
         s.setProperty(`--seg${i}`, seg(p, edge, nextEdge).toFixed(4))
         s.setProperty(`--sent${i}`, bright.toFixed(4))
         s.setProperty(`--hl${i}`, (enter * (1 - passed)).toFixed(4))
       }
+
+      frameRef.current?.(p)
 
       setStep(Math.min(BEATS - 1, Math.floor(p * BEATS)))
     }
@@ -156,7 +162,10 @@ export function useStoryScrub(
 export const ATTRS = [
   { code: 'autoComplete="one-time-code"', note: 'one-tap SMS codes' },
   { code: 'inputMode="numeric"', note: 'the right mobile keyboard' },
-  { code: 'clipPath="inset(0 40px 0 0)"', note: 'dodges password-manager badges' },
+  {
+    code: 'clipPath="inset(0 40px 0 0)"',
+    note: 'dodges password-manager badges',
+  },
   { code: 'WebkitTextFillColor="transparent"', note: 'WebKit has opinions' },
 ] as const
 
@@ -175,21 +184,23 @@ export function Note({
   seg: segVar,
   first,
   plain,
+  ink,
   className,
   children,
 }: React.PropsWithChildren<{
   seg: string
   first?: boolean
   plain?: boolean
+  /** Beat this note is drawn for — see `useStageAlign` in story-iso. */
+  ink?: number
   className?: string
 }>) {
   return (
     <div
+      data-ink={ink}
       className={cn(
         'anatomy-note pointer-events-none absolute',
-        plain
-          ? 'text-[1.02rem] leading-snug text-white/90'
-          : 'xp-note-chip',
+        plain ? 'text-[1.02rem] leading-snug text-white/90' : 'xp-note-chip',
         first && 'anatomy-note-first',
         fontHand.className,
         className,
@@ -220,7 +231,9 @@ export function Arrow({
       viewBox={viewBox}
       fill="none"
       style={
-        segVar ? ({ '--sg': `var(${segVar})` } as React.CSSProperties) : undefined
+        segVar
+          ? ({ '--sg': `var(${segVar})` } as React.CSSProperties)
+          : undefined
       }
     >
       <path
