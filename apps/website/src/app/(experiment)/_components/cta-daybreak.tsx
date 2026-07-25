@@ -188,7 +188,7 @@ export function CtaDaybreak({ starCount }: { starCount: string | null }) {
   const { ref, near, ready } = useMotesGate()
 
   return (
-    <section className="xp-cta" ref={ref}>
+    <section className="xp-cta" ref={ref} data-rv-group>
       {near && (
         <Motes
           className="xp-cta-field"
@@ -203,11 +203,11 @@ export function CtaDaybreak({ starCount }: { starCount: string | null }) {
       <ParticleWordmark />
 
       <div className="xp-cta-inner">
-        <h2 className="xp-cta-title">Your last OTP input.</h2>
-        <p className="xp-cta-sub">
+        <h2 className="xp-cta-title" data-rv="title">Your last OTP input.</h2>
+        <p className="xp-cta-sub" data-rv="lede">
           MIT licensed, zero dependencies, one real input under the slots.
         </p>
-        <div className="xp-cta-row">
+        <div className="xp-cta-row" data-rv="action">
           <a className="xp-cta-key xp-cta-key--primary" href={GITHUB_URL}>
             Get started
             <span className="xp-cta-key-glyph xp-mono" aria-hidden="true">

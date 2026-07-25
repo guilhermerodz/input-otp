@@ -1,0 +1,195 @@
+/* ---------------------------------------------------------------------------
+   Reveal start states.
+
+   Only the *hidden* end of each variant lives here; the motion itself is in
+   _reveal/choreography.ts. Keeping the start state in CSS is what stops the
+   page flashing its finished layout for a frame before the effect runs — and
+   scoping the whole file to `prefers-reduced-motion: no-preference` means
+   reduced-motion visitors, and anyone without JS, get the page intact.
+
+   Every rule opts out on [data-rv-done], which the engine stamps on an
+   element the moment its animation settles. That is what lets variant 4 hang
+   a mask on an element and still guarantee the mask is gone afterwards.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-rv-variant] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    opacity: 0;
+  }
+
+  /* A split title is a container of moving parts: it stays put, its words
+     or glyphs are what animate. */
+  [data-rv-variant] [data-rv][data-rv-hollow] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  [data-rv-variant] [data-rv-word],
+  [data-rv-variant] [data-rv-char] {
+    display: inline-block;
+    /* Descenders and the blur radius both need room, or a glyph gets
+       sheared by its own overflow while it animates. */
+    will-change: auto;
+  }
+
+  [data-rv-variant] [data-rv-word]:not([data-rv-done]),
+  [data-rv-variant] [data-rv-char]:not([data-rv-done]) {
+    opacity: 0;
+  }
+
+  /* -- 1 · Cascade ------------------------------------------------------ */
+
+  [data-rv-variant='1'] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+  [data-rv-variant='1'] [data-rv='lede']:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-variant='1'] [data-rv='body']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  [data-rv-variant='1'] [data-rv-word]:not([data-rv-done]) {
+    transform: translateY(16px);
+    filter: blur(9px);
+  }
+
+  /* -- 2 · Fill --------------------------------------------------------- */
+
+  [data-rv-variant='2'] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-14px);
+  }
+  [data-rv-variant='2'] [data-rv='lede']:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-variant='2'] [data-rv='body']:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-variant='2'] [data-rv='eyebrow']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateX(-8px);
+  }
+  [data-rv-variant='2'] [data-rv-char]:not([data-rv-done]) {
+    transform: translateY(-14px) scaleY(0.62);
+  }
+
+  /* -- 3 · Focus -------------------------------------------------------- */
+
+  /* Scroll-linked: the engine writes every frame, so this only has to keep
+     the first paint from showing sharp content that is about to blur. */
+  [data-rv-variant='3'] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    opacity: 0.04;
+    transform: translateY(30px) scale(0.966);
+    filter: blur(11px);
+  }
+  [data-rv-variant='3'] [data-rv='title']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(34px) scale(0.962);
+    filter: blur(15px);
+  }
+  [data-rv-variant='3'] [data-rv='chrome']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(10px) scale(0.989);
+    filter: blur(4px);
+  }
+
+  /* -- 4 · Horizon ------------------------------------------------------ */
+
+  /* The mask box is 2.5× the element, with the transparent-to-opaque edge
+     at 40%. Parked at `0% 0%` the element sits in the transparent half; the
+     animation slides it to `0% 100%`, so the reveal edge sweeps up through
+     the glyphs and they surface out of their own baseline. */
+  [data-rv-variant='4'] [data-rv]:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-variant='4'] [data-rv-word]:not([data-rv-done]) {
+    transform: translateY(22px);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 40%);
+    mask-size: 100% 250%;
+    -webkit-mask-size: 100% 250%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: 0% 0%;
+    -webkit-mask-position: 0% 0%;
+  }
+  /* Surfaces would have their border and any running beam cut by a mask, so
+     they rise and settle instead. */
+  [data-rv-variant='4'] [data-rv='card']:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-variant='4'] [data-rv='action']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(26px) scale(0.985);
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  /* -- 5 · Decode ------------------------------------------------------- */
+
+  [data-rv-variant='5'] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+  [data-rv-variant='5'] [data-rv='card']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: none;
+    filter: brightness(1.9);
+    clip-path: inset(0 0 100% 0);
+  }
+  [data-rv-variant='5'] [data-rv-char]:not([data-rv-done]) {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Variant switcher — a review affordance, not part of the page.
+--------------------------------------------------------------------------- */
+
+/* Bottom-left: the slot-background switcher already owns bottom-centre. */
+.rv-switch {
+  position: fixed;
+  left: 16px;
+  bottom: 18px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid #27272a;
+  border-radius: 999px;
+  /* Opaque for the same reason the other switcher is: a backdrop blur
+     fixed over a scrolling page costs a composite every frame. */
+  background: #0b0b0d;
+  font-size: 12px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
+}
+
+.rv-switch a {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  color: #71717a;
+  font-variant-numeric: tabular-nums;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
+}
+
+.rv-switch a:hover {
+  color: #fafafa;
+  background: #18181b;
+  opacity: 1;
+}
+
+.rv-switch a[aria-current='page'] {
+  color: #09090b;
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.rv-switch-label {
+  padding: 0 10px 0 6px;
+  color: #52525b;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+@media (max-width: 1080px) {
+  .rv-switch-label {
+    display: none;
+  }
+}

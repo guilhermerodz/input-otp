@@ -321,12 +321,13 @@ export function UsedByMarquee() {
   }, [card])
 
   return (
-    <section className="xp-usedby-section">
-      <div className="xp-usedby-eyebrow xp-mono">
+    <section className="xp-usedby-section" data-rv-group>
+      <div className="xp-usedby-eyebrow xp-mono" data-rv="eyebrow">
         USED BY<span style={{ color: '#3f3f46' }}>_</span>
       </div>
       <div
         className="xp-usedby-row"
+        data-rv="card"
         ref={rowRef}
         onPointerEnter={hold}
         onPointerLeave={release}
