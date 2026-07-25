@@ -2,20 +2,25 @@
 
 /* Three tweets on a loop. Each card is a real x.com post as far down as it
    goes — avatar, blue check, the affiliation badge the account actually carries,
-   the reply header, the counts — and the whole card is the anchor to the post,
-   so the only thing it asks of a reader is a click.
+   the reply header, the date — and the whole card is the anchor to the post, so
+   the only thing it asks of a reader is a click.
 
-   Every number, date and badge here was read off the tweet itself
-   (cdn.syndication.twimg.com, 2026-07-24); nothing is dressed up. A count is
-   only printed where there is one, the same as on x.com. */
+   Where x.com prints reply/like counts the card prints who the person is
+   instead: a like tally says nothing about why their word carries here, and the
+   work they're known for does. Those are real links, which is why the card is a
+   div with a stretched anchor over it rather than an anchor itself — a link
+   inside a link is not a thing the DOM will keep. */
 
-import { Heart, MessageCircle, Share } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 /* A tweet body is lines of pieces, not a string, because the blue bits are not
    decoration — a t.co link and a mention render differently from the text around
-   them, and the fold has to cut the body by line. */
+   them. */
 type Piece = string | { link: string } | { mention: string } | { mark: string }
+
+/* The bio is pieces too, so the projects inside it can be links rather than
+   domains printed as prose. */
+type BioPiece = string | { text: string; href: string }
 
 type Tweet = {
   key: string
@@ -26,13 +31,8 @@ type Tweet = {
   company: string
   href: string
   date: string
-  replies: number
-  likes: number
+  bio: BioPiece[]
   replyingTo?: string[]
-  /* Lines past this one sit behind x.com's own "Show more". A card on the belt
-     is 344px wide; a ten-line post in one would set the height of the whole row
-     and leave the two short ones in a hole. */
-  foldAt?: number
   body: Piece[][]
 }
 
@@ -46,8 +46,7 @@ const TWEETS: Tweet[] = [
     company: 'Vercel',
     href: 'https://x.com/rauchg/status/1759689594155708715',
     date: 'Feb 19, 2024',
-    replies: 34,
-    likes: 2144,
+    bio: ['Founder & CEO of ', { text: 'Vercel', href: 'https://vercel.com' }],
     body: [['This React OTP input 🔥'], [{ link: 'input-otp.rodz.dev' }]],
   },
   {
@@ -59,22 +58,24 @@ const TWEETS: Tweet[] = [
     company: 'Linear',
     href: 'https://x.com/emilkowalski/status/2074169272717152716',
     date: 'Jul 6, 2026',
-    replies: 50,
-    likes: 4978,
-    /* Cut after Liveline: the line that names the library is the fourth, so the
-       fold never takes the reason the card is here. */
-    foldAt: 5,
+    bio: [
+      'Design Engineer at Linear, author of ',
+      { text: 'animations.dev', href: 'https://animations.dev' },
+      ', ',
+      { text: 'sonner', href: 'https://sonner.emilkowal.ski' },
+      ' and ',
+      { text: 'vaul', href: 'https://vaul.emilkowal.ski' },
+    ],
+    /* Ten libraries in a 344px card would set the height of the whole row and
+       leave the two short posts in a hole. The list is elided to the one line
+       this page is about, with an ellipsis on either side standing in for the
+       nine it isn't — the same shape as the post, a tenth of the height. */
     body: [
       ['Some of my favorite UI libraries:'],
       [],
-      ['NumberFlow for animating numbers.'],
+      ['…'],
       [{ mark: 'input-otp for one-time passwords.' }],
-      ['Liveline for real-time charts.'],
-      ['Leva for customizable GUIs.'],
-      ['cmdk for command menus.'],
-      ['Virtuoso for virtualization.'],
-      ['dnd kit for drag and drop.'],
-      ['Sonner for notifications.'],
+      ['…'],
     ],
   },
   {
@@ -86,8 +87,7 @@ const TWEETS: Tweet[] = [
     company: 'Dub.co',
     href: 'https://x.com/steventey/status/1759721166267359501',
     date: 'Feb 19, 2024',
-    replies: 0,
-    likes: 7,
+    bio: ['Founder & CEO of ', { text: 'Dub', href: 'https://dub.co' }],
     replyingTo: ['@rauchg', '@guilherme_rodz'],
     body: [['incredible work ', { mention: '@guilherme_rodz' }, ' 👏']],
   },
@@ -101,10 +101,6 @@ const SPEED = 34
    three cards are narrower than the page, and a belt shorter than its own
    viewport leaves a hole at the seam. */
 const PASS = [...TWEETS, ...TWEETS]
-
-/* Fixed locale: this renders on the server too, and a count that reads
-   differently on the two passes is a hydration mismatch. */
-const NUMBER = new Intl.NumberFormat('en-US')
 
 function VerifiedCheck() {
   return (
@@ -169,20 +165,27 @@ function Body({ lines }: { lines: Piece[][] }) {
 /* Grid, not a stack of rows: the avatar sits in its own column beside the name
    and the body spans both, which is how x.com lays a single post out. */
 function TweetCard({ tweet, clone }: { tweet: Tweet; clone?: boolean }) {
-  const folded = tweet.foldAt !== undefined
-  const lines = folded ? tweet.body.slice(0, tweet.foldAt) : tweet.body
-
   return (
-    <a
+    <div
       className="xp-tw"
-      href={tweet.href}
-      target="_blank"
-      rel="noreferrer"
       /* The second pass is decoration: hidden from assistive tech and skipped
          by the tab order, so a reader meets each tweet once. */
       aria-hidden={clone || undefined}
-      tabIndex={clone ? -1 : undefined}
     >
+      {/* Stretched over the whole card, under the bio's own links: anywhere a
+          reader clicks that isn't a project goes to the post. */}
+      <a
+        className="xp-tw-open"
+        href={tweet.href}
+        target="_blank"
+        rel="noreferrer"
+        tabIndex={clone ? -1 : undefined}
+      >
+        <span className="xp-sr">
+          {tweet.name} on X, {tweet.date}
+        </span>
+      </a>
+
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="xp-tw-avatar" src={tweet.avatar} alt="" />
 
@@ -216,27 +219,28 @@ function TweetCard({ tweet, clone }: { tweet: Tweet; clone?: boolean }) {
       ) : null}
 
       <p className="xp-tw-body">
-        <Body lines={lines} />
-        {folded ? <span className="xp-tw-more">Show more</span> : null}
+        <Body lines={tweet.body} />
       </p>
 
-      <div className="xp-tw-foot">
-        <span className="xp-tw-date">{tweet.date}</span>
-        <span className="xp-tw-metrics">
-          {tweet.replies > 0 ? (
-            <span className="xp-tw-metric">
-              <MessageCircle size={14} strokeWidth={1.9} aria-hidden="true" />
-              {NUMBER.format(tweet.replies)}
-            </span>
-          ) : null}
-          <span className="xp-tw-metric">
-            <Heart size={14} strokeWidth={1.9} aria-hidden="true" />
-            {NUMBER.format(tweet.likes)}
-          </span>
-          <Share size={14} strokeWidth={1.9} aria-hidden="true" />
-        </span>
-      </div>
-    </a>
+      <p className="xp-tw-bio">
+        {tweet.bio.map((piece, i) =>
+          typeof piece === 'string' ? (
+            piece
+          ) : (
+            <a
+              className="xp-tw-bio-link"
+              key={i}
+              href={piece.href}
+              target="_blank"
+              rel="noreferrer"
+              tabIndex={clone ? -1 : undefined}
+            >
+              {piece.text}
+            </a>
+          ),
+        )}
+      </p>
+    </div>
   )
 }
 

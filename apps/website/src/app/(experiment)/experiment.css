@@ -1455,17 +1455,21 @@ html {
   border-top: 1px solid #1c1c1f;
 }
 
+/* Centred: the belt underneath runs edge to edge, so a left-aligned heading
+   had nothing to line up with. */
 .xp-sp-title {
   margin: 0 40px;
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
 .xp-sp-sub {
   margin: 6px 40px 30px;
   color: #71717a;
   font-size: 14px;
+  text-align: center;
 }
 
 /* The card borrows x.com's dark palette rather than the page's greys: #1d9bf0
@@ -1494,17 +1498,42 @@ html {
   text-align: left;
 }
 
+/* The link to the post, stretched over the card. It sits under the bio's own
+   links, so those stay clickable and everything else opens the tweet. */
+.xp-tw-open {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+}
+
 /* Beats the page-wide `.xp a:hover { opacity: .8 }` — a card that dims on hover
    reads as disabled, not as a link. */
-.xp a.xp-tw:hover {
+.xp a.xp-tw-open:hover {
   opacity: 1;
+}
+
+.xp-tw:hover {
   border-color: #2f3336;
   background: #101014;
 }
 
-.xp-tw:focus-visible {
+/* The card is a div now, so the ring is drawn on it when the link inside takes
+   focus — an outline on the overlay itself would trace the padding box, not
+   the card's rounded edge. */
+.xp-tw:has(.xp-tw-open:focus-visible) {
   outline: 2px solid rgba(250, 250, 250, 0.72);
   outline-offset: 3px;
+}
+
+/* Reachable by a screen reader, absent from the layout. */
+.xp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .xp-tw-avatar {
@@ -1602,40 +1631,37 @@ html {
   background: #1e2936;
 }
 
-.xp-tw-more {
-  display: block;
-  margin-top: 2px;
-  color: #1d9bf0;
-  font-size: 15px;
-}
-
-.xp-tw-foot {
+/* Set off to the right, the way an attribution line is: the post is the card,
+   this is the byline under it. */
+.xp-tw-bio {
   grid-area: foot;
   align-self: end;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 14px;
+  margin: 0;
+  padding-top: 16px;
   color: #71767b;
   font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
+  text-wrap: pretty;
 }
 
-.xp-tw-date {
-  white-space: nowrap;
+/* Above the stretched link, so these open the project and not the tweet. */
+.xp-tw-bio-link {
+  position: relative;
+  z-index: 1;
+  color: #a1a1aa;
+  text-decoration: underline;
+  text-decoration-color: #3f3f46;
+  text-underline-offset: 2px;
+  transition:
+    color 200ms ease,
+    text-decoration-color 200ms ease;
 }
 
-.xp-tw-metrics {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.xp-tw-metric {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-variant-numeric: tabular-nums;
+.xp .xp-tw-bio-link:hover {
+  opacity: 1;
+  color: #e7e9ea;
+  text-decoration-color: #71767b;
 }
 
 .xp-sp-band {
