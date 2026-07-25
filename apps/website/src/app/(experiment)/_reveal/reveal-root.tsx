@@ -51,9 +51,40 @@ function roleOf(el: HTMLElement): Role {
    `rv-done` flag is what drops the CSS start state along with it. */
 const TOUCHED = ['opacity', 'transform', 'filter', 'will-change']
 
+/* Elements muted by the handoff below, unmuted together one frame later —
+   each mapped to whatever inline transition it had, since a grid item can be
+   a client component that writes its own. */
+const muted = new Map<HTMLElement, string>()
+let unmute = 0
+
+/* Handing an element back to the stylesheet moves its computed opacity,
+   transform and filter off the start state in a single recalc — and if the
+   element also carries a CSS transition on one of them, that recalc is a
+   change the transition will animate. The sponsor cards transition
+   `transform` for their hover tilt, so each one slid up from its start
+   offset a second time, a beat after its reveal had already landed. WebKit
+   does this; Blink coalesces it away.
+   So the swap is committed with transitions muted, and they are handed back
+   a frame later — by which point the resting value is the value the element
+   is already showing, and there is nothing left to interpolate. */
 function clearInline(el: HTMLElement) {
+  if (!muted.has(el)) muted.set(el, el.style.transition)
+  el.style.transition = 'none'
   for (const prop of TOUCHED) el.style.removeProperty(prop)
   el.dataset.rvDone = '1'
+
+  if (unmute) return
+  unmute = requestAnimationFrame(() => {
+    unmute = 0
+    // One forced recalc for the whole batch, so the muted values are
+    // committed even on a frame that never paints.
+    void document.body.offsetHeight
+    muted.forEach((prev, node) => {
+      if (prev) node.style.transition = prev
+      else node.style.removeProperty('transition')
+    })
+    muted.clear()
+  })
 }
 
 /* An animation with `fill: both` keeps holding its last frame forever, which
