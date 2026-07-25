@@ -19,6 +19,12 @@ import { UsedByMarquee } from './_components/used-by-marquee'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
+/* The docs live in this same app, under the (docs) route group. They have their
+   own root layout, so these stay plain anchors: a Link across root layouts is a
+   full document load anyway. */
+const DOCS_URL = '/docs'
+const DOCS_INSTALL_URL = '/docs/installation'
+const DOCS_EXAMPLES_URL = '/docs/examples'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
 const RESEND_URL = 'https://go.resend.com/input-otp'
 const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
@@ -107,10 +113,10 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             color: '#a1a1aa',
           }}
         >
-          <a data-rv="chrome" href={`${GITHUB_URL}#readme`}>
+          <a data-rv="chrome" href={DOCS_URL}>
             Docs
           </a>
-          <a data-rv="chrome" href="https://input-otp.rodz.dev">
+          <a data-rv="chrome" href={DOCS_EXAMPLES_URL}>
             Examples
           </a>
           <a data-rv="chrome" href="#sponsors">
@@ -187,7 +193,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               justifyContent: 'center',
             }}
           >
-            <GetStartedButton href={GITHUB_URL} />
+            <GetStartedButton href={DOCS_INSTALL_URL} />
             <CopyCommand />
           </div>
 
@@ -397,7 +403,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
       >
         <span data-rv="chrome">MIT © Guilherme Rodz</span>
         <div style={{ display: 'flex', gap: 20 }}>
-          <a data-rv="chrome" href={`${GITHUB_URL}#readme`}>
+          <a data-rv="chrome" href={DOCS_URL}>
             Docs
           </a>
           <a data-rv="chrome" href={GITHUB_URL}>

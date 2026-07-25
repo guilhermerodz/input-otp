@@ -14,6 +14,9 @@ import { GetStartedButton } from './get-started-button'
 import { useParticleMark } from './particle-mark'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
+/* Same destination as the hero's button — the promise made at the top of the
+   page and the one made at the foot have to land in the same place. */
+const DOCS_INSTALL_URL = '/docs/installation'
 
 /* Nothing runs a canvas for a section nobody has reached. The field mounts a
    screen ahead of the viewport, then fades in on the frame after motes' first
@@ -209,7 +212,7 @@ export function CtaDaybreak({ starCount }: { starCount: string | null }) {
           MIT licensed, zero dependencies, one real input under the slots.
         </p>
         <div className="xp-cta-row" data-rv="action">
-          <GetStartedButton href={GITHUB_URL} />
+          <GetStartedButton href={DOCS_INSTALL_URL} />
           <a className="xp-btn xp-btn--quiet xp-btn--star" href={GITHUB_URL}>
             <span aria-hidden="true">★</span> {starCount ?? '3.2k'} on GitHub
           </a>
