@@ -176,6 +176,10 @@ function Slot(
     error: boolean
     success: boolean
     staticActive: boolean
+    /* The ghost hand is resting in this slot. Draws the same caret the real
+       input would, so the suggestion reads as someone typing rather than as
+       digits appearing on their own. */
+    ghostCaret: boolean
     gain: number
     slotRef: (el: HTMLDivElement | null) => void
   },
@@ -195,7 +199,7 @@ function Slot(
           {props.char}
         </div>
       )}
-      {props.hasFakeCaret && <div className="xp-caret" />}
+      {(props.hasFakeCaret || props.ghostCaret) && <div className="xp-caret" />}
     </div>
   )
 }
@@ -236,6 +240,9 @@ export function HeroOtp() {
   const wrapRef = React.useRef<HTMLDivElement>(null)
   const slotRefs = React.useRef<(HTMLDivElement | null)[]>([])
   const hintTimers = React.useRef<ReturnType<typeof setTimeout>[]>([])
+  /* Set when the suggestion has finished and the caret is owed to the
+     reader; cleared by whoever hands it over or gives up on it. */
+  const handOff = React.useRef(false)
   const [value, setValue] = React.useState('')
   const [mode, setMode] = React.useState<Mode>('play')
   const [step, setStep] = React.useState(0)
@@ -245,6 +252,17 @@ export function HeroOtp() {
   // user's turn.
   const [locked, setLocked] = React.useState(true)
   const [active, setActive] = React.useState<number[]>([])
+  /**
+   * Where the ghost hand is, while the suggestion types itself.
+   *
+   * The input is disabled for that stretch, so input-otp reports no active
+   * slot and the real ring has nothing to sit on — which is why the ring
+   * used to appear on the third slot out of nowhere. This stands in for the
+   * caret only when the input has none of its own, so a stale value can
+   * never fight the real selection: whenever the field is focused, `active`
+   * wins.
+   */
+  const [ghost, setGhost] = React.useState<number | null>(null)
   const [isMobile, setIsMobile] = React.useState(false)
   const [isMac, setIsMac] = React.useState(true)
   const [ring, setRing] = React.useState<Ring>({
@@ -260,6 +278,8 @@ export function HeroOtp() {
   valueRef.current = value
   const activeRef = React.useRef(active)
   activeRef.current = active
+  const ghostRef = React.useRef(ghost)
+  ghostRef.current = ghost
 
   React.useEffect(() => {
     setIsMobile(window.matchMedia('(pointer: coarse)').matches)
@@ -268,31 +288,43 @@ export function HeroOtp() {
 
   /* The focus ring is one element gliding between slots (Luxe's shared
      indicator), measured off the real slot boxes so it survives the
-     mobile size change. */
-  const measureRing = React.useCallback(() => {
+     mobile size change.
+
+     A single active slot is the ring's home. With none — the field is
+     blurred or disabled — the ghost takes over if it is holding a slot,
+     which is what carries the ring through the self-typing suggestion and
+     the error shake. A multi-slot selection has no single home, so the ring
+     steps aside and the slots show the selection themselves. */
+  const ringSlot = () => {
     const current = activeRef.current
-    if (current.length === 1) {
-      const el = slotRefs.current[current[0]]
-      const wrap = wrapRef.current
-      if (el && wrap) {
-        const a = el.getBoundingClientRect()
-        const b = wrap.getBoundingClientRect()
-        setRing(prev => ({
-          x: a.left - b.left,
-          y: a.top - b.top,
-          w: a.width,
-          h: a.height,
-          radius: getComputedStyle(el).borderRadius,
-          visible: true,
-          snap: !prev.visible,
-        }))
-      }
+    if (current.length === 1) return current[0]
+    if (current.length === 0) return ghostRef.current
+    return null
+  }
+
+  const measureRing = React.useCallback(() => {
+    const idx = ringSlot()
+    const el = idx === null ? null : slotRefs.current[idx]
+    const wrap = wrapRef.current
+    if (el && wrap) {
+      const a = el.getBoundingClientRect()
+      const b = wrap.getBoundingClientRect()
+      setRing(prev => ({
+        x: a.left - b.left,
+        y: a.top - b.top,
+        w: a.width,
+        h: a.height,
+        radius: getComputedStyle(el).borderRadius,
+        visible: true,
+        snap: !prev.visible,
+      }))
     } else {
       setRing(r => ({ ...r, visible: false }))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  React.useLayoutEffect(measureRing, [active, measureRing])
+  React.useLayoutEffect(measureRing, [active, ghost, measureRing])
 
   React.useEffect(() => {
     window.addEventListener('resize', measureRing)
@@ -358,6 +390,7 @@ export function HeroOtp() {
   const clearHint = () => {
     hintTimers.current.forEach(clearTimeout)
     hintTimers.current = []
+    handOff.current = false
   }
 
   const at = (ms: number, fn: () => void) =>
@@ -386,21 +419,58 @@ export function HeroOtp() {
   // Suggest the right code: type 1, then 2 at a human pace, then unlock
   // and hand the caret over on the third slot. The input is disabled
   // while the ghost is typing so nobody can fight it for the keyboard.
+  //
+  // The ghost caret takes each slot *before* its digit lands and moves on as
+  // it appears, which is the order a real hand does it in — sit in the slot,
+  // press the key, carry on to the next. It also means the ring is already
+  // on screen and travelling by the time it reaches the third slot, instead
+  // of blinking into existence there once focus arrives.
   const runHint = (delay: number) => {
     at(delay, () => {
       setLocked(true)
-      setValue('1')
+      setValue('')
+      setGhost(0)
     })
-    at(delay + 280, () => setValue('12'))
-    at(delay + 760, () => setLocked(false))
-    at(delay + 800, () => {
-      if (!fieldOnScreen()) return
-      // preventScroll even when it is on screen: it may be only just
-      // inside the fold, and centring itself would still move the page
-      // under someone who never asked for the caret.
-      inputRef.current?.focus({ preventScroll: true })
+    at(delay + 300, () => {
+      setValue('1')
+      setGhost(1)
+    })
+    at(delay + 620, () => {
+      setValue('12')
+      setGhost(2)
+    })
+    at(delay + 940, () => {
+      handOff.current = true
+      setLocked(false)
     })
   }
+
+  /**
+   * Hands the caret over, once the input is genuinely able to take it.
+   *
+   * `focus()` on a disabled input is a no-op, so unlocking and focusing has
+   * to straddle a commit — as two timers 40ms apart it worked only as long
+   * as nothing delayed them into the same task, and a throttled tab does
+   * exactly that. Waiting for the render that clears `disabled` makes the
+   * ordering a fact rather than a hope.
+   */
+  React.useLayoutEffect(() => {
+    if (locked || !handOff.current) return
+    handOff.current = false
+    // preventScroll even when it is on screen: it may be only just inside
+    // the fold, and centring itself would still move the page under
+    // someone who never asked for the caret.
+    if (fieldOnScreen()) {
+      inputRef.current?.focus({ preventScroll: true })
+    }
+    // The ghost stays on the third slot through a successful hand-off:
+    // focus lands there too, but `active` only catches up an effect later,
+    // and dropping the ghost here would blink the ring off for that frame.
+    // A hand-off that did not happen is the opposite — nothing owns the
+    // caret, so nothing should be drawing one.
+    if (document.activeElement !== inputRef.current) setGhost(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locked])
 
   // On load, once the intro curtain is gone, the hint plays by itself.
   React.useEffect(() => {
@@ -424,12 +494,28 @@ export function HeroOtp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Wrong code: shake it off, then replay the suggestion.
+  /**
+   * Wrong code: shake it off, then replay the suggestion.
+   *
+   * Locked for the whole recovery, not just the shake. A full field puts the
+   * selection on the last slot, so every further keypress overwrites that
+   * one digit — input-otp behaving exactly as it should, but it kept the
+   * value at six characters and each of those keystrokes cancelled the
+   * pending hint, which left the field stranded in the red state with no
+   * replay coming. Swallowing the spam is what makes the recovery reliable.
+   *
+   * The ghost holds the last slot meanwhile: disabling a focused input
+   * blurs it, and without a stand-in the ring would snap away just as the
+   * shake starts.
+   */
   const failThenHint = () => {
     setError(true)
+    setLocked(true)
+    setGhost(5)
     at(450, () => {
       setError(false)
       setValue('')
+      setGhost(null)
     })
     runHint(850)
   }
@@ -515,6 +601,10 @@ export function HeroOtp() {
 
   const success = mode === 'success'
   const multi = active.length > 1
+  /* Same rule the ring follows: the ghost only draws a caret while the input
+     has no selection of its own, so the real one and the stand-in can never
+     both be on screen. */
+  const ghostAt = active.length === 0 ? ghost : null
   // Only the desktop tour shows key chips to light up.
   const presses = usePresses(mode === 'tutorial' && !isMobile, isMac)
 
@@ -533,10 +623,13 @@ export function HeroOtp() {
           disabled={locked}
           onChange={v => {
             // A real keystroke or paste takes over from any pending hint.
+            // The field is focused to have produced this, so `active` is
+            // driving the ring and letting the ghost go is free.
             if (mode === 'play') {
               clearHint()
               setLocked(false)
               setError(false)
+              setGhost(null)
             }
             setValue(v)
           }}
@@ -567,6 +660,7 @@ export function HeroOtp() {
                     error={error}
                     success={success}
                     staticActive={slot.isActive && multi}
+                    ghostCaret={ghostAt === idx}
                     gain={SPOT_GAIN[idx]}
                     slotRef={el => {
                       slotRefs.current[idx] = el
@@ -583,6 +677,7 @@ export function HeroOtp() {
                     error={error}
                     success={success}
                     staticActive={slot.isActive && multi}
+                    ghostCaret={ghostAt === idx + 3}
                     gain={SPOT_GAIN[idx + 3]}
                     slotRef={el => {
                       slotRefs.current[idx + 3] = el
@@ -630,7 +725,7 @@ export function HeroOtp() {
       >
         {mode === 'play' && error && (
           <div key="err" className="xp-fade-text" style={{ color: '#f87171' }}>
-            not this one — psst, it starts with 1 2 …
+            nope. it starts with 1 2 …
           </div>
         )}
         {mode === 'success' && (
