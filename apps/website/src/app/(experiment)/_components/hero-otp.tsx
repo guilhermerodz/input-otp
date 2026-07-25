@@ -216,6 +216,31 @@ function ActiveProbe({
   return null
 }
 
+/* The success line, one span per letter, so it nods along with the input's
+   own success bounce instead of just sitting there. Spaces stay plain text
+   nodes: they keep the sentence wrappable, and only the letters carry the
+   animation, each one a beat behind the last. */
+function BouncingLine({ text }: { text: string }) {
+  let letter = 0
+  return (
+    <>
+      {Array.from(text).map((ch, idx) =>
+        ch === ' ' ? (
+          ' '
+        ) : (
+          <span
+            key={idx}
+            className="xp-win-letter"
+            style={{ '--i': letter++ } as React.CSSProperties}
+          >
+            {ch}
+          </span>
+        ),
+      )}
+    </>
+  )
+}
+
 type Ring = {
   x: number
   y: number
@@ -667,7 +692,7 @@ export function HeroOtp() {
         )}
         {mode === 'success' && (
           <div key="ok" className="xp-fade-text" style={{ color: '#34d399' }}>
-            ✓ 123456 — you&apos;re in
+            <BouncingLine text="✓ 123456 — you guessed it! let's play" />
           </div>
         )}
         {mode === 'tutorial' && !finished && (

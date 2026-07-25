@@ -635,6 +635,42 @@ html {
   }
 }
 
+/* The success line nods along with the input: same easing and duration as
+   .xp-otp-bounce, a third of the travel so it stays readable, and a small
+   per-letter delay (--i) so the nod ripples left to right instead of the
+   whole sentence hopping as one block. The step is small on purpose — at
+   ~30 letters the last one still starts inside the first half-second, so
+   the ripple finishes well before the tour takes the line (1300ms). */
+.xp-win-letter {
+  display: inline-block;
+  animation: xp-win-letter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 14ms);
+}
+
+@keyframes xp-win-letter {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-3.5px);
+  }
+  50% {
+    transform: translateY(1px);
+  }
+  72% {
+    transform: translateY(-1.5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-win-letter {
+    animation: none;
+  }
+}
+
 /* Hand-written note chip: optical legibility over the illustration —
    generous tracking, a dark blurred panel, and breathing room. */
 .xp-note-chip {
