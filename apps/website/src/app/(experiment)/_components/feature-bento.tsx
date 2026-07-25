@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { ProofCard } from './feature-proof-card'
+import { registerSpotlights } from './spotlight'
 import { useIsLive, usePrefersReducedMotion } from './use-live'
 
 function OtpSlots({ compact = false }: { compact?: boolean }) {
@@ -357,9 +358,16 @@ export function FeatureBento() {
     document.addEventListener('visibilitychange', setDocumentState)
     setDocumentState()
 
+    /* The cursor rim on every card, from the same list the pause observer
+       walks. The reach is wider here than on the hero controls: these are big
+       boxes tiled tight, and the light should arrive with the cursor rather
+       than only once it is over a card. */
+    const unspot = registerSpotlights(cards, { reach: 260, spread: 380 })
+
     return () => {
       observer.disconnect()
       document.removeEventListener('visibilitychange', setDocumentState)
+      unspot()
     }
   }, [])
 

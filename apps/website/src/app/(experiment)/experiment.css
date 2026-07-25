@@ -154,6 +154,76 @@ html {
   color: #70757e;
 }
 
+/* Pointer spotlight rim ---------------------------------------------------- */
+
+/* The rim the cursor drags along a bordered box — the hero slots' trick (see
+   .xp-otp-spot below) made general. The span is appended by spotlight.ts, which
+   also writes --xp-mx / --xp-my (pointer, in the box's own coordinates) and
+   --xp-spot (how lit it is, by distance). Each host sets the geometry: the ring
+   has to land on the host's own border, so it is pulled out over it by the
+   border width and takes that box's radius. */
+.xp-spot-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  padding: var(--xp-spot-width, 1px);
+  background: radial-gradient(
+    var(--xp-spot-spread, 240px) circle at var(--xp-mx, -9999px)
+      var(--xp-my, -9999px),
+    rgba(232, 240, 255, 0.95) 0%,
+    rgba(226, 236, 255, 0.42) 30%,
+    rgba(214, 228, 255, 0) 72%
+  );
+  /* Ring only: punch the fill out and keep the rim. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: var(--xp-spot, 0);
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-spot-ring {
+    display: none;
+  }
+}
+
+/* The CTA carries a 2px border and a grain overlay that already overhangs it,
+   so the rim goes out to the same edge and is drawn as thick as the border. */
+.xp-btn > .xp-spot-ring {
+  inset: -2px;
+  padding: 2px;
+  border-radius: 16px;
+}
+
+/* Sits above the button's grain tile, which has no z-index of its own. */
+.xp-btn:not(.xp-btn--quiet) > .xp-spot-ring {
+  z-index: 1;
+}
+
+/* Nothing to catch on a button with no border to speak of. */
+.xp-btn--quiet > .xp-spot-ring {
+  display: none;
+}
+
+/* The install line: 1px border, same corner as the button beside it. */
+.xp-install {
+  position: relative;
+}
+
+.xp-install > .xp-spot-ring {
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: 16px;
+}
+
 @keyframes xp-blink {
   0%,
   100% {
@@ -1516,6 +1586,13 @@ html {
 .xp-tw:hover {
   border-color: #2f3336;
   background: #101014;
+}
+
+/* Out over the 1px border, at the card's own outer radius. */
+.xp-tw > .xp-spot-ring {
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: 16px;
 }
 
 /* The card is a div now, so the ring is drawn on it when the link inside takes
