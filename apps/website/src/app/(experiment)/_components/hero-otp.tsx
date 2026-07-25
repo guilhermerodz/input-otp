@@ -552,8 +552,8 @@ export function HeroOtp() {
           <Kbd>V</Kbd>
         </>,
         <>
-          hold <Kbd>Shift</Kbd> + <Kbd>←</Kbd> — the selection grows slot by
-          slot
+          hold <Kbd>Shift</Kbd>
+          <Kbd>←</Kbd> — the selection grows slot by slot
         </>,
         <>
           now cut or paste just that slice — <Kbd>{modK}</Kbd>
