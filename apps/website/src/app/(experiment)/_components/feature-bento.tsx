@@ -383,8 +383,8 @@ export function FeatureBento() {
         </div>
         <div className="xp-fb-intro-side">
           <p data-rv="lede">
-            Five animated proofs of what a single native input can do when the
-            visible slots only mirror its state.
+            What a single native input can do when the visible slots only
+            mirror its state.
           </p>
         </div>
       </div>

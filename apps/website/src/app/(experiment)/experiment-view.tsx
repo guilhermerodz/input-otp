@@ -197,29 +197,52 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
             <CopyCommand />
           </div>
 
+          {/* No chrome around this one: it is a footnote to the hero, and the
+              wordmark is the only thing that needs to carry weight. */}
+          {/* Inline flow rather than a flex row: on a phone the sentence wraps,
+              and the wordmark has to travel with the words it belongs to
+              instead of being pushed to the end of the line. */}
           <a
             data-rv="chrome"
             href={CLERK_URL}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
+              display: 'block',
+              /* Wide enough for one line where there is room; the phone falls
+                 back to two, breaking before "Get started with". */
+              maxWidth: 430,
               marginTop: 22,
-              ...card,
-              borderRadius: 12,
-              padding: '13px 22px',
+              fontSize: 13,
+              lineHeight: 1.7,
+              color: '#a1a1aa',
+              textAlign: 'center',
+              textWrap: 'balance',
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/sponsors/clerk-wordmark-white-trimmed.svg"
-              alt="Clerk"
-              style={{ height: 17, width: 'auto' }}
-            />
-            <span style={{ fontSize: 13, color: '#a1a1aa' }}>
-              Looking for an authentication solution?{' '}
-              <span style={{ color: '#fafafa', fontWeight: 600 }}>
-                Get started with Clerk →
+            Looking for an authentication solution?{' '}
+            <span
+              style={{
+                color: '#fafafa',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Get started with{' '}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                alt="Clerk"
+                style={{
+                  height: 15,
+                  width: 'auto',
+                  display: 'inline-block',
+                  verticalAlign: '-3px',
+                }}
+              />
+              <span
+                aria-hidden="true"
+                style={{ color: '#52525b', fontSize: 12, marginLeft: 5 }}
+              >
+                ↗
               </span>
             </span>
           </a>
@@ -238,21 +261,21 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
         style={{ padding: '56px 40px', borderTop: border }}
         data-rv-group
       >
+        {/* Same path-as-heading device as ~/features: the logos below say
+            "sponsors" better than a sentence about them would. */}
         <h2
           data-rv="title"
           style={{
+            /* The grid brings its own 28px of top margin. */
             margin: 0,
-            fontSize: 28,
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
+            fontFamily: 'var(--font-jetbrains), ui-monospace, Menlo, monospace',
+            fontSize: 22,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
           }}
         >
-          Our sponsors
+          <span style={{ color: '#52525b' }}>~/</span>sponsors
         </h2>
-        <div data-rv="lede" style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
-          Thank you for believing in what we&apos;re building
-          <span style={{ color: '#3f3f46' }}>_</span>
-        </div>
 
         <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
           <SponsorBorderBeam tier="diamond" duration={4.1} revealRole="card">
