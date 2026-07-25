@@ -13,12 +13,15 @@ export function SponsorBorderBeam({
   children: React.ReactNode
 }) {
   const isDiamond = tier === 'diamond'
+  // The wrapper is the grid item, so the tier has to reach it — the diamond
+  // spans two of the three columns.
+  const wrapClassName = `xp-sponsor-beam-wrap xp-sponsor-beam-wrap--${tier}`
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
   if (!mounted) {
-    return <div className="xp-sponsor-beam-wrap">{children}</div>
+    return <div className={wrapClassName}>{children}</div>
   }
 
   return (
@@ -29,7 +32,7 @@ export function SponsorBorderBeam({
       duration={duration}
       theme="dark"
       borderRadius={14}
-      className="xp-sponsor-beam-wrap"
+      className={wrapClassName}
       style={
         isDiamond
           ? ({ '--pulse-glow-boost': 1.9 } as CSSProperties)
