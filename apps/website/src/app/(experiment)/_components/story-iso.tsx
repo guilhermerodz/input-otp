@@ -815,6 +815,32 @@ export function StoryIso() {
   const frame = useStageAlign(stickyRef, sceneRef)
   const step = useStoryScrub(trackRef, sceneRef, frame)
 
+  /**
+   * Scroll the page to the beat a sentence belongs to. The story has no
+   * anchors to jump to — it is one tall track scrubbed by scroll — so the
+   * beat is turned back into the scroll offset that produces it.
+   */
+  const jumpTo = React.useCallback((i: number) => {
+    const track = trackRef.current
+    if (!track) return
+    const rect = track.getBoundingClientRect()
+    const total = rect.height - window.innerHeight
+    if (total <= 0) return
+    // Land mid-beat: the sentence is fully lit and the stage has finished
+    // hopping to it. The last beat is the exception — its input only goes
+    // live, flat and typeable near the end — so that one lands late.
+    const p = (i + (i === BEATS - 1 ? 0.92 : 0.5)) / BEATS
+    // 'instant', not 'auto': the page sets scroll-behavior: smooth on <html>,
+    // which 'auto' would defer to — the one case that must not glide.
+    const reduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+    window.scrollTo({
+      top: window.scrollY + rect.top + p * total,
+      behavior: reduced ? 'instant' : 'smooth',
+    })
+  }, [])
+
   return (
     <div ref={trackRef} className="relative h-[640vh]">
       <div ref={stickyRef} className="sticky top-0 h-[100svh] overflow-hidden">
@@ -854,6 +880,14 @@ export function StoryIso() {
             <div
               data-lecture
               className="flex min-h-0 flex-1 items-start overflow-hidden"
+              // Tabbing to a sentence that is currently masked makes the
+              // browser try to reveal it by scrolling this box. Nothing here
+              // is meant to scroll — the list is placed by --text-y — so any
+              // such scroll is undone before it can slip the mask.
+              onScroll={e => {
+                e.currentTarget.scrollTop = 0
+                e.currentTarget.scrollLeft = 0
+              }}
               style={{
                 height: 'var(--lect-h, auto)',
                 maskImage: LECT_MASK,
@@ -866,16 +900,25 @@ export function StoryIso() {
                 style={{ transform: 'translateY(var(--text-y, 0px))' }}
               >
                 {SENTENCES.map((sentence, i) => (
-                  <p
+                  <button
                     key={i}
+                    type="button"
                     data-sentence
-                    className="m-0 text-balance text-lg font-semibold leading-snug tracking-tight text-white sm:text-xl md:text-[1.7rem] md:leading-snug"
-                    style={{
-                      opacity: `var(--sent${i}, ${i === 0 ? 1 : 0.08})`,
+                    onClick={() => jumpTo(i)}
+                    // Keyboard focus lands on beats that may be dimmed and
+                    // off-window; bring the story to the one being read.
+                    onFocus={e => {
+                      if (e.currentTarget.matches(':focus-visible')) jumpTo(i)
                     }}
+                    className="xp-beat m-0 border-0 bg-transparent p-0 text-balance text-lg font-semibold leading-snug tracking-tight text-white sm:text-xl md:text-[1.7rem] md:leading-snug"
+                    style={
+                      {
+                        '--o': `var(--sent${i}, ${i === 0 ? 1 : 0.08})`,
+                      } as React.CSSProperties
+                    }
                   >
                     {sentence}
-                  </p>
+                  </button>
                 ))}
               </div>
             </div>

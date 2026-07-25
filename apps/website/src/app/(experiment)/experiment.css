@@ -715,6 +715,34 @@ html {
   will-change: transform;
 }
 
+/* A sentence in the story lecture, which doubles as a jump button. The
+   scrub writes its brightness into --o every frame, so the hover lift is a
+   floor under that rather than an override — and deliberately un-transitioned,
+   since a transition on this opacity would also smear the scroll scrub. */
+.xp-beat {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  opacity: max(var(--o, 1), var(--beat-lift, 0));
+}
+
+@media (hover: hover) {
+  .xp-beat:hover {
+    --beat-lift: 0.62;
+  }
+}
+
+/* The ring is drawn *inside* the box: a beat spans the full column, and the
+   lecture window clips anything past its edges — an offset ring would lose
+   its left and right sides to that clip and read as two stray rules. */
+.xp-beat:focus-visible {
+  --beat-lift: 0.62;
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
 /* Highlighter sweep for the chalk-talk story variant: the pen drags
    across the current sentence, driven by --hl. */
 .xp-hl {
