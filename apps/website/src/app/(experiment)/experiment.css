@@ -45,6 +45,115 @@ html {
   opacity: 0.8;
 }
 
+/* Buttons ---------------------------------------------------------------- */
+
+/* The call to action, after Resend's: glass rather than plastic. It carries
+   both ends of the page — the hero and the closing CTA — so it lives up here
+   with the base rules rather than inside either section. Both colour rules
+   carry the .xp prefix: `.xp a` sets colour: inherit, which would otherwise
+   paint the label white on the hovered white face, and `.xp a:hover` would
+   drop the whole button to 0.8. */
+.xp-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.xp .xp-btn,
+.xp .xp-btn:hover {
+  opacity: 1;
+}
+
+/* The face is a barely-there diagonal wash over whatever is behind it,
+   blurred, and the 2px border is white at 5% rather than a line —
+   background-origin puts the wash under it instead of stopping at it, so the
+   border reads as the same pane seen edge-on. */
+.xp .xp-btn:not(.xp-btn--quiet) {
+  color: #fafafa;
+  border-color: rgba(255, 255, 255, 0.05);
+  background-origin: border-box;
+  background-image: linear-gradient(
+    104deg,
+    rgba(253, 253, 253, 0.05) 5%,
+    rgba(240, 240, 228, 0.1) 100%
+  );
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Grain over the border as well as the face — hence the 2px overhang, and the
+   outer radius left at the inner one so the corners stay tight. The tile is
+   white at alphas 0-7/255, fine enough to read as a surface rather than as a
+   pattern; it survives the hover to white, which is where it does most of its
+   work. */
+.xp-btn:not(.xp-btn--quiet)::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  border-radius: 16px;
+  background: url('/button-grain.png') repeat;
+  pointer-events: none;
+}
+
+/* Inverts on hover, and the shadow becomes a bloom rather than a drop — the
+   button is lighter than everything around it, so it should throw light. */
+.xp .xp-btn:not(.xp-btn--quiet):hover,
+.xp .xp-btn:not(.xp-btn--quiet):focus-visible {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #09090b;
+}
+
+.xp .xp-btn:not(.xp-btn--quiet):hover {
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.06),
+    0 1px 14px rgba(255, 255, 255, 0.12),
+    0 3px 32px rgba(255, 255, 255, 0.18);
+}
+
+/* What Resend pairs the button with: no chrome at all, so the one button in
+   the row is unmistakably the one thing to press. */
+.xp .xp-btn--quiet {
+  background: transparent;
+  color: #a1a1aa;
+}
+
+.xp .xp-btn--quiet:hover {
+  color: #fafafa;
+}
+
+/* A ring rather than an outline: the button is already inverted by the time it
+   is focused, and an outline at an offset would sit off the grain overlay and
+   lose the corner radius. */
+.xp-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Pulled back into the right padding, so the label stays centred in the
+   button and the chevron reads as trailing it rather than as a second item. */
+.xp-btn-chevron {
+  margin-right: -8px;
+  color: #70757e;
+}
+
 @keyframes xp-blink {
   0%,
   100% {
@@ -432,192 +541,6 @@ html {
     box-shadow 0.15s ease;
 }
 
-/* ————— Hero slot background candidates —————
-   Five subtle to-bottom gradients on the hero slots only (.xp-otp-spot is
-   the hero container), swapped live by SlotBgSwitcher via a data attribute
-   on <html>. Drop the switcher and the five rules below once one is chosen.
-
-   Every stop is translucent, so the page — and the motes field behind it —
-   reads through the whole slot rather than only where a gradient runs out.
-   Nothing here composites the backdrop (no blur, no filters) — plain paint.
-
-   The numbers are chosen by what they composite to over the page's #09090b
-   (r=9), not by how they read on their own: rgba(18,18,23,0.6) lands at
-   0.6·18 + 0.4·9 ≈ 14, i.e. #0e0e12 — just above the old flat #0c0c0e, and
-   well under the #17171b of the first pass. Every ramp ends at or a little
-   below the page tone, so the top-to-bottom delta is ~5 levels: enough to
-   see the gradient, not enough to see a lit box. */
-
-/* Dim along the top edge, thinning out to nothing at the bottom. */
-[data-slot-bg='lift'] .xp-otp-spot .xp-slot {
-  background: linear-gradient(
-    180deg,
-    rgba(18, 18, 23, 0.6) 0%,
-    rgba(15, 15, 20, 0.34) 45%,
-    rgba(15, 15, 20, 0) 100%
-  );
-}
-
-/* The mirror: open at the top, gathering into a floor at the bottom. */
-[data-slot-bg='well'] .xp-otp-spot .xp-slot {
-  background: linear-gradient(
-    180deg,
-    rgba(15, 15, 20, 0) 0%,
-    rgba(15, 15, 20, 0.34) 55%,
-    rgba(18, 18, 23, 0.6) 100%
-  );
-}
-
-/* An even veil: alpha holds, only the tint shifts — top sits above the page
-   tone, bottom dips just under it. The steadiest of the five. */
-[data-slot-bg='sheet'] .xp-otp-spot .xp-slot {
-  background: linear-gradient(
-    180deg,
-    rgba(20, 20, 26, 0.5) 0%,
-    rgba(6, 6, 9, 0.5) 100%
-  );
-}
-
-/* The field's own cool accent washed over the top of a translucent base. */
-[data-slot-bg='frost'] .xp-otp-spot .xp-slot {
-  background: linear-gradient(
-      180deg,
-      rgba(221, 234, 254, 0.03) 0%,
-      rgba(221, 234, 254, 0.007) 58%,
-      rgba(221, 234, 254, 0) 100%
-    ),
-    rgba(11, 11, 16, 0.5);
-}
-
-/* Not a ramp but an edge: a hairline of specular on the top bevel, then the
-   fill drops away immediately and keeps thinning. */
-[data-slot-bg='seam'] .xp-otp-spot .xp-slot {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(17, 17, 22, 0.48) 10%,
-    rgba(14, 14, 19, 0.26) 58%,
-    rgba(14, 14, 19, 0.06) 100%
-  );
-}
-
-/* The switcher itself — a dev control, docked bottom-centre. */
-.xp-bgswitch {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
-  border: 1px solid #27272a;
-  border-radius: 999px;
-  /* Opaque, not frosted: it sits fixed over a scrolling page, and a
-     backdrop blur there costs a composite every frame while you scroll. */
-  background: #0b0b0d;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
-}
-
-.xp-bgswitch-title {
-  padding: 0 8px 0 6px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #52525b;
-}
-
-.xp-bgswitch-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 11px 6px 8px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: none;
-  color: #a1a1aa;
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  transition:
-    color 0.15s ease,
-    background-color 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.xp-bgswitch-btn:hover {
-  color: #fafafa;
-  background: #18181b;
-}
-
-.xp-bgswitch-btn--on {
-  color: #fafafa;
-  border-color: #3f3f46;
-  background: #18181b;
-}
-
-/* Each chip previews the shape of its variant. Deliberately exaggerated —
-   the real gradients are too faint to survive 12×16px, so read these as
-   labels and judge the gradients on the slots. */
-.xp-bgswitch-chip {
-  width: 12px;
-  height: 16px;
-  border: 1px solid #3f3f46;
-  border-radius: 3px;
-}
-
-.xp-bgswitch-chip--off {
-  background: #0c0c0e;
-}
-
-.xp-bgswitch-chip--lift {
-  background: linear-gradient(180deg, #1c1c22 0%, rgba(9, 9, 11, 0) 100%);
-}
-
-.xp-bgswitch-chip--well {
-  background: linear-gradient(180deg, rgba(9, 9, 11, 0) 0%, #1c1c22 100%);
-}
-
-.xp-bgswitch-chip--sheet {
-  background: linear-gradient(180deg, #1a1a20 0%, #0a0a0d 100%);
-}
-
-.xp-bgswitch-chip--frost {
-  background: linear-gradient(
-      180deg,
-      rgba(221, 234, 254, 0.16) 0%,
-      rgba(221, 234, 254, 0) 100%
-    ),
-    #0b0b0e;
-}
-
-.xp-bgswitch-chip--seam {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.5) 8%,
-    rgba(22, 22, 28, 0.8) 9%,
-    rgba(16, 16, 20, 0.15) 100%
-  );
-}
-
-@media (max-width: 900px) {
-  .xp-bgswitch {
-    gap: 2px;
-    padding: 5px 6px;
-  }
-
-  .xp-bgswitch-title {
-    display: none;
-  }
-
-  .xp-bgswitch-btn {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-}
-
 /* ————— Hero-only cursor spotlight —————
    The pointer is a light source and the slot rims catch it. The gain is
    baked per slot (--xp-lit, set from JS): the outer slots reflect nearly
@@ -867,6 +790,24 @@ html {
 .xp-sponsor-beam-wrap > .xp-sponsor-card {
   height: 100%;
   box-sizing: border-box;
+}
+
+/* Perspective per tile rather than on the grid: a shared vanishing point on
+   the container makes the outer cards shear instead of tilt. Only armed once
+   the tilt component has confirmed a fine, hovering pointer. */
+.xp-sponsors-grid[data-tilt] > .xp-sponsor-beam-wrap,
+.xp-sponsors-grid[data-tilt] > .xp-sponsor-cta {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  /* Long enough to glide back to flat on leave; the tilting state below cuts it
+     down so the card still feels stuck to the cursor while it's inside. */
+  transition: transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-sponsors-grid[data-tilt] > [data-tilting] {
+  transition-duration: 110ms;
+  will-change: transform;
 }
 
 .xp-sponsor-card {
@@ -1773,82 +1714,9 @@ html {
   }
 }
 
-/* Keycaps: a cap with a bottom edge, which it travels when pressed. Both
-   colour rules carry the .xp prefix — `.xp a` sets colour: inherit, which
-   would otherwise paint the primary label white on a white cap, and
-   `.xp a:hover` would drop the whole cap to 0.8. */
-.xp-cta-key {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 12px;
-  padding: 14px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition:
-    transform 90ms ease,
-    box-shadow 90ms ease,
-    background 200ms ease,
-    border-color 200ms ease;
-}
-
-.xp .xp-cta-key,
-.xp .xp-cta-key:hover {
-  opacity: 1;
-}
-
-.xp .xp-cta-key--primary {
-  background: #fafafa;
-  color: #09090b;
-  box-shadow:
-    0 4px 0 #a1a1aa,
-    0 8px 18px -8px rgba(0, 0, 0, 0.9);
-}
-
-.xp .xp-cta-key--primary:hover {
-  background: #fff;
-}
-
-.xp .xp-cta-key--ghost {
-  background: #101013;
-  color: #fafafa;
-  border: 1px solid #27272a;
-  box-shadow:
-    0 4px 0 #1c1c1f,
-    0 8px 18px -10px rgba(0, 0, 0, 0.9);
-}
-
-.xp .xp-cta-key--ghost:hover {
-  border-color: #3f3f46;
-  background: #16161a;
-}
-
-.xp-cta-key:active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-}
-
-.xp-cta-key:focus-visible {
-  outline: 2px solid #ddeafe;
-  outline-offset: 3px;
-}
-
-.xp-cta-key-glyph {
-  font-size: 12px;
-  line-height: 1;
-  padding: 3px 6px;
-  border-radius: 5px;
-  background: rgba(9, 9, 11, 0.09);
-  color: #52525b;
-}
-
-.xp .xp-cta-key--star {
-  gap: 8px;
-  color: #d4d4d8;
-}
-
-.xp .xp-cta-key--star span {
+/* The star keeps its colour through the hover — it is the only thing in the
+   row that is not text, and going white with the label loses it. */
+.xp .xp-btn--star span {
   color: #eab308;
 }
 
@@ -1883,8 +1751,7 @@ html {
     align-self: stretch;
   }
 
-  .xp-cta-key {
-    justify-content: center;
+  .xp-cta-row .xp-btn {
     width: 100%;
   }
 }

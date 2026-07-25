@@ -13,8 +13,11 @@ export function CopyCommand() {
         gap: 12,
         border: '1px solid #27272a',
         background: '#101012',
-        borderRadius: 999,
-        padding: '13px 22px',
+        /* Sized off the button it stands next to (.xp-btn), so the hero's two
+           halves read as one control rather than two shapes. */
+        height: 48,
+        borderRadius: 16,
+        padding: '0 22px',
         fontSize: 14,
         fontWeight: 500,
       }}

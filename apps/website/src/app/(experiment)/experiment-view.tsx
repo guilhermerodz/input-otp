@@ -3,13 +3,14 @@ import { ExternalLink } from 'lucide-react'
 import { ClerkParticles } from './_components/clerk-particles'
 import { CtaDaybreak } from './_components/cta-daybreak'
 import { FeatureBento } from './_components/feature-bento'
+import { GetStartedButton } from './_components/get-started-button'
 import { SponsorBorderBeam } from './_components/sponsor-border-beam'
+import { SponsorTiltGrid } from './_components/sponsor-tilt-grid'
 import { StoryIso } from './_components/story-iso'
 import { CopyCommand } from './_components/copy-command'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { Preloader } from './_components/preloader'
-import { SlotBgSwitcher } from './_components/slot-bg-switcher'
 import { SpottedMarquee } from './_components/spotted-marquee'
 import { StatsOdometer } from './_components/stats-odometer'
 import { UsedByMarquee } from './_components/used-by-marquee'
@@ -78,7 +79,6 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
   return (
     <div className="xp">
       <Preloader />
-      <SlotBgSwitcher />
 
       {/* Nav */}
       <header
@@ -168,19 +168,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               justifyContent: 'center',
             }}
           >
-            <a
-              href={GITHUB_URL}
-              style={{
-                background: '#fafafa',
-                color: '#09090b',
-                fontSize: 14,
-                fontWeight: 600,
-                padding: '13px 26px',
-                borderRadius: 999,
-              }}
-            >
-              Get started
-            </a>
+            <GetStartedButton href={GITHUB_URL} />
             <CopyCommand />
           </div>
 
@@ -238,7 +226,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
           <span style={{ color: '#3f3f46' }}>_</span>
         </div>
 
-        <div className="xp-sponsors-grid">
+        <SponsorTiltGrid className="xp-sponsors-grid">
           <SponsorBorderBeam tier="diamond" duration={4.1}>
             <a
               href={CLERK_URL}
@@ -338,7 +326,7 @@ export function ExperimentView({ starCount }: { starCount: string | null }) {
               <ExternalLink size={12} strokeWidth={1.75} />
             </span>
           </a>
-        </div>
+        </SponsorTiltGrid>
       </section>
 
       <FeatureBento />

@@ -10,6 +10,7 @@
 import { Motes } from '@lucasmarkes/motes-react'
 import * as React from 'react'
 
+import { GetStartedButton } from './get-started-button'
 import { useParticleMark } from './particle-mark'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
@@ -208,16 +209,8 @@ export function CtaDaybreak({ starCount }: { starCount: string | null }) {
           MIT licensed, zero dependencies, one real input under the slots.
         </p>
         <div className="xp-cta-row">
-          <a className="xp-cta-key xp-cta-key--primary" href={GITHUB_URL}>
-            Get started
-            <span className="xp-cta-key-glyph xp-mono" aria-hidden="true">
-              ↵
-            </span>
-          </a>
-          <a
-            className="xp-cta-key xp-cta-key--ghost xp-cta-key--star"
-            href={GITHUB_URL}
-          >
+          <GetStartedButton href={GITHUB_URL} />
+          <a className="xp-btn xp-btn--quiet xp-btn--star" href={GITHUB_URL}>
             <span aria-hidden="true">★</span> {starCount ?? '3.2k'} on GitHub
           </a>
         </div>

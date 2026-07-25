@@ -5,6 +5,34 @@
       "name": "website",
       "url": "http://localhost:3040",
       "port": 3040
+    },
+    {
+      "name": "website-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3041"
+      ],
+      "port": 3041
+    },
+    {
+      "name": "website-reveal",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/reveal-variants/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3046"
+      ],
+      "port": 3046
     }
   ]
 }
