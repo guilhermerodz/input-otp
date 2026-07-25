@@ -1,8 +1,23 @@
-# The only accessible & unstyled & full featured Input OTP component in the Web.
+<div align="center">
 
-### OTP Input for React 🔐 by [@guilhermerodz](https://twitter.com/guilherme_rodz)
+# input-otp
 
-<h3 align="center">Hero Sponsors 🎖️</h3>
+**One invisible input, any UI you can imagine.**
+
+The accessible, unstyled, fully featured one-time-password component for React.
+
+[![npm](https://img.shields.io/npm/v/input-otp?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/input-otp)
+[![downloads](https://img.shields.io/npm/dm/input-otp?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/input-otp)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/input-otp?style=flat&label=size&colorA=000000&colorB=000000)](https://bundlephobia.com/package/input-otp)
+[![license](https://img.shields.io/npm/l/input-otp?style=flat&colorA=000000&colorB=000000)](./LICENSE)
+
+[**Documentation**](https://input-otp.rodz.dev/docs) · [Examples](https://input-otp.rodz.dev/docs/examples) · [API](https://input-otp.rodz.dev/docs/api) · [Edge cases](https://input-otp.rodz.dev/docs/edge-cases)
+
+</div>
+
+<br />
+
+<h4 align="center">Hero Sponsors 🎖️</h4>
 <p align="center">
 <a href="https://go.clerk.com/input-otp" target="_blank">
 <img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
@@ -17,529 +32,192 @@
 
 https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
 
-## Usage
+## Why
+
+HTML has no one-time-password control. There is no `<input type="otp">`, so most
+products build one out of six separate inputs wired together with keydown
+handlers that shuffle focus between them — and quietly lose SMS autofill, screen
+reader support, partial paste, undo, and half the keyboard along the way.
+
+`input-otp` renders **exactly one real text input**, paints it invisible, and
+hands you the state to draw whatever you want on top. Everything the browser
+gives a text field keeps working, because there is still a text field.
+
+- **SMS autofill** — `autocomplete="one-time-code"` only means something on a single field
+- **Screen readers** — one control, one name, one value, one caret, one tab stop
+- **Every keybinding you didn't implement** — select-all, word-delete, shift-arrow ranges, undo, the iOS long-press menu
+- **Real paste** — including a partial paste into the middle of a half-filled code
+- **Form semantics** — one `name`, one entry in `FormData`, a real `<label>` that focuses it
+- **Unstyled** — no theme, no class names to override, no CSS to import
+- **~4 kB** minified + gzipped, zero dependencies, React 16.8 → 19
+
+## Install
 
 ```bash
 npm install input-otp
 ```
 
-Then import the component.
+## Usage
 
-```diff
-+'use client'
-+import { OTPInput } from 'input-otp'
-
-function MyForm() {
-  return <form>
-+   <OTPInput maxLength={6} render={({slots})  => (...)} />
-  </form>
-}
-```
-
-## Default example
-
-The example below uses `tailwindcss` `@shadcn/ui` `tailwind-merge` `clsx`:
+`maxLength` is the number of slots. `render` receives them and returns your
+markup — that's the whole contract.
 
 ```tsx
 'use client'
-import { OTPInput, SlotProps } from 'input-otp'
-<OTPInput
-  maxLength={6}
-  containerClassName="group flex items-center has-[:disabled]:opacity-30"
-  render={({ slots }) => (
-    <>
-      <div className="flex">
-        {slots.slice(0, 3).map((slot, idx) => (
-          <Slot key={idx} {...slot} />
-        ))}
-      </div>
+import { OTPInput } from 'input-otp'
 
-      <FakeDash />
+export function VerificationCode() {
+  return (
+    <OTPInput
+      maxLength={6}
+      containerClassName="group flex items-center"
+      render={({ slots }) => (
+        <div className="flex">
+          {slots.map((slot, idx) => (
+            <Slot key={idx} {...slot} />
+          ))}
+        </div>
+      )}
+    />
+  )
+}
+```
 
-      <div className="flex">
-        {slots.slice(3).map((slot, idx) => (
-          <Slot key={idx} {...slot} />
-        ))}
-      </div>
-    </>
-  )}
-/>
+Each slot tells you what to draw:
 
-// Feel free to copy. Uses @shadcn/ui tailwind colors.
-function Slot(props: SlotProps) {
+```tsx
+import type { SlotProps } from 'input-otp'
+
+function Slot({ char, placeholderChar, isActive, hasFakeCaret }: SlotProps) {
   return (
     <div
       className={cn(
-        'relative w-10 h-14 text-[2rem]',
-        'flex items-center justify-center',
-        'transition-all duration-300',
-        'border-border border-y border-r first:border-l first:rounded-l-md last:rounded-r-md',
-        'group-hover:border-accent-foreground/20 group-focus-within:border-accent-foreground/20',
-        'outline outline-0 outline-accent-foreground/20',
-        { 'outline-4 outline-accent-foreground': props.isActive },
+        'relative flex h-14 w-12 items-center justify-center',
+        'border-y border-r border-border first:rounded-l-md first:border-l last:rounded-r-md',
+        'text-[1.375rem] font-medium tabular-nums transition-all duration-200',
+        'outline outline-0 outline-foreground/80',
+        isActive && 'z-10 outline-2', // this slot is being edited
       )}
     >
-      <div className="group-has-[input[data-input-otp-placeholder-shown]]:opacity-20">
-        {props.char ?? props.placeholderChar}
-      </div>
-      {props.hasFakeCaret && <FakeCaret />}
+      {char ?? placeholderChar}
+      {hasFakeCaret && <FakeCaret />} {/* the real caret is transparent */}
     </div>
   )
-}
-
-// You can emulate a fake textbox caret!
-function FakeCaret() {
-  return (
-    <div className="absolute pointer-events-none inset-0 flex items-center justify-center animate-caret-blink">
-      <div className="w-px h-8 bg-white" />
-    </div>
-  )
-}
-
-// Inspired by Stripe's MFA input.
-function FakeDash() {
-  return (
-    <div className="flex w-10 justify-center items-center">
-      <div className="w-3 h-1 rounded-full bg-border" />
-    </div>
-  )
-}
-
-// tailwind.config.ts for the blinking caret animation.
-const config = {
-  theme: {
-    extend: {
-      keyframes: {
-        'caret-blink': {
-          '0%,70%,100%': { opacity: '1' },
-          '20%,50%': { opacity: '0' },
-        },
-      },
-      animation: {
-        'caret-blink': 'caret-blink 1.2s ease-out infinite',
-      },
-    },
-  },
-}
-
-// Small utility to merge class names.
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-import type { ClassValue } from 'clsx'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
 }
 ```
 
-## How it works
+> The full, copy-pasteable slot component (with the caret keyframe and the
+> Stripe-style dash) is in
+> [**Installation**](https://input-otp.rodz.dev/docs/installation).
 
-There's currently no native OTP/2FA/MFA input in HTML, which means people are either going with 1. a simple input design or 2. custom designs like this one.
-This library works by rendering an invisible input as a sibling of the slots, contained by a `relative`ly positioned parent (the container root called _OTPInput_).
+### Using shadcn/ui?
 
-## Features
+shadcn/ui's `input-otp` component wraps this library with pre-composed parts.
+Same engine, `<InputOTPSlot index={0} />` instead of a render prop:
 
-This is the most complete OTP input on the web. It's fully featured 
+```bash
+npx shadcn@latest add input-otp
+```
 
-<details>
-<summary>Supports iOS + Android copy-paste-cut</summary>
+## What it handles for you
 
-https://github.com/guilhermerodz/input-otp/assets/10366880/bdbdc96a-23da-4e89-bff8-990e6a1c4c23
+The API is five props. The value is the list of things that go wrong when one
+invisible input has to behave like six boxes — and the fix for each:
 
-</details>
+|                                             |                                                                                                                                                    |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A collapsed caret has no slot               | The selection is rewritten into a one-character range on every `selectionchange` — except at the append position, where a bare caret is meaningful |
+| `ArrowLeft` appears to skip a slot          | Direction is inferred from the previous selection, with a guard for leaving insert mode                                                            |
+| Deleting doesn't fire `selectionchange`     | The event is dispatched by hand when the value shrinks                                                                                             |
+| Password manager badges cover the last slot | Known extensions are detected and the input widens 40px behind a `clip-path` — no visible layout shift                                             |
+| iOS won't paste into an invisible input     | The field keeps `opacity: 1` and hides itself with transparent colours; paste is handled manually                                                  |
+| Autofill paints its own background          | `:autofill` is neutralised, and the state is shaken off with a synthetic `input` event                                                             |
+| No JavaScript means no visible field        | A `<noscript>` stylesheet turns the input back into a plain visible one                                                                            |
 
-<details>
-<summary>Automatic OTP code retrieval from transport (e.g SMS)</summary>
+Each of these — and a dozen more — is written up with the reasoning and the exact
+code in [**Edge cases**](https://input-otp.rodz.dev/docs/edge-cases).
 
-By default, this input uses `autocomplete='one-time-code'` and it works as it's a single input. 
+## Documentation
 
-https://github.com/guilhermerodz/input-otp/assets/10366880/5705dac6-9159-443b-9c27-b52e93c60ea8
+|                                                                        |                                                                 |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [Introduction](https://input-otp.rodz.dev/docs)                        | Why one input, and what you write                               |
+| [Installation](https://input-otp.rodz.dev/docs/installation)           | Install, first render, a slot component to copy                 |
+| [Anatomy](https://input-otp.rodz.dev/docs/anatomy)                     | X-ray the field and watch the selection algorithm run live      |
+| [Styling](https://input-otp.rodz.dev/docs/styling)                     | Slots, carets, placeholders, groups, data attributes            |
+| [Validation](https://input-otp.rodz.dev/docs/validation)               | `pattern`, `pasteTransformer`, `inputMode`                      |
+| [Forms](https://input-otp.rodz.dev/docs/forms)                         | Controlled values, auto-submit, react-hook-form, server actions |
+| [Accessibility](https://input-otp.rodz.dev/docs/accessibility)         | Labelling, keyboard, what a screen reader hears                 |
+| [Password managers](https://input-otp.rodz.dev/docs/password-managers) | How badge detection works — **with a live simulator**           |
+| [Mobile & platforms](https://input-otp.rodz.dev/docs/mobile)           | SMS autofill, iOS quirks, autofill styling, no-JS               |
+| [API reference](https://input-otp.rodz.dev/docs/api)                   | Every prop, render prop, data attribute and export              |
+| [Examples](https://input-otp.rodz.dev/docs/examples)                   | A gallery of finished fields to copy                            |
+| [Troubleshooting](https://input-otp.rodz.dev/docs/troubleshooting)     | The questions that come up most                                 |
 
-</details>
-
-<details>
-<summary>Supports screen readers (a11y)</summary>
-
-Stripe was my first inspiration to build this library.
-
-Take a look at Stripe's input. The screen reader does not behave like it normally should on a normal single input.
-That's because Stripe's solution is to render a 1-digit input with "clone-divs" rendering a single char per div.
-
-https://github.com/guilhermerodz/input-otp/assets/10366880/3d127aef-147c-4f28-9f6c-57a357a802d0
-
-So we're rendering a single input with invisible/transparent colors instead.
-The screen reader now gets to read it, but there is no appearance. Feel free to build whatever UI you want:
-
-https://github.com/guilhermerodz/input-otp/assets/10366880/718710f0-2198-418c-8fa0-46c05ae5475d
-
-</details>
-
-<details>
-<summary>Supports all keybindings</summary>
-
-Should be able to support all keybindings of a common text input as it's an input.
-
-https://github.com/guilhermerodz/input-otp/assets/10366880/185985c0-af64-48eb-92f9-2e59be9eb78f
-
-</details>
-
-<details>
-<summary>Automatically optimizes for password managers</summary>
-
-
-For password managers such as LastPass, 1Password, Dashlane or Bitwarden, `input-otp` will automatically detect them in the page and increase input width by ~40px to trick the password manager's browser extension and prevent the badge from rendering to the last/right slot of the input.
-
-<img width="670" alt="image" src="https://github.com/guilhermerodz/input-otp/assets/10366880/9bb306ca-deff-4803-aa3d-148c594a540c">
-
-- **This feature is optional and it's enabled by default. You can disable this optimization by adding `pushPasswordManagerStrategy="none"`.**
-- **This feature does not cause visible layout shift.**
-
-### Auto tracks if the input has space in the right side for the badge
-
-https://github.com/guilhermerodz/input-otp/assets/10366880/bf01af88-1f82-463e-adf4-54a737a92f59
-
-</details>
-
-## API Reference
-
-### OTPInput
-
-The root container. Define settings for the input via props. Then, use the `render` prop to create the slots.
-
-#### Props
+## API at a glance
 
 ```ts
 type OTPInputProps = {
-  // The number of slots
-  maxLength: number
+  maxLength: number                       // number of slots — required
 
-  // Render function creating the slots
-  render: (props: RenderProps) => React.ReactElement
-  // PS: Render prop is mandatory, except in cases
-  // you'd like to consume the original Context API.
-  // (search for Context in this docs)
+  render?: (props: RenderProps) => React.ReactNode
+  children?: React.ReactNode              // …or compose and read OTPInputContext
 
-  // The class name for the root container
-  containerClassName?: string
-
-  // Value state controlling the input
   value?: string
-  // Setter for the controlled value (or callback for uncontrolled value)
-  onChange?: (newValue: string) => unknown
+  onChange?: (newValue: string) => unknown   // a string, not an event
+  onComplete?: (value: string) => unknown    // fires once, on the transition to full
 
-  // Callback when the input is complete
-  onComplete?: (...args: any[]) => unknown
+  pattern?: string | RegExp               // gates every change; no default
+  placeholder?: string                    // per-slot placeholder characters
+  pasteTransformer?: (pasted: string) => string
 
-  // Where is the text located within the input
-  // Affects click-holding or long-press behavior
-  // Default: 'left'
-  textAlign?: 'left' | 'center' | 'right'
+  containerClassName?: string             // the visible wrapper
+  // className goes to the invisible input
 
-  // Virtual keyboard appearance on mobile
-  // Default: 'numeric'
-  inputMode?: 'numeric' | 'text' | 'decimal' | 'tel' | 'search' | 'email' | 'url'
-
-  // Pro tip: input-otp export some patterns by default such as REGEXP_ONLY_DIGITS which you can import from the same library path
-  // Example: import { REGEXP_ONLY_DIGITS } from 'input-otp';
-  // Then use it as: <OTPInput pattern={REGEXP_ONLY_DIGITS}>
-  pattern?: string
-
-  // While rendering the input slot, you can access both the char and the placeholder, if there's one and it's active.
-  placeholder?: string
-
-  // Transfomer function that allows pasting, for example, "XXX-XXX" even though the input's regex/pattern doesn't allow hyphen and its max length is 6.
-  // Example: (pasted) => pasted.replaceAll('-', '')
-  pasteTransformer?: (pastedText: string) => string
-
-  // Enabled by default, it's an optional
-  // strategy for detecting Password Managers
-  // in the page and then shifting their
-  // badges to the right side, outside the input.
-  pushPasswordManagerStrategy?:
-    | 'increase-width'
-    | 'none'
-
-  // Enabled by default, it's an optional
-  // fallback for pages without JS.
-  // This is a CSS string. Write your own
-  // rules that will be applied as soon as
-  // <noscript> is parsed for no-js pages.
-  // Use `null` to disable any no-js fallback (not recommended).
-  // Default: `
-  // [data-input-otp] {
-  //   --nojs-bg: white !important;
-  //   --nojs-fg: black !important;
-  // 
-  //   background-color: var(--nojs-bg) !important;
-  //   color: var(--nojs-fg) !important;
-  //   caret-color: var(--nojs-fg) !important;
-  //   letter-spacing: .25em !important;
-  //   text-align: center !important;
-  //   border: 1px solid var(--nojs-fg) !important;
-  //   border-radius: 4px !important;
-  //   width: 100% !important;
-  // }
-  // @media (prefers-color-scheme: dark) {
-  //   [data-input-otp] {
-  //     --nojs-bg: black !important;
-  //     --nojs-fg: white !important;
-  //   }
-  // }`
+  textAlign?: 'left' | 'center' | 'right'          // default 'left'
+  inputMode?: 'numeric' | 'text' | ...             // default 'numeric'
+  pushPasswordManagerStrategy?: 'increase-width' | 'none'
   noScriptCSSFallback?: string | null
 }
-```
 
-## Examples
-
-<details>
-<summary>Automatic form submission on OTP completion</summary>
-
-```tsx
-export default function Page() {
-  const formRef = useRef<HTMLFormElement>(null)
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
-  return (
-    <form ref={formRef}>
-      <OTPInput
-        // ... automatically submit the form
-        onComplete={() => formRef.current?.requestSubmit()}
-        // ... or focus the button like as you wish
-        onComplete={() => buttonRef.current?.focus()}
-      />
-
-      <button ref={buttonRef}>Submit</button>
-    </form>
-  )
+interface SlotProps {
+  char: string | null
+  placeholderChar: string | null
+  isActive: boolean
+  hasFakeCaret: boolean
 }
 ```
-</details>
 
-<details>
-<summary>Automatically focus the input when the page loads</summary>
+Every other `<input>` attribute is forwarded — `name`, `required`, `disabled`,
+`autoFocus`, `aria-*`, `data-*` — and `ref` points at the real input.
 
-```tsx
-export default function Page() {
-  return (
-    <form ref={formRef}>
-      <OTPInput
-        autoFocus
-        // Pro tip: accepts all common HTML input props...
-      />
-    </form>
-  )
-}
-```
-</details>
+Full reference: [**input-otp.rodz.dev/docs/api**](https://input-otp.rodz.dev/docs/api).
 
-<details>
-<summary>Usage with react-hook-form</summary>
-Just use it as a regular text input:
+## Contributing
 
-```tsx
-const { register, handleSubmit } = useForm();
-// Then register it like a text input
-<InputOTP {...register("otp")} />
+```bash
+pnpm install
+pnpm build:lib          # tsup → packages/input-otp/dist
+pnpm dev:playground     # the Playwright target, port 3039
+pnpm test               # Playwright, all browsers
 ```
 
-You can also use react-hook-form's Controller if needed:
-```tsx
-const { control } = useForm();
-// Then control it like a text input
-<Controller
-  name="customOTP"
-  control={control}
-  defaultValue=""
-  render={({ field }) => (
-    <OTPInput
-      {...field}
-      label="Custom OTP"
-    />
-  )}
-/>
-```
-</details>
+Tests live in `apps/playground/src/tests`. Note that the iOS code path, SMS
+autofill and password manager badges **cannot** be covered headlessly — see
+[Mobile & platforms](https://input-otp.rodz.dev/docs/mobile#testing-across-platforms).
 
-<details>
-<summary>Paste-transformers</summary>
-If you want to allow pasting of "XXX-XXX" even though the input's regex/pattern doesn't allow hyphen and its max length is 6, you can use the `pasteTransformer` prop.
-
-```tsx
-<OTPInput
-  // Transform the pasted text to parse hyphens but remove hyphens,
-  // so it fits into the input's pattern and max length.
-  pasteTransformer={(pasted) => pasted.replaceAll('-', '')}
-/>
-```
-</details>
-
-## Caveats
-
-<details>
-<summary>[Workaround] If you want to block specific password manager/badges:</summary>
-
-By default, `input-otp` handles password managers for you.
-The password manager badges should be automatically shifted to the right side.
-
-However, if you still want to block password managers, please disable the `pushPasswordManagerStrategy` and then manually block each PWM.
-
-```diff
-<OTPInput
-  // First, disable library's built-in strategy
-  // for shifting badges automatically
-- pushPasswordManagerStrategy="increase-width"
-+ pushPasswordManagerStrategy="none"
-  // Then, manually add specifics attributes
-  // your password manager docs
-  // Example: block LastPass
-+ data-lpignore="true" 
-  // Example: block 1Password
-+ data-1p-ignore="true"
-/>
-```
-</details>
-
-<details>
-<summary>[Setting] If you want to customize the `noscript` CSS fallback</summary>
-
-By default, `input-otp` handles cases where JS is not in the page by applying custom CSS styles.
-If you do not like the fallback design and want to apply it to your own, just pass a prop:
-
-```diff
-// This is the default CSS fallback.
-// Feel free to change it entirely and apply to your design system.
-const NOSCRIPT_CSS_FALLBACK = `
-[data-input-otp] {
-  --nojs-bg: white !important;
-  --nojs-fg: black !important;
-
-  background-color: var(--nojs-bg) !important;
-  color: var(--nojs-fg) !important;
-  caret-color: var(--nojs-fg) !important;
-  letter-spacing: .25em !important;
-  text-align: center !important;
-  border: 1px solid var(--nojs-fg) !important;
-  border-radius: 4px !important;
-  width: 100% !important;
-}
-@media (prefers-color-scheme: dark) {
-  [data-input-otp] {
-    --nojs-bg: black !important;
-    --nojs-fg: white !important;
-  }
-}`
-
-<OTPInput
-  // Pass your own custom styles for when JS is disabled
-+ noScriptCSSFallback={NOSCRIPT_CSS_FALLBACK}
-/>
-```
-</details>
-
-<details>
-<summary>[Workaround] If you're experiencing an unwanted border on input focus:</summary>
-
-```diff
-<OTPInput
-  // Add class to the input itself
-+ className="focus-visible:ring-0"
-  // Not the container
-  containerClassName="..."
-/>
-```
-</details>
-
-<details>
-<summary>[Not Recommended] If you want to centralize input text/selection, use the `textAlign` prop:</summary>
-
-```diff
-<OTPInput
-  // customizable but not recommended
-+ textAlign="center"
-/>
-```
-
-NOTE: this also affects the selected caret position after a touch/click.
-
-`textAlign="left"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/685a03df-2b69-4a36-b21c-e453f6098f79" width="300" />
-<br>
-
-`textAlign="center"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/e0f15b97-ceb8-40c8-96b7-fa3a8896379f" width="300" />
-<br>
-
-`textAlign="right"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/26697579-0e8b-4dad-8b85-3a036102e951" width="300" />
-<br>
-
-</details>
-
-<details>
-<summary>If you want to use Context props:</summary>
-
-```diff
-+import { OTPInputContext } from 'input-otp'
-
-function MyForm() {
-  return (
-    <OTPInput
--     // First remove the `render` prop
--     render={...}
-    >
-      <OTPInputWrapper />
-    </OTPInput>
-  )
-}
-
-+function OTPInputWrapper() {
-+ const inputContext = React.useContext(OTPInputContext)
-+ return (
-+   <>
-+     {inputContext.slots.map((slot, idx) => (
-+       <Slot key={idx} {...slot} />
-+     ))}
-+   </>
-+ )
-+}
-```
-
-NOTE: this also affects the selected caret position after a touch/click.
-
-`textAlign="left"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/685a03df-2b69-4a36-b21c-e453f6098f79" width="300" />
-<br>
-
-`textAlign="center"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/e0f15b97-ceb8-40c8-96b7-fa3a8896379f" width="300" />
-<br>
-
-`textAlign="right"`
-<img src="https://github.com/guilhermerodz/input-otp/assets/10366880/26697579-0e8b-4dad-8b85-3a036102e951" width="300" />
-<br>
-
-</details>
-
-<details>
-<summary>[DX] Add Tailwind autocomplete for `containerClassname` attribute in VS Code.</summary>
-
-Add the following setting to your `.vscode/settings.json`:
-```diff
-{
-  "tailwindCSS.classAttributes": [
-    "class",
-    "className",
-+   ".*ClassName"
-  ]
-}
-```
-</details>
-
-#### Sponsors
+## Sponsors
 
 > [Clerk](https://go.clerk.com/input-otp) is the easiest way to add authentication to your application.
 
 > [Resend](https://go.resend.com/input-otp) is email for developers.
 
 > [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) offers Residential Proxies starting from $0.49.
+
+<br />
+
+<div align="center">
+
+MIT © [Guilherme Rodz](https://twitter.com/guilherme_rodz)
+
+</div>
