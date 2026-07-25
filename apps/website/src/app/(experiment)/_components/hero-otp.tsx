@@ -13,17 +13,27 @@ function Kbd({ children }: { children: React.ReactNode }) {
   return <kbd className="xp-kbd">{children}</kbd>
 }
 
+/* How much of the cursor light each slot's rim returns. The hero's
+   background field lights the row from the sides, so the outer slots are
+   already the bright ones and the middle pair sits in the trough — the
+   spotlight has to follow that falloff or the two lights disagree. */
+const SPOT_GAIN = [1, 0.6, 0.34, 0.34, 0.6, 1]
+/* How far the pointer can be from the input before the rims go dark. */
+const SPOT_REACH = 560
+
 function Slot(
   props: SlotProps & {
     error: boolean
     success: boolean
     staticActive: boolean
+    gain: number
     slotRef: (el: HTMLDivElement | null) => void
   },
 ) {
   return (
     <div
       ref={props.slotRef}
+      style={{ '--xp-lit': props.gain } as React.CSSProperties}
       className={`xp-slot ${props.staticActive ? 'xp-slot--active' : ''} ${
         props.error ? 'xp-slot--error' : ''
       } ${props.success ? 'xp-slot--success' : ''}`}
@@ -138,6 +148,62 @@ export function HeroOtp() {
     window.addEventListener('resize', measureRing)
     return () => window.removeEventListener('resize', measureRing)
   }, [measureRing])
+
+  /* Cursor spotlight (hero only): feed each slot the pointer position in
+     its own box, and fade the whole effect by how near the pointer is to
+     the input. No enter/leave events — the distance falloff is the fade,
+     so the light dies off smoothly wherever the cursor wanders. */
+  React.useEffect(() => {
+    const wrap = wrapRef.current
+    if (!wrap) return
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let frame = 0
+    let px = 0
+    let py = 0
+
+    const paint = () => {
+      frame = 0
+      // Read every rect first, then write — one reflow per frame, not six.
+      const els = slotRefs.current.filter(Boolean) as HTMLDivElement[]
+      const rects = els.map(el => el.getBoundingClientRect())
+      const box = wrap.getBoundingClientRect()
+      const dx = Math.max(box.left - px, 0, px - box.right)
+      const dy = Math.max(box.top - py, 0, py - box.bottom)
+      const near = Math.max(0, 1 - Math.hypot(dx, dy) / SPOT_REACH)
+      wrap.style.setProperty('--xp-spot', String(near * near))
+      els.forEach((el, i) => {
+        el.style.setProperty('--xp-mx', `${px - rects[i].left}px`)
+        el.style.setProperty('--xp-my', `${py - rects[i].top}px`)
+      })
+    }
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(paint)
+    }
+    const onMove = (e: PointerEvent) => {
+      px = e.clientX
+      py = e.clientY
+      schedule()
+    }
+    const onLeave = () => {
+      wrap.style.setProperty('--xp-spot', '0')
+    }
+
+    window.addEventListener('pointermove', onMove, { passive: true })
+    document.addEventListener('pointerleave', onLeave)
+    // Scrolling and resizing move the slots under a stationary cursor.
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      document.removeEventListener('pointerleave', onLeave)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [])
 
   const clearHint = () => {
     hintTimers.current.forEach(clearTimeout)
@@ -309,7 +375,7 @@ export function HeroOtp() {
           pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
           inputMode="text"
           autoComplete="one-time-code"
-          containerClassName={`xp-otp-container ${
+          containerClassName={`xp-otp-container xp-otp-spot ${
             error ? 'xp-otp-shake' : ''
           } ${success ? 'xp-otp-bounce' : ''}`}
           render={({ slots }) => (
@@ -323,6 +389,7 @@ export function HeroOtp() {
                     error={error}
                     success={success}
                     staticActive={slot.isActive && multi}
+                    gain={SPOT_GAIN[idx]}
                     slotRef={el => {
                       slotRefs.current[idx] = el
                     }}
@@ -338,6 +405,7 @@ export function HeroOtp() {
                     error={error}
                     success={success}
                     staticActive={slot.isActive && multi}
+                    gain={SPOT_GAIN[idx + 3]}
                     slotRef={el => {
                       slotRefs.current[idx + 3] = el
                     }}
