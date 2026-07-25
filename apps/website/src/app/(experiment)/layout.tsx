@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 
 import { siteConfig } from '../../config/site'
+import { SCROLLBAR_PROBE } from '../../lib/scrollbars'
 import '../globals.css'
 import './experiment.css'
 import './feature-bento.css'
@@ -92,6 +93,9 @@ export default function RootLayout({
               "try{localStorage.getItem('xp-intro-seen')&&document.documentElement.classList.add('xp-intro-seen')}catch(e){}",
           }}
         />
+        {/* Decides whether this browser gets the hand-drawn scrollbar. Also
+            pre-paint: the answer changes the width of the page's gutter. */}
+        <script dangerouslySetInnerHTML={{ __html: SCROLLBAR_PROBE }} />
         {children}
       </body>
     </html>

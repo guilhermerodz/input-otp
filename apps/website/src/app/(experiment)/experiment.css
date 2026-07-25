@@ -180,9 +180,11 @@ html {
   z-index: 50;
 }
 
-/* Set on <html> before first paint when the intro was already seen. */
-.xp-intro-seen .xp-panel,
-.xp-intro-seen .xp-pre-layer {
+/* Set on <html> before first paint when the intro was already seen. The
+   exception is a replay: that visitor has seen it and is asking for it back,
+   so the overlay flags itself as invited. */
+.xp-intro-seen .xp-panel:not([data-xp-replay]),
+.xp-intro-seen .xp-pre-layer:not([data-xp-replay]) {
   display: none !important;
 }
 
@@ -677,6 +679,34 @@ html {
   will-change: transform;
 }
 
+/* A sentence in the story lecture, which doubles as a jump button. The
+   scrub writes its brightness into --o every frame, so the hover lift is a
+   floor under that rather than an override — and deliberately un-transitioned,
+   since a transition on this opacity would also smear the scroll scrub. */
+.xp-beat {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  opacity: max(var(--o, 1), var(--beat-lift, 0));
+}
+
+@media (hover: hover) {
+  .xp-beat:hover {
+    --beat-lift: 0.62;
+  }
+}
+
+/* The ring is drawn *inside* the box: a beat spans the full column, and the
+   lecture window clips anything past its edges — an offset ring would lose
+   its left and right sides to that clip and read as two stray rules. */
+.xp-beat:focus-visible {
+  --beat-lift: 0.62;
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
 /* Highlighter sweep for the chalk-talk story variant: the pen drags
    across the current sentence, driven by --hl. */
 .xp-hl {
@@ -691,23 +721,97 @@ html {
   -webkit-box-decoration-break: clone;
 }
 
-/* Keyboard keys in the tour. */
-.xp-kbd {
+/* ————— Keyboard keys in the tour —————
+   Holds the chip and the pulse that fires out from under it. */
+.xp-kbd-wrap {
+  position: relative;
   display: inline-grid;
   place-items: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
   margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* Every chip is the same box: one square per key, so a chord reads as a
+   row of keys rather than a set of differently sized labels. Widths were
+   drifting before because the box grew with the glyph, and ⌘ is wider
+   than a capital in the fallback symbol font. */
+.xp-kbd {
+  --xp-cap: 0.73em; /* cap height of the chip's own type */
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 1px solid #3f3f46;
   border-bottom-width: 2px;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #18181b;
   font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
   font-size: 12px;
   font-weight: 500;
+  line-height: 1;
   color: #e4e4e7;
-  vertical-align: middle;
+  transition:
+    transform 0.09s ease,
+    background-color 0.09s ease,
+    border-color 0.14s ease,
+    color 0.14s ease;
+}
+
+/* The worded keys (Shift, Ctrl) keep the height and grow sideways only. */
+.xp-kbd--wide {
+  width: auto;
+  min-width: 24px;
+  padding: 0 7px;
+}
+
+/* Drawn glyphs, cropped to their ink, so ⌘ and ← stand exactly as tall as
+   the X or V in the chip next door. */
+.xp-kbd-glyph {
+  width: var(--xp-cap);
+  height: var(--xp-cap);
+}
+
+/* Held down: the key drops onto its short edge, the way the border-bottom
+   suggests it would. */
+.xp-kbd--down {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+  border-color: #52525b;
+  background-color: #232327;
+  color: #fafafa;
+}
+
+/* One ring per keystroke, in the same cool light the hero throws. */
+.xp-kbd-pulse {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(226, 236, 255, 0.55);
+  border-radius: 8px;
+  animation: xp-kbd-pulse 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes xp-kbd-pulse {
+  from {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-kbd-pulse {
+    display: none;
+  }
+
+  .xp-kbd {
+    transition: none;
+  }
 }
 
 /* Status/tour copy fades in softly on every change. */
@@ -849,11 +953,17 @@ html {
   bottom: 18px;
 }
 
-.xp-sponsor-card:hover {
+/* [data-tilting] alongside :hover throughout — the tilt component decides that
+   flag from the card's resting box plus a safe area, while :hover is hit-tested
+   against the rotated geometry, which pulls a few px inside that box. Without
+   it the glow would blink off in the strip where the card is still tilting. */
+.xp-sponsor-card:hover,
+[data-tilting] .xp-sponsor-card {
   box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.035);
 }
 
-.xp-sponsor-card:hover .xp-sponsor-tier-label {
+.xp-sponsor-card:hover .xp-sponsor-tier-label,
+[data-tilting] .xp-sponsor-card .xp-sponsor-tier-label {
   color: #8f9aa6;
   opacity: 0.88;
 }
@@ -903,12 +1013,14 @@ html {
 }
 
 .xp-sponsor-cta:hover .xp-sponsor-cta-plus,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-plus,
 .xp-sponsor-cta:focus-visible .xp-sponsor-cta-plus {
   opacity: 0;
   filter: blur(6px);
 }
 
 .xp-sponsor-cta:hover .xp-sponsor-cta-label,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-label,
 .xp-sponsor-cta:focus-visible .xp-sponsor-cta-label {
   opacity: 1;
   filter: blur(0);
