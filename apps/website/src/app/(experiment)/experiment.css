@@ -439,18 +439,22 @@ html {
 
    Every stop is translucent, so the page — and the motes field behind it —
    reads through the whole slot rather than only where a gradient runs out.
-   Alphas are picked against the page's #09090b: rgba(20,20,25,0.72) lands
-   near #111115 composited, a touch above the old flat #0c0c0e instead of
-   the #17171b that made the first pass read as lit. Nothing here composites
-   the backdrop (no blur, no filters) — these are plain paint. */
+   Nothing here composites the backdrop (no blur, no filters) — plain paint.
+
+   The numbers are chosen by what they composite to over the page's #09090b
+   (r=9), not by how they read on their own: rgba(18,18,23,0.6) lands at
+   0.6·18 + 0.4·9 ≈ 14, i.e. #0e0e12 — just above the old flat #0c0c0e, and
+   well under the #17171b of the first pass. Every ramp ends at or a little
+   below the page tone, so the top-to-bottom delta is ~5 levels: enough to
+   see the gradient, not enough to see a lit box. */
 
 /* Dim along the top edge, thinning out to nothing at the bottom. */
 [data-slot-bg='lift'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(20, 20, 25, 0.72) 0%,
-    rgba(17, 17, 22, 0.5) 45%,
-    rgba(17, 17, 22, 0) 100%
+    rgba(18, 18, 23, 0.6) 0%,
+    rgba(15, 15, 20, 0.34) 45%,
+    rgba(15, 15, 20, 0) 100%
   );
 }
 
@@ -458,19 +462,19 @@ html {
 [data-slot-bg='well'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(17, 17, 22, 0) 0%,
-    rgba(17, 17, 22, 0.5) 55%,
-    rgba(20, 20, 25, 0.72) 100%
+    rgba(15, 15, 20, 0) 0%,
+    rgba(15, 15, 20, 0.34) 55%,
+    rgba(18, 18, 23, 0.6) 100%
   );
 }
 
 /* An even veil: alpha holds, only the tint shifts — top sits above the page
-   tone, bottom settles onto it. The steadiest of the five. */
+   tone, bottom dips just under it. The steadiest of the five. */
 [data-slot-bg='sheet'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(21, 21, 26, 0.68) 0%,
-    rgba(10, 10, 13, 0.68) 100%
+    rgba(20, 20, 26, 0.5) 0%,
+    rgba(6, 6, 9, 0.5) 100%
   );
 }
 
@@ -478,11 +482,11 @@ html {
 [data-slot-bg='frost'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
       180deg,
-      rgba(221, 234, 254, 0.055) 0%,
-      rgba(221, 234, 254, 0.012) 58%,
+      rgba(221, 234, 254, 0.03) 0%,
+      rgba(221, 234, 254, 0.007) 58%,
       rgba(221, 234, 254, 0) 100%
     ),
-    rgba(11, 11, 15, 0.62);
+    rgba(11, 11, 16, 0.5);
 }
 
 /* Not a ramp but an edge: a hairline of specular on the top bevel, then the
@@ -490,10 +494,10 @@ html {
 [data-slot-bg='seam'] .xp-otp-spot .xp-slot {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.055) 0%,
-    rgba(19, 19, 24, 0.62) 10%,
-    rgba(16, 16, 20, 0.38) 58%,
-    rgba(16, 16, 20, 0.1) 100%
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(17, 17, 22, 0.48) 10%,
+    rgba(14, 14, 19, 0.26) 58%,
+    rgba(14, 14, 19, 0.06) 100%
   );
 }
 
