@@ -1,0 +1,365 @@
+/* Styles for the five "used by" candidates. Temporary — everything here goes
+   once one of them wins. Shared bits (the eyebrow, .xp-usedby-name, the band)
+   live in experiment.css with the real section. */
+
+.xp-uv-wrap {
+  position: relative;
+}
+
+.xp-uv-tag {
+  position: absolute;
+  top: 12px;
+  left: 18px;
+  z-index: 1;
+  color: #3f3f46;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.xp-uv-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 02 — trio -------------------------------------------------------------- */
+
+.xp-uv-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  padding: 14px 40px 6px;
+}
+
+.xp-uv-trio-cell {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  gap: 12px;
+  color: #fafafa;
+  opacity: 0.62;
+  transition: opacity 220ms ease;
+}
+
+.xp-uv-trio:hover .xp-uv-trio-cell {
+  opacity: 0.3;
+}
+
+.xp-uv-trio .xp-uv-trio-cell:hover {
+  opacity: 1;
+}
+
+/* Stepped, not eased: the tear should read as dropped frames, not motion. */
+.xp-uv-glitch {
+  animation: xp-uv-glitch 500ms steps(1, end) both;
+}
+
+@keyframes xp-uv-glitch {
+  0% {
+    transform: translateX(0);
+    clip-path: inset(0 0 0 0);
+  }
+  10% {
+    opacity: 0.55;
+    transform: translateX(-5px);
+    clip-path: inset(46% 0 34% 0);
+  }
+  22% {
+    opacity: 0.85;
+    transform: translateX(4px);
+    clip-path: inset(10% 0 68% 0);
+  }
+  34% {
+    opacity: 0.25;
+    transform: translateX(-3px);
+    clip-path: inset(72% 0 6% 0);
+  }
+  46% {
+    opacity: 0.9;
+    transform: translateX(7px);
+    clip-path: inset(28% 0 52% 0);
+  }
+  58% {
+    opacity: 0.4;
+    transform: translateX(-2px);
+    clip-path: inset(0 0 0 0);
+  }
+  72% {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 03 — reels ------------------------------------------------------------- */
+
+.xp-uv-reels {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 6px 40px 4px;
+}
+
+.xp-uv-reel {
+  position: relative;
+  width: 218px;
+  height: 62px;
+  overflow: hidden;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  background: #0c0c0e;
+}
+
+/* Top and bottom shading, so the strip reads as a drum rather than a list. */
+.xp-uv-reel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    #0c0c0e 0%,
+    rgba(12, 12, 14, 0) 38%,
+    rgba(12, 12, 14, 0) 62%,
+    #0c0c0e 100%
+  );
+}
+
+.xp-uv-reel-strip {
+  transition: transform 720ms cubic-bezier(0.14, 0.8, 0.3, 1);
+}
+
+.xp-uv-reel-strip--snap {
+  transition: none;
+}
+
+.xp-uv-reel-strip--spin {
+  animation: xp-uv-reel-blur 720ms linear both;
+}
+
+@keyframes xp-uv-reel-blur {
+  0% {
+    filter: blur(0);
+  }
+  18% {
+    filter: blur(2.4px);
+  }
+  74% {
+    filter: blur(2.4px);
+  }
+  100% {
+    filter: blur(0);
+  }
+}
+
+.xp-uv-reel-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 62px;
+  color: #fafafa;
+  opacity: 0.72;
+}
+
+.xp-uv-reel-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.xp-uv-reel-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.xp-uv-reel-hit:hover ~ .xp-uv-reel-strip,
+.xp-uv-reel:hover .xp-uv-reel-strip {
+  opacity: 1;
+}
+
+.xp-uv-reel:hover {
+  border-color: #3f3f46;
+}
+
+.xp-uv-reel-hit:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+/* 04 — keypad ------------------------------------------------------------ */
+
+.xp-uv-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4px 40px 0;
+}
+
+.xp-uv-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  height: 62px;
+  border: 1px solid #1f1f23;
+  border-radius: 12px;
+  background: #0b0b0d;
+  color: #fafafa;
+  /* --d is the cell's distance along the diagonal, set per cell. Negative
+     delays put each ring of the grid at a different point of the same loop. */
+  animation: xp-uv-key-lift 5.4s ease-in-out infinite;
+  animation-delay: calc(var(--d) * -0.62s);
+}
+
+@keyframes xp-uv-key-lift {
+  0%,
+  100% {
+    opacity: 0.42;
+    border-color: #1f1f23;
+    background: #0b0b0d;
+  }
+  9% {
+    opacity: 1;
+    border-color: #34343b;
+    background: #101014;
+  }
+  30% {
+    opacity: 0.42;
+    border-color: #1f1f23;
+    background: #0b0b0d;
+  }
+}
+
+.xp-uv-key:hover {
+  /* The pointer outranks the sweep. */
+  animation-play-state: paused;
+  opacity: 1;
+  border-color: #52525b;
+  background: #101014;
+}
+
+.xp-uv-key:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+/* 05 — ticker ------------------------------------------------------------ */
+
+.xp-uv-ticker-section {
+  padding-bottom: 46px;
+}
+
+.xp-uv-ticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+
+.xp-uv-ticker-label {
+  color: #71717a;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+}
+
+/* Sized to the widest lockup (ElevenLabs, 120px) so the label beside it never
+   shifts as the names change. */
+.xp-uv-ticker-slot {
+  position: relative;
+  display: block;
+  width: 132px;
+  height: 28px;
+}
+
+.xp-uv-ticker-item {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  /* Slack for the caret to land in without sitting on the last letter. */
+  padding-right: 6px;
+  color: #fafafa;
+  animation: xp-uv-type 520ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes xp-uv-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Same duration and curve as the reveal, so the caret is the reveal's edge. */
+.xp-uv-ticker-caret {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  background: #fafafa;
+  animation:
+    xp-uv-caret-sweep 520ms cubic-bezier(0.65, 0, 0.35, 1) both,
+    xp-blink 1s step-end 520ms infinite;
+}
+
+@keyframes xp-uv-caret-sweep {
+  from {
+    left: 0;
+  }
+  to {
+    left: calc(100% - 4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-uv-glitch,
+  .xp-uv-key,
+  .xp-uv-ticker-item,
+  .xp-uv-ticker-caret,
+  .xp-uv-reel-strip--spin {
+    animation: none;
+  }
+
+  .xp-uv-key {
+    opacity: 1;
+  }
+
+  .xp-uv-reel-strip {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-uv-trio {
+    padding-inline: 16px;
+  }
+
+  .xp-uv-trio .xp-usedby-name {
+    font-size: 14px;
+  }
+
+  .xp-uv-reels {
+    flex-wrap: wrap;
+    padding-inline: 16px;
+  }
+
+  .xp-uv-keypad {
+    grid-template-columns: 1fr 1fr;
+    padding-inline: 16px;
+  }
+}
