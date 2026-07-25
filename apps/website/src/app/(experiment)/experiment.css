@@ -754,17 +754,23 @@ html {
 }
 
 .xp-usedby-cell {
-  position: relative;
   display: grid;
   justify-items: center;
   align-items: center;
 }
 
-/* Sizer and link share one cell — the sizer sets the width, the link is what
-   you see. The screenshot is positioned out of flow, so it is left out. */
+/* Sizer and link share one cell: the sizer sets the width, the link is what
+   you see. */
 .xp-usedby-cell > .xp-usedby-sizer,
 .xp-usedby-cell > .xp-usedby-item {
   grid-area: 1 / 1;
+}
+
+/* Hit area over the whole column, so the pointer finds a short name as
+   easily as a long one. */
+.xp-usedby-cell > .xp-usedby-item {
+  justify-content: center;
+  width: 100%;
 }
 
 .xp-usedby-sizer {
@@ -779,10 +785,17 @@ html {
 .xp-usedby-item {
   display: flex;
   align-items: center;
-  gap: 16px;
   color: #fafafa;
   opacity: 0.62;
   transition: opacity 220ms ease;
+}
+
+/* The mark and the name travel together, one layer inside the link, so the
+   tear can move and slice them without touching the link's own box. */
+.xp-usedby-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .xp-usedby-mark {
@@ -816,14 +829,21 @@ html {
 }
 
 /* Hover proof: a 16:9 screenshot of the company's own product using the
-   input, floated above the lockup. The frame carries the shadow as a stack of
-   five, each roughly double the last in blur and offset — one big soft shadow
-   reads as fog, a stack reads as a card sitting above the page. */
+   input, riding the cursor. This layer only carries the position — written
+   from JS on every move — so the card inside it is free to animate. */
 .xp-usedby-shot {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 22px);
-  z-index: 5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* The shadow is a stack of five, each roughly double the last in blur and
+   offset: one big soft shadow reads as fog, a stack reads as a card sitting
+   above the page. */
+.xp-usedby-shot-card {
   width: 420px;
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -836,9 +856,7 @@ html {
     0 8px 16px rgba(0, 0, 0, 0.28),
     0 18px 36px rgba(0, 0, 0, 0.26),
     0 36px 72px rgba(0, 0, 0, 0.24);
-  /* Never in the way of the hover that opened it. */
-  pointer-events: none;
-  animation: xp-usedby-shot-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: xp-usedby-shot-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .xp-usedby-shot img {
@@ -848,15 +866,32 @@ html {
   display: block;
 }
 
+/* It arrives from the side it is anchored to, so a flipped card does not
+   appear to come from the wrong direction. */
 @keyframes xp-usedby-shot-in {
   from {
     opacity: 0;
-    transform: translate(-50%, 8px) scale(0.97);
+    transform: translateY(8px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0) scale(1);
+    transform: translateY(0) scale(1);
   }
+}
+
+@keyframes xp-usedby-shot-in-below {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.xp-usedby-shot[data-side='bottom'] .xp-usedby-shot-card {
+  animation-name: xp-usedby-shot-in-below;
 }
 
 /* Junk is set in the mono face at the ratio where its fixed advance lands on
@@ -921,8 +956,10 @@ html {
   }
 }
 
+/* The full-size row needs about 680px; below that the three lockups step down
+   together rather than one of them being dropped. */
 @media (max-width: 900px) {
-  .xp-usedby-shot {
+  .xp-usedby-shot-card {
     width: 300px;
   }
 }
@@ -937,7 +974,7 @@ html {
     padding: 0 12px;
   }
 
-  .xp-usedby-item {
+  .xp-usedby-lockup {
     gap: 8px;
   }
 
@@ -978,26 +1015,6 @@ html {
 
   .xp-nav-links {
     display: none !important;
-  }
-
-}
-
-  /* Three lockups have to share a phone's width, so the whole row steps down
-     a size rather than dropping a company. */
-  .xp-usedby-row {
-    padding: 0 12px;
-  }
-
-  .xp-usedby-item {
-    gap: 7px;
-  }
-
-  .xp-usedby-mark {
-    height: calc(var(--mark-h) * 0.95);
-  }
-
-  .xp-usedby-name {
-    font-size: 13px;
   }
 }
 
