@@ -7,7 +7,9 @@
    wheel that fast looks like. Nobody reads the last two digits. Nobody is meant
    to: the blur is the statistic. */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+import { canReplayIntro, replayIntro } from './preloader'
 
 /* Read off the npm registry API on 2026-07-24: every daily figure summed from
    the first publish through 2026-07-23, and the last full week. Two of those
@@ -143,6 +145,13 @@ function shift(position: number) {
 export function StatsOdometer() {
   const drums = useRef<(HTMLSpanElement | null)[]>([])
 
+  /* The number is the way back into the intro — the only one. Rendered
+     disabled and enabled on mount rather than swapped in: the markup is the
+     same on both passes, and a visitor on reduced motion (or with no JS) is
+     left with a number that plainly does not offer anything. */
+  const [replayable, setReplayable] = useState(false)
+  useEffect(() => setReplayable(canReplayIntro()), [])
+
   const hostRef = useDownloadClock(frame => {
     for (let j = 0; j < DIGITS; j++) {
       const drum = drums.current[j]
@@ -156,29 +165,40 @@ export function StatsOdometer() {
         TRUSTED AT SCALE<span style={{ color: '#3f3f46' }}>_</span>
       </div>
 
-      <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
-        {Array.from({ length: DIGITS }, (_, j) => {
-          const power = DIGITS - 1 - j
-          return (
-            <span className="xp-st-odo-group" key={power}>
-              {j > 0 && power % 3 === 2 && <span className="xp-st-odo-sep">,</span>}
-              <span className="xp-st-odo-col" data-spin={drumSpin(power)}>
-                <span
-                  className="xp-st-odo-drum"
-                  ref={el => {
-                    drums.current[j] = el
-                  }}
-                  style={{ transform: shift(drumAt(ANCHOR_TOTAL, power)) }}
-                >
-                  {CELLS.map((n, i) => (
-                    <span key={i}>{n}</span>
-                  ))}
+      <button
+        type="button"
+        className="xp-st-odo-btn"
+        onClick={replayIntro}
+        disabled={!replayable}
+        aria-label="Replay the 700M downloads intro"
+        title="Replay the intro"
+      >
+        <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
+          {Array.from({ length: DIGITS }, (_, j) => {
+            const power = DIGITS - 1 - j
+            return (
+              <span className="xp-st-odo-group" key={power}>
+                {j > 0 && power % 3 === 2 && (
+                  <span className="xp-st-odo-sep">,</span>
+                )}
+                <span className="xp-st-odo-col" data-spin={drumSpin(power)}>
+                  <span
+                    className="xp-st-odo-drum"
+                    ref={el => {
+                      drums.current[j] = el
+                    }}
+                    style={{ transform: shift(drumAt(ANCHOR_TOTAL, power)) }}
+                  >
+                    {CELLS.map((n, i) => (
+                      <span key={i}>{n}</span>
+                    ))}
+                  </span>
                 </span>
               </span>
-            </span>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      </button>
       {/* The drums are decoration to a screen reader; this is the number. */}
       <p className="xp-st-sr">
         {NUMBER.format(ANCHOR_TOTAL)} total downloads, growing by about{' '}
@@ -187,7 +207,7 @@ export function StatsOdometer() {
 
       <div className="xp-st-caption" data-rv="lede">
         total downloads
-        <span className="xp-st-dim">{` · ${WEEKLY_SHORT} weekly downloads`}</span>
+        <span className="xp-st-dim">{` · ${WEEKLY_SHORT} weekly`}</span>
       </div>
 
       <div className="xp-st-row" data-rv="chrome">

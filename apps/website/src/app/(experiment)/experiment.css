@@ -180,9 +180,11 @@ html {
   z-index: 50;
 }
 
-/* Set on <html> before first paint when the intro was already seen. */
-.xp-intro-seen .xp-panel,
-.xp-intro-seen .xp-pre-layer {
+/* Set on <html> before first paint when the intro was already seen. The
+   exception is a replay: that visitor has seen it and is asking for it back,
+   so the overlay flags itself as invited. */
+.xp-intro-seen .xp-panel:not([data-xp-replay]),
+.xp-intro-seen .xp-pre-layer:not([data-xp-replay]) {
   display: none !important;
 }
 

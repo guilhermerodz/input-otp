@@ -42,12 +42,60 @@
 
 /* The drums ---------------------------------------------------------------- */
 
+/* The counter is a button: clicking it is the only way back to the intro.
+   Everything here is either the reset a <button> needs to stop looking like
+   one, or the hint that it is worth clicking. Nothing that costs a repaint —
+   the digits under it already change every frame, so the hover state is one
+   static gradient layer fading in and out, not a filter over live content. */
+.xp-st-odo-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 22px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.xp-st-odo-btn:enabled {
+  cursor: pointer;
+}
+
+.xp-st-odo-btn::after {
+  content: '';
+  position: absolute;
+  inset: -14px -26px;
+  border-radius: 26px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(250, 250, 250, 0.07) 0%,
+    transparent 70%
+  );
+}
+
+.xp-st-odo-btn:enabled:hover::after,
+.xp-st-odo-btn:enabled:focus-visible::after {
+  opacity: 1;
+}
+
+.xp-st-odo-btn:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 6px;
+}
+
 .xp-st-odo {
   --st-cell: 72px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  margin-top: 22px;
   font-size: 60px;
   font-weight: 600;
   letter-spacing: -0.02em;

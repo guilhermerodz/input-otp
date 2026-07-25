@@ -31,6 +31,27 @@ const LIFT_MS = 700
 const REEL_W = 104
 const REEL_H = 132
 
+/* The intro plays once per visitor and then stays out of the way. The one way
+   back in is the download counter down in "trusted at scale" — it is a button,
+   and this is what it fires. Nothing else reopens the curtain. */
+export const INTRO_REPLAY_EVENT = 'xp:intro-replay'
+
+export function replayIntro() {
+  window.dispatchEvent(new Event(INTRO_REPLAY_EVENT))
+}
+
+/* Whether asking would get you anything. Reduced motion never sees the intro —
+   not on the first visit, not on request — so the counter renders its button
+   disabled rather than dead. Client only: call it from an effect. */
+export function canReplayIntro() {
+  return !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/* How long a fresh replay ignores the skip handlers. A replay is one
+   pointerdown away from being a double click, and a double click should not
+   raise the curtain and drop it in the same gesture. */
+const REPLAY_GRACE = 400
+
 const mono = 'var(--font-jetbrains), ui-monospace, Menlo, monospace'
 
 /* Lets the hero know the stage is clear (flag covers late subscribers). */
@@ -376,11 +397,20 @@ export function Preloader() {
   const [phase, setPhase] = React.useState<'show' | 'lift' | 'gone'>('show')
   const phaseRef = React.useRef(phase)
   phaseRef.current = phase
+  /* A replay is the show running again, not the page arriving. The reveal
+     cascade and the hero's typing hint both key off the intro's signals and
+     both have already had their turn, so a replay stays quiet — it borrows
+     the curtain and hands the page back exactly as it found it. */
+  const replaying = React.useRef(false)
+  const guardUntil = React.useRef(0)
   const timeouts = React.useRef<ReturnType<typeof setTimeout>[]>([])
+
+  /* Drains in place: the mount effect's cleanup holds this same array. */
+  const clearPending = () => timeouts.current.splice(0).forEach(clearTimeout)
 
   const startLift = React.useCallback(() => {
     if (phaseRef.current !== 'show') return
-    timeouts.current.forEach(clearTimeout)
+    clearPending()
     // Recorded only once the intro has actually played through (or been
     // skipped) — writing at mount made Strict Mode's second effect run
     // read its own flag and kill the intro in dev.
@@ -388,12 +418,26 @@ export function Preloader() {
       localStorage.setItem('xp-intro-seen', '1')
     } catch {}
     setPhase('lift')
-    announceIntroLift()
-    setTimeout(() => {
-      setPhase('gone')
-      announceIntroDone()
-    }, LIFT_MS)
+    if (!replaying.current) announceIntroLift()
+    timeouts.current.push(
+      setTimeout(() => {
+        setPhase('gone')
+        if (!replaying.current) announceIntroDone()
+        replaying.current = false
+      }, LIFT_MS),
+    )
   }, [])
+
+  const replay = React.useCallback(() => {
+    // Only from a settled page: mid-intro there is nothing to reopen, and the
+    // counter that asks for this is behind the curtain anyway.
+    if (phaseRef.current !== 'gone' || !canReplayIntro()) return
+    replaying.current = true
+    guardUntil.current = Date.now() + REPLAY_GRACE
+    clearPending()
+    setPhase('show')
+    timeouts.current.push(setTimeout(startLift, LIFT_AT))
+  }, [startLift])
 
   React.useEffect(() => {
     // The blocking script in the layout already hid the overlay pre-paint;
@@ -405,28 +449,41 @@ export function Preloader() {
     } catch {
       // storage unavailable: play the intro every time
     }
+    const pending = timeouts.current
     if (
       seen ||
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ) {
       setPhase('gone')
       announceIntroDone()
-      return
+    } else {
+      pending.push(setTimeout(startLift, LIFT_AT))
     }
-    const pending = timeouts.current
-    pending.push(setTimeout(startLift, LIFT_AT))
+    // Cleans up either way: a replay schedules into this same list long after
+    // the first visit skipped straight past it.
     return () => pending.forEach(clearTimeout)
   }, [startLift])
 
-  // Impatient visitors skip straight to the reveal.
+  // Impatient visitors skip straight to the reveal — but a replay gets a
+  // moment's grace first, so the second half of a double click on the counter
+  // does not close what the first half opened.
   React.useEffect(() => {
-    window.addEventListener('pointerdown', startLift)
-    window.addEventListener('keydown', startLift)
+    const skip = () => {
+      if (Date.now() < guardUntil.current) return
+      startLift()
+    }
+    window.addEventListener('pointerdown', skip)
+    window.addEventListener('keydown', skip)
     return () => {
-      window.removeEventListener('pointerdown', startLift)
-      window.removeEventListener('keydown', startLift)
+      window.removeEventListener('pointerdown', skip)
+      window.removeEventListener('keydown', skip)
     }
   }, [startLift])
+
+  React.useEffect(() => {
+    window.addEventListener(INTRO_REPLAY_EVENT, replay)
+    return () => window.removeEventListener(INTRO_REPLAY_EVENT, replay)
+  }, [replay])
 
   // No scrolling behind the curtain while it is up.
   React.useEffect(() => {
@@ -441,14 +498,23 @@ export function Preloader() {
   if (phase === 'gone') return null
 
   const lifting = phase === 'lift'
+  /* Repeat visitors have the overlay hidden outright by a rule set before
+     first paint; this is how a replay says it means to be here. */
+  const asked = replaying.current ? '' : undefined
 
   return (
     <>
       {/* One simple curtain */}
-      <div className={`xp-panel xp-panel--full ${lifting ? 'xp-panel--up' : ''}`} />
+      <div
+        className={`xp-panel xp-panel--full ${lifting ? 'xp-panel--up' : ''}`}
+        data-xp-replay={asked}
+      />
 
       {/* The machine floats above it and exits on its own */}
-      <div className={`xp-pre-layer ${lifting ? 'xp-pre-exit' : ''}`}>
+      <div
+        className={`xp-pre-layer ${lifting ? 'xp-pre-exit' : ''}`}
+        data-xp-replay={asked}
+      >
         <div className="xp-pre-fade">
           <div className="xp-pre-scale">
             <Casino />
