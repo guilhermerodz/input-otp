@@ -789,7 +789,7 @@
   animation: xp-fb-carousel-fill 3200ms linear forwards;
 }
 
-.xp-fb-styles[data-running='false'] .xp-fb-carousel-step__fill {
+.xp-fb-card[data-running='false'] .xp-fb-carousel-step__fill {
   animation-play-state: paused;
 }
 

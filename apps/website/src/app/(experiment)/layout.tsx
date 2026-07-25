@@ -6,6 +6,7 @@ import { SCROLLBAR_PROBE } from '../../lib/scrollbars'
 import '../globals.css'
 import './experiment.css'
 import './feature-bento.css'
+import './feature-proof-card.css'
 import './stats-odometer.css'
 import './reveal.css'
 

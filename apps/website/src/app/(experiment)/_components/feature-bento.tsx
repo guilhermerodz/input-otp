@@ -2,6 +2,9 @@
 
 import * as React from 'react'
 
+import { ProofCard } from './feature-proof-card'
+import { useIsLive, usePrefersReducedMotion } from './use-live'
+
 function OtpSlots({ compact = false }: { compact?: boolean }) {
   return (
     <div
@@ -41,69 +44,6 @@ function CardHeading({
   )
 }
 
-function ComparisonCard() {
-  return (
-    <article data-rv="card" className="xp-fb-card xp-fb-comparison">
-      <CardHeading
-        index="01"
-        title="One real input. Native wins."
-        copy="The slots are visual. The browser, keyboard and assistive tech still meet a single HTML input."
-      />
-
-      <div
-        className="xp-fb-comparison-table"
-        role="table"
-        aria-label="input-otp compared with other OTP libraries"
-      >
-        <div
-          className="xp-fb-comparison-row xp-fb-comparison-row--header"
-          role="row"
-        >
-          <span role="columnheader">Native behavior</span>
-          <span role="columnheader">input-otp</span>
-          <span role="columnheader">Other OTP libraries</span>
-        </div>
-        {[
-          ['SMS autofill', 'autocomplete=one-time-code'],
-          ['Paste the whole code', 'one native paste event'],
-          ['Accessible by default', 'one focus target'],
-        ].map(([label, detail], index) => (
-          <div className="xp-fb-comparison-row" role="row" key={label}>
-            <span role="cell">
-              <strong>{label}</strong>
-              <small>{detail}</small>
-            </span>
-            <span
-              role="cell"
-              className="xp-fb-verdict xp-fb-verdict--yes"
-              style={{ '--i': index } as React.CSSProperties}
-            >
-              {/* The column header disappears once the table stacks, so each
-                  verdict carries its own label below 620px. */}
-              <b aria-hidden="true">input-otp</b>
-              <span>
-                <i>✓</i> Native
-              </span>
-            </span>
-            <span role="cell" className="xp-fb-verdict xp-fb-verdict--other">
-              <b aria-hidden="true">Other libraries</b>
-              <span>
-                <i>–</i> Varies
-              </span>
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="xp-fb-input-spine" aria-hidden="true">
-        <span className="xp-fb-input-spine__label">&lt;input /&gt;</span>
-        <span className="xp-fb-input-spine__pulse" />
-        <OtpSlots compact />
-      </div>
-    </article>
-  )
-}
-
 const STYLE_VARIANTS = [
   { label: 'keycaps', file: 'keycaps.tsx', type: 'keycaps' },
   { label: 'underline', file: 'underline.tsx', type: 'underline' },
@@ -113,50 +53,6 @@ const STYLE_VARIANTS = [
 
 /** How long each style holds before the carousel moves on. */
 const SLIDE_MS = 3200
-
-/** True only while the node is on screen and the tab is in the foreground. */
-function useIsLive(ref: React.RefObject<HTMLElement>) {
-  const [live, setLive] = React.useState(false)
-
-  React.useEffect(() => {
-    const node = ref.current
-    if (!node) return
-
-    let onScreen = false
-    const sync = () => setLive(onScreen && !document.hidden)
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        onScreen = entry.isIntersecting
-        sync()
-      },
-      { threshold: 0.08 },
-    )
-
-    observer.observe(node)
-    document.addEventListener('visibilitychange', sync)
-
-    return () => {
-      observer.disconnect()
-      document.removeEventListener('visibilitychange', sync)
-    }
-  }, [ref])
-
-  return live
-}
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = React.useState(false)
-
-  React.useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const sync = () => setReduced(query.matches)
-    sync()
-    query.addEventListener('change', sync)
-    return () => query.removeEventListener('change', sync)
-  }, [])
-
-  return reduced
-}
 
 function StyleCard() {
   const cardRef = React.useRef<HTMLElement>(null)
@@ -476,7 +372,9 @@ export function FeatureBento() {
     >
       <div className="xp-fb-intro">
         <div>
-          <span className="xp-fb-path" data-rv="eyebrow">~/features</span>
+          <span className="xp-fb-path" data-rv="eyebrow">
+            ~/features
+          </span>
           <h2 id="xp-features-title" data-rv="title">
             Small API.
             <br />
@@ -492,7 +390,7 @@ export function FeatureBento() {
       </div>
 
       <div className="xp-fb-grid" data-rv-group>
-        <ComparisonCard />
+        <ProofCard />
         <StyleCard />
         <PasswordCard />
         <PatternCard />
