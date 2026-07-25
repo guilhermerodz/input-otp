@@ -12,6 +12,8 @@
 import { Heart, MessageCircle, Share } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { registerSpotlights } from './spotlight'
+
 /* A tweet body is lines of pieces, not a string, because the blue bits are not
    decoration — a t.co link and a mention render differently from the text around
    them, and the fold has to cut the body by line. */
@@ -319,6 +321,22 @@ export function SpottedMarquee() {
       observer.disconnect()
       stop()
     }
+  }, [])
+
+  /* The cursor rim, on both passes: the clone is what the reader is looking at
+     for half of every lap, and a card that lights on one pass and not the
+     other would give the seam away. Registered from here rather than per card
+     because the belt is built once and never re-renders. */
+  useEffect(() => {
+    const band = bandRef.current
+    if (!band) return
+    return registerSpotlights(
+      band.querySelectorAll<HTMLElement>('.xp-tw'),
+      /* Reach is short relative to a 344px card: the belt puts three or four
+         of them across the page, and a wide reach would light the neighbours
+         of whichever one the cursor is actually on. */
+      { reach: 220, spread: 300 },
+    )
   }, [])
 
   const hold = () => {

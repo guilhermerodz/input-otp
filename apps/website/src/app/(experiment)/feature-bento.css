@@ -108,6 +108,17 @@
   pointer-events: none;
 }
 
+/* The cursor rim — spotlight.ts, .xp-spot-ring in experiment.css. The card
+   clips its overflow at the padding edge, so unlike the other hosts this rim
+   cannot sit out on the border: it is drawn just inside it, at the radius the
+   padding box actually has (14px less the 1px border). It still lands above
+   the card's own ::after wash, which has no stacking order of its own. */
+.xp-fb-card > .xp-spot-ring {
+  inset: 0;
+  padding: 1.5px;
+  border-radius: 13px;
+}
+
 .xp-fb-card.xp-fb-is-paused *,
 .xp-fb-card.xp-fb-is-paused *::before,
 .xp-fb-card.xp-fb-is-paused *::after,

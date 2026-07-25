@@ -2,12 +2,19 @@
 
 import * as React from 'react'
 
+import { useSpotlight } from './spotlight'
+
 export function CopyCommand() {
   const [copied, setCopied] = React.useState(false)
+  /* Matched to the button it stands beside, so the cursor crossing the row
+     hands the light from one to the other. */
+  const spot = useSpotlight<HTMLDivElement>({ reach: 200, spread: 200 })
 
   return (
     <div
+      ref={spot}
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         gap: 12,
@@ -21,7 +28,7 @@ export function CopyCommand() {
         fontSize: 14,
         fontWeight: 500,
       }}
-      className="xp-mono"
+      className="xp-mono xp-install"
     >
       <span style={{ color: '#71717a' }}>$</span> npm install input-otp
       <button
