@@ -1,0 +1,68 @@
+/* ————— Docs-only surface tweaks —————
+   The landing page owns globals.css; these rules narrow the shared
+   rehype-pretty-code styling for the tighter, quieter docs code blocks. */
+
+.docs-code [data-rehype-pretty-code-figure] {
+  margin: 0;
+}
+.docs-code [data-rehype-pretty-code-figure] pre {
+  margin: 0;
+  max-height: 34rem;
+  overflow-x: auto;
+  border: 0;
+  border-radius: 0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: transparent !important;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+.docs-code [data-rehype-pretty-code-figure] [data-line] {
+  padding-inline: 1.25rem;
+  padding-block: 0;
+  min-height: 0;
+}
+
+/* rehype-pretty-code emits diff markers as line properties; give +/- lines a
+   gutter sign so the "before → after" snippets read like a patch. */
+.docs-code [data-line].diff-add,
+.docs-code [data-line][data-diff='+'] {
+  background: hsl(142 70% 45% / 0.1);
+}
+.docs-code [data-line].diff-remove,
+.docs-code [data-line][data-diff='-'] {
+  background: hsl(0 70% 55% / 0.1);
+}
+
+/* The nudge an invalid code gets. Small on purpose — a big shake reads as an
+   error in the page, not in the field. */
+@keyframes otp-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+/* Character landing in a keycap slot. */
+@keyframes keycap-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
