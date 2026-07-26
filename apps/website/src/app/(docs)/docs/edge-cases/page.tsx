@@ -648,6 +648,37 @@ export default function EdgeCasesPage() {
         <CodeBlock code={BLUR_REGRESSION} lang="ts" />
       </EdgeCase>
 
+      <EdgeCase
+        title="The gutter was reserved for everyone"
+        platforms={['Extensions']}
+        symptom={
+          <>
+            With no extension installed, focusing the field still set{' '}
+            <C>input.style.width</C> to <C>calc(100% + 40px)</C>.
+          </>
+        }
+        cause={
+          <>
+            The fallback probe bailed out only when <C>elementFromPoint</C>{' '}
+            returned the <em>container</em>. It never does — the invisible input
+            is the one node in the field with <C>pointer-events: all</C>, so it
+            is always the topmost element at the probe point.
+          </>
+        }
+        fix={
+          <>
+            Compare against the input instead, and treat a <C>null</C> hit — the
+            point is off-screen — as &ldquo;learned nothing&rdquo; rather than
+            as a badge. Fixed after 1.4.2. Nothing visibly changed either way:
+            the clip-path hid the extra width and clipped hit-testing with it.{' '}
+            <A href="/docs/password-managers#how-detection-works">
+              How detection works
+            </A>
+            .
+          </>
+        }
+      />
+
       <H2>State and lifecycle</H2>
 
       <EdgeCase
@@ -818,12 +849,11 @@ export default function EdgeCasesPage() {
         </p>
         <p>
           <strong className="font-medium text-foreground">
-            The fallback probe over-reports.
+            Unknown extensions are detected by what they paint.
           </strong>{' '}
-          As of 1.4.2 the second detection pass compares against the container
-          rather than the input, so the gutter is reserved even with no
-          extension installed. Invisible in practice, but it is not what the
-          code intends —{' '}
+          The fallback probe asks what sits at one point in the corner. Anything
+          the user happens to have overlapping that point counts as a badge, and
+          a badge drawn anywhere else does not —{' '}
           <A href="/docs/password-managers#how-detection-works">details</A>.
         </p>
         <p>

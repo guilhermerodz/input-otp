@@ -20,7 +20,7 @@ const y = container.getBoundingClientRect().top + container.offsetHeight / 2
 
 if (document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS).length === 0) {
   const maybeBadgeEl = document.elementFromPoint(x, y)
-  if (maybeBadgeEl === container) {
+  if (!maybeBadgeEl || maybeBadgeEl === input) {
     return // nothing sitting on top of the field
   }
 }
@@ -154,23 +154,25 @@ export default function PasswordManagersPage() {
       </P>
       <CodeBlock code={PROBE} lang="ts" />
 
-      <Callout type="warning" title="Current behaviour of the fallback probe">
+      <Callout type="warning" title="This probe was wrong in 1.4.2 and earlier">
         <p>
-          In 1.4.2 this second pass effectively always says yes. The topmost
-          element at that point is the invisible input — it is the one node in
-          the field with <C>pointer-events: all</C> — but the comparison is
-          against the <em>container</em>, so <C>maybeBadgeEl === container</C>{' '}
-          is never true and the gutter is reserved for everyone.
+          The comparison used to be against the <em>container</em>, not the
+          input. The topmost element at that point is always the invisible input
+          — it is the one node in the field with <C>pointer-events: all</C> — so{' '}
+          <C>maybeBadgeEl === container</C> was never true and the second pass
+          effectively always said yes, reserving the gutter for everyone.
         </p>
         <p>
-          You can verify it in the simulator: set the extension to{' '}
-          <strong>None</strong>, focus the field, and watch{' '}
-          <C>input.style.width</C> still become <C>calc(100% + 40px)</C>. It is
-          invisible in practice — the clip-path hides the extra width and
-          hit-testing is unchanged — so this is a correctness note, not a bug
-          you need to work around. Set{' '}
-          <C>pushPasswordManagerStrategy=&quot;none&quot;</C> if you want the
-          reservation gone.
+          It was invisible in practice: the clip-path hides the extra width and
+          also clips hit-testing, so nothing moved and nothing broke. If you are
+          on 1.4.2 or earlier and want the reservation gone, set{' '}
+          <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
+        </p>
+        <p>
+          You can confirm the current behaviour in the simulator: set the
+          extension to <strong>None</strong>, focus the field, and{' '}
+          <C>input.style.width</C> stays at <C>100%</C>. Switch to a real vendor
+          and it becomes <C>calc(100% + 40px)</C>.
         </p>
       </Callout>
 
