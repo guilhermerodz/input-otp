@@ -57,16 +57,17 @@ export function usePasswordManagerBadge({
       return
     }
 
-    const elementToCompare = container
+    // Probe against the container's box, not the input's: once the badge
+    // space is pushed the input grows wider than the field it renders.
+    const elementToProbe = container
 
     // Get the top right-center point of the container.
     // That is usually where most password managers place their badge.
     const rightCornerX =
-      elementToCompare.getBoundingClientRect().left +
-      elementToCompare.offsetWidth
+      elementToProbe.getBoundingClientRect().left + elementToProbe.offsetWidth
     const centereredY =
-      elementToCompare.getBoundingClientRect().top +
-      elementToCompare.offsetHeight / 2
+      elementToProbe.getBoundingClientRect().top +
+      elementToProbe.offsetHeight / 2
     const x = rightCornerX - PWM_BADGE_MARGIN_RIGHT
     const y = centereredY
 
@@ -82,7 +83,9 @@ export function usePasswordManagerBadge({
       // If the found element is the input itself,
       // then we assume it's not a password manager badge.
       // We are not sure. Most times that means there isn't a badge.
-      if (maybeBadgeEl === container) {
+      // A null result means the point is off-screen, so we learned nothing
+      // and must not claim a badge is there either.
+      if (!maybeBadgeEl || maybeBadgeEl === input) {
         return
       }
     }
