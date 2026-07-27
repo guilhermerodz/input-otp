@@ -49,6 +49,20 @@
       "port": 3061
     },
     {
+      "name": "beta-merge-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/input-otp-beta-merge-5a2a5b/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3063"
+      ],
+      "port": 3063
+    },
+    {
       "name": "docs-worktree",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
