@@ -534,6 +534,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         <div
           ref={containerRef}
           data-input-otp-container
+          // Chrome's translation feature rewrites the slots' text nodes
+          // (wrapping them in <font>), which crashes React on the next
+          // update — and a one-time code is never meaningful to translate.
+          translate="no"
           style={rootStyle}
           className={containerClassName}
         >
