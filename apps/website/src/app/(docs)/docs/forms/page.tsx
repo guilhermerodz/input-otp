@@ -45,7 +45,7 @@ const { register, handleSubmit } = useForm<{ code: string }>()
 
 const RHF_CONTROLLER = `import { Controller, useForm } from 'react-hook-form'
 
-const { control } = useForm({ defaultValues: { code: '' } })
+const { control, handleSubmit } = useForm({ defaultValues: { code: '' } })
 
 <Controller
   name="code"
@@ -53,10 +53,11 @@ const { control } = useForm({ defaultValues: { code: '' } })
   rules={{ minLength: 6 }}
   render={({ field }) => (
     <OTPInput
+      // onChange gives you a string, which is exactly what field.onChange wants
       {...field}
       maxLength={6}
-      // onChange gives you a string, which is exactly what field.onChange wants
-      onComplete={handleSubmit(onValid)}
+      // handleSubmit(onValid) expects a form event, not the code — wrap it
+      onComplete={() => handleSubmit(onValid)()}
     />
   )}
 />`

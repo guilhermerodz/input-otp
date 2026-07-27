@@ -262,6 +262,18 @@ export default function ApiPage() {
               </>
             ),
           },
+          {
+            name: 'nonce',
+            type: 'string',
+            description: (
+              <>
+                Applied to the <code>&lt;style&gt;</code> tag the library
+                injects, so a <code>style-src</code> Content-Security-Policy
+                that requires nonces doesn&apos;t block it. Only needed under
+                such a CSP.
+              </>
+            ),
+          },
         ]}
       />
 
@@ -270,7 +282,9 @@ export default function ApiPage() {
           Unless you pass your own, the input gets{' '}
           <C>autoComplete=&quot;one-time-code&quot;</C>, which is what lets iOS
           and Android offer the code straight from the SMS. Overriding it turns
-          SMS autofill off.
+          SMS autofill off. <C>spellCheck</C> likewise defaults to{' '}
+          <C>false</C> — browsers would underline a full code as a typo — and
+          passing your own value overrides it.
         </p>
       </Callout>
 

@@ -215,30 +215,25 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
       }
       updateRootHeight()
+      // ResizeObserver is missing in older browsers (e.g. iOS Safari <13.4);
+      // without it the root height is still measured once on mount.
+      const resizeObserver =
+        typeof ResizeObserver === 'undefined'
+          ? null
+          : new ResizeObserver(updateRootHeight)
+      resizeObserver?.observe(input)
 
-      // Feature detection for ResizeObserver
-      if (typeof ResizeObserver !== 'undefined') {
-        const resizeObserver = new ResizeObserver(updateRootHeight)
-        resizeObserver.observe(input)
-
-        return () => {
-          document.removeEventListener(
-            'selectionchange',
-            onDocumentSelectionChange,
-            { capture: true },
-          )
-          resizeObserver.disconnect()
-        }
-      }
-
-      // Fallback return for browsers without ResizeObserver
       return () => {
         document.removeEventListener(
           'selectionchange',
           onDocumentSelectionChange,
           { capture: true },
         )
+        resizeObserver?.disconnect()
       }
+      // The style tag is created once per document, so only the first
+      // render's nonce can ever be used — a mount-only effect is intended.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     /** Mirrors for UI rendering purpose only */
@@ -441,7 +436,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           maxLength={maxLength}
           value={value}
           ref={inputRef}
-          spellCheck={false}
+          spellCheck={props.spellCheck ?? false}
           onPaste={e => {
             _pasteListener(e)
             props.onPaste?.(e)

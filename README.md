@@ -178,10 +178,7 @@ type OTPInputProps = {
   inputMode?: 'numeric' | 'text' | ...             // default 'numeric'
   pushPasswordManagerStrategy?: 'increase-width' | 'none'
   noScriptCSSFallback?: string | null
-
-  // If you are using a Content-Security-Policy (CSP) with the `style-src` directive, you may need to 
-  // specify a nonce value for the inline style tag.
-  nonce?: string
+  nonce?: string                          // for CSP style-src — applied to the injected <style> tag
 }
 
 interface SlotProps {
@@ -194,6 +191,8 @@ interface SlotProps {
 
 Every other `<input>` attribute is forwarded — `name`, `required`, `disabled`,
 `autoFocus`, `aria-*`, `data-*` — and `ref` points at the real input.
+`spellCheck` defaults to `false` (browsers would underline a full code as a
+typo); pass `spellCheck` yourself to override.
 
 Full reference: [**input-otp.rodz.dev/docs/api**](https://input-otp.rodz.dev/docs/api).
 
