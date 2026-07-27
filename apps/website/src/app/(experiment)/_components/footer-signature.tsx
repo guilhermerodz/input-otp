@@ -25,8 +25,9 @@ export function FooterSignature() {
   const hostRef = React.useRef<HTMLDivElement>(null)
 
   /* The element animates the moment the script upgrades it, which happens
-     long before anyone reaches the footer. Restart the signing when it
-     actually scrolls into view so the visitor sees it drawn. */
+     long before anyone reaches the footer. Restart the signing every time it
+     scrolls into view — the observer stays on for good, so leaving and
+     coming back replays the whole performance. */
   React.useEffect(() => {
     const host = hostRef.current
     if (!host) return
@@ -35,7 +36,6 @@ export function FooterSignature() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return
-        observer.disconnect()
         customElements.whenDefined('rodz-signature').then(() => {
           if (cancelled) return
           host.querySelector<SignatureElement>('rodz-signature')?.replay?.()
