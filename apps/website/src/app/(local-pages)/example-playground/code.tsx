@@ -1,5 +1,4 @@
 import { Code } from '@/components/code'
-import { useTheme } from 'next-themes'
 
 const tsx = `'use client'
 import { OTPInput, SlotProps } from 'input-otp'
@@ -98,16 +97,10 @@ ${tsx}
 
 export function ExampleCode() {
   return (
-    <div className="relative code-example w-full overflow-hidden lg:opacity-0 lg:animate-fade-up !duration-1000 ![animation-delay:3000ms] animate-none">
+    <div className="relative code-example w-full overflow-hidden">
       <div className="w-full">
-        <Code dark={false} code={code} toCopy={tsx} />
-        <Code dark={true} code={code} toCopy={tsx} />
+        <Code code={code} toCopy={tsx} />
       </div>
-
-      <div className="hidden lg:[display:unset] absolute inset-x-0 top-0 -bottom-full pointer-events-none z-20 [animation-delay:5000ms]"></div>
-
-      {/* Anchor */}
-      <div id="code-example-anchor" className="absolute pointer-events-none w-px h-px -top-[5.5rem]" />
     </div>
   )
 }

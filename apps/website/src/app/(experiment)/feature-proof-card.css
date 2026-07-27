@@ -1,0 +1,695 @@
+/* Feature card 01 — one phone, one continuous story.
+
+   The phone is mounted once and never replaced. Every scene change moves data
+   attributes on it, and the movement between states belongs to the transitions
+   below — that is what keeps a scene change from flashing a new frame in.
+   Scoped under .pc so nothing here leaks into the rest of the bento. */
+
+.pc {
+  --pc-select: rgba(85, 214, 154, 0.22);
+  --pc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* The curve iOS uses to bring a keyboard in and out. */
+  --pc-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Exits get their own curve. --pc-ease spends most of its duration in the
+     last tenth of the distance, which is lovely arriving and terrible
+     leaving: the old step hung around faintly while the new one started, so
+     the advance did not register. Leaving is quicker and does not linger. */
+  --pc-exit: cubic-bezier(0.4, 0, 0.9, 0.6);
+}
+
+.pc-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+  gap: 32px;
+  padding: 14px 24px 22px;
+}
+
+.pc-stage {
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------------- *
+ * The phone
+ * ---------------------------------------------------------------- */
+
+.pc-phone {
+  width: 228px;
+  border: 1px solid #2c2c33;
+  border-radius: 22px;
+  background: #0a0a0d;
+  padding: 8px;
+  box-shadow:
+    0 18px 40px -22px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.pc-phone__screen {
+  position: relative;
+  display: flex;
+  height: 322px;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #121218, #0c0c10 40%);
+  padding: 16px 12px 0;
+}
+
+/* Sits high enough that the notification covers it completely — a few pixels
+   of the subtitle poking out below the banner read as a rendering fault. */
+.pc-phone__head {
+  margin: 0;
+  text-align: center;
+}
+
+.pc-phone__head b {
+  display: block;
+  font-size: 11px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.pc-phone__head span {
+  display: block;
+  margin-top: 3px;
+  color: var(--fb-quiet);
+  font-size: 8px;
+}
+
+/* Two reserved lanes above the slots: the clipboard sits in the upper one and
+   the selection menu in the lower one. They are on screen together during the
+   paste — the chip is what the menu is about to paste — so they cannot share
+   a lane without colliding. */
+.pc-phone__field {
+  position: relative;
+  margin-top: 8px;
+  padding-top: 56px;
+}
+
+/* ---------------------------------------------------------------- *
+ * The notification
+ * ---------------------------------------------------------------- */
+
+.pc-banner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #33333c;
+  border-radius: 11px;
+  background: #202026;
+  padding: 9px 9px 10px;
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.95);
+  opacity: 0;
+  transition:
+    opacity 170ms var(--pc-exit),
+    transform 260ms var(--pc-exit);
+  transform: translateY(-130%);
+}
+
+.pc-banner[data-in] {
+  opacity: 1;
+  transition:
+    opacity 320ms var(--pc-ease),
+    transform 520ms var(--pc-sheet);
+  transform: translateY(0);
+}
+
+.pc-banner__icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  border-radius: 6px;
+  background: linear-gradient(160deg, #5ad06a, #2ba84a);
+}
+
+.pc-banner__body {
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.pc-banner__body b {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.pc-banner__body span {
+  display: block;
+  overflow: hidden;
+  color: #a1a1aa;
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- *
+ * The field
+ * ---------------------------------------------------------------- */
+
+.pc-field {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pc-slot {
+  position: relative;
+  display: grid;
+  width: 27px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #38383f;
+  border-radius: 6px;
+  background: #101014;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color 150ms var(--pc-exit),
+    background 150ms var(--pc-exit);
+}
+
+/* A selection that spans slots — the thing separate inputs cannot express.
+   It sweeps rather than snapping, so you see it crossing the boundaries. */
+.pc-field[data-selected] .pc-slot {
+  border-color: rgba(85, 214, 154, 0.45);
+  background: var(--pc-select);
+  transition:
+    border-color 240ms var(--pc-ease),
+    background 240ms var(--pc-ease);
+  transition-delay: calc(var(--i) * 45ms);
+}
+
+.pc-field[data-tap] .pc-slot:first-child {
+  border-color: rgba(244, 244, 245, 0.5);
+}
+
+.pc-slot__digit {
+  display: block;
+  opacity: 0;
+  transition:
+    opacity 180ms var(--pc-exit),
+    transform 180ms var(--pc-exit),
+    filter 180ms var(--pc-exit);
+  transform: translateY(9px);
+  filter: blur(4px);
+}
+
+.pc-field[data-filled] .pc-slot__digit {
+  opacity: 1;
+  transition:
+    opacity 300ms var(--pc-ease),
+    transform 300ms var(--pc-ease),
+    filter 300ms var(--pc-ease);
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Arriving one slot at a time reads as typing; arriving together reads as one
+   value landing, which is exactly the difference between the two scenes. */
+.pc-field[data-fill='stagger'] .pc-slot__digit {
+  transition-delay: calc(var(--i) * 55ms);
+}
+
+.pc-field[data-cutting] .pc-slot__digit {
+  opacity: 0;
+  transform: translateY(-12px);
+  filter: blur(3px);
+  transition-duration: 190ms;
+  transition-delay: calc(var(--i) * 14ms);
+}
+
+.pc-slot:first-child::after {
+  position: absolute;
+  width: 1px;
+  height: 45%;
+  background: var(--fb-ink);
+  content: '';
+  opacity: 0;
+}
+
+.pc-field[data-caret]:not([data-filled]) .pc-slot:first-child::after {
+  animation: pc-blink 1.05s step-end infinite;
+}
+
+@keyframes pc-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Chips over the field
+ * ---------------------------------------------------------------- */
+
+.pc-clip,
+.pc-menu {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  align-items: baseline;
+  border-radius: 7px;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The value leaves the field on Cut, waits on the clipboard while the
+   keyboard is away, and comes back down on Paste. */
+.pc-clip {
+  gap: 7px;
+  border: 1px dashed rgba(85, 214, 154, 0.45);
+  background: rgba(85, 214, 154, 0.08);
+  padding: 4px 9px;
+  color: #b7f7d3;
+  opacity: 0;
+  transition:
+    opacity 180ms var(--pc-exit),
+    transform 260ms var(--pc-exit);
+  transform: translate(-50%, 26px) scale(0.94);
+}
+
+.pc-clip small {
+  color: var(--fb-quiet);
+  font-size: 7.5px;
+}
+
+.pc-clip[data-phase='rising'],
+.pc-clip[data-phase='parked'] {
+  transition:
+    opacity 320ms var(--pc-ease),
+    transform 460ms var(--pc-ease);
+}
+
+.pc-clip[data-phase='rising'] {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.pc-clip[data-phase='parked'] {
+  opacity: 0.5;
+  transform: translate(-50%, 0) scale(0.94);
+}
+
+.pc-clip[data-phase='diving'] {
+  opacity: 0;
+  transform: translate(-50%, 26px) scale(0.96);
+}
+
+/* The selection menu. It never just appears and disappears — the item that
+   matters is pressed, and that press is what causes the next frame. */
+.pc-menu {
+  top: 28px;
+  z-index: 2;
+  border: 1px solid #3a3a44;
+  background: #26262e;
+  box-shadow: 0 8px 18px -12px rgba(0, 0, 0, 0.9);
+  color: #e4e4e7;
+  font-family: inherit;
+  font-size: 8.5px;
+  opacity: 0;
+  transition:
+    opacity 120ms var(--pc-exit),
+    transform 150ms var(--pc-exit);
+  transform: translate(-50%, 7px) scale(0.94);
+}
+
+.pc-menu[data-in] {
+  opacity: 1;
+  transition:
+    opacity 200ms var(--pc-ease),
+    transform 260ms var(--pc-ease);
+  transform: translate(-50%, 0) scale(1);
+}
+
+.pc-menu b {
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.pc-menu b + b {
+  border-left: 1px solid #3a3a44;
+}
+
+.pc-menu b[data-press] {
+  background: rgba(85, 214, 154, 0.28);
+  color: #ddfced;
+}
+
+/* ---------------------------------------------------------------- *
+ * The keyboard
+ * ---------------------------------------------------------------- */
+
+.pc-keyboard {
+  margin: auto -12px 0;
+  border-top: 1px solid #1e1e24;
+  background: #17171c;
+  padding: 8px 8px 10px;
+  transition: transform 460ms var(--pc-sheet);
+}
+
+.pc-keyboard[data-state='down'] {
+  transform: translateY(100%);
+}
+
+.pc-suggestions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 22px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.pc-suggestions > span {
+  height: 100%;
+  border-radius: 5px;
+  background: #202027;
+}
+
+/* Keeps its chip in every scene — hiding it left a hole in the middle of the
+   QuickType row. Only the code inside it arrives. */
+.pc-suggestions__code {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  border-radius: 5px;
+  background: #202027;
+  color: var(--fb-green);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  transition:
+    background 160ms var(--pc-exit),
+    box-shadow 160ms var(--pc-exit),
+    transform 140ms var(--pc-exit);
+}
+
+.pc-suggestions__code b {
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 140ms var(--pc-exit);
+}
+
+.pc-suggestions__code[data-state] b {
+  transition: opacity 240ms var(--pc-ease);
+}
+
+.pc-suggestions__code[data-state] {
+  background: rgba(85, 214, 154, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(85, 214, 154, 0.4);
+  transition:
+    background 260ms var(--pc-ease),
+    box-shadow 260ms var(--pc-ease),
+    transform 140ms var(--pc-ease);
+}
+
+.pc-suggestions__code[data-state] b {
+  opacity: 1;
+}
+
+.pc-suggestions__code[data-state='press'] {
+  background: rgba(85, 214, 154, 0.36);
+  box-shadow: inset 0 0 0 1px rgba(85, 214, 154, 0.62);
+  transform: scale(0.93);
+}
+
+.pc-keyrows {
+  display: grid;
+  gap: 5px;
+}
+
+.pc-keyrows > div {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+}
+
+.pc-keyrows i {
+  width: 15px;
+  height: 17px;
+  border-radius: 3px;
+  background: #26262d;
+}
+
+/* ---------------------------------------------------------------- *
+ * The comparison, which is also the transport
+ * ---------------------------------------------------------------- */
+
+.pc-verdicts {
+  --pc-cols: minmax(0, 1.45fr) minmax(72px, 0.75fr) minmax(84px, 0.85fr);
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.pc-verdicts__head {
+  display: none;
+  padding: 0 10px 9px;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 8.5px;
+}
+
+/* Beside a phone-sized scene there is only room for three columns on a wide
+   viewport, so stacked is the base and tabular is the enhancement — below
+   that the mono detail line truncated mid-attribute. */
+.pc-verdict {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'claim claim'
+    'yes no';
+  justify-content: start;
+  gap: 7px 18px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  padding: 9px 10px 12px;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 320ms var(--pc-ease);
+}
+
+.pc-verdict__claim {
+  grid-area: claim;
+}
+
+.pc-verdict__mark--yes {
+  grid-area: yes;
+}
+
+.pc-verdict__mark--no {
+  grid-area: no;
+}
+
+.pc-verdict:hover {
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.pc-verdict[aria-selected='true'] {
+  background: linear-gradient(
+    90deg,
+    rgba(85, 214, 154, 0.075),
+    transparent 72%
+  );
+}
+
+.pc-verdict:focus-visible {
+  outline: 2px solid rgba(244, 244, 245, 0.9);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1180px) {
+  .pc-verdicts__head {
+    display: grid;
+    grid-template-columns: var(--pc-cols);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pc-verdict {
+    grid-template-columns: var(--pc-cols);
+    grid-template-areas: none;
+    align-items: center;
+    justify-content: stretch;
+    gap: 10px;
+  }
+
+  .pc-verdict__claim,
+  .pc-verdict__mark--yes,
+  .pc-verdict__mark--no {
+    grid-area: auto;
+  }
+}
+
+.pc-verdict__claim strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+
+.pc-verdict__claim small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--fb-quiet);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pc-verdict__mark {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+}
+
+.pc-verdict__mark i {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 8.5px;
+  font-style: normal;
+}
+
+.pc-verdict__mark--yes {
+  color: #b9f5d4;
+}
+
+.pc-verdict__mark--yes i {
+  border: 1px solid rgba(85, 214, 154, 0.36);
+  background: var(--fb-green-soft);
+  color: var(--fb-green);
+}
+
+.pc-verdict__mark--no {
+  color: #7c7c86;
+}
+
+.pc-verdict__mark--no i {
+  border: 1px solid #3a3a42;
+  color: #6a6a74;
+}
+
+/* The row separator is the timer. Only the playing row fills; deselecting
+   drops the animation, which resets the bar in one frame rather than winding
+   it backwards. */
+.pc-verdict__track {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  left: 10px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--fb-line);
+}
+
+.pc-verdict:last-child .pc-verdict__track {
+  background: transparent;
+}
+
+.pc-verdict[aria-selected='true'] .pc-verdict__track {
+  background: #2a2a30;
+}
+
+.pc-verdict__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fb-green);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.pc-verdict[aria-selected='true'] .pc-verdict__fill {
+  animation: pc-row-fill var(--pc-scene-ms) linear forwards;
+}
+
+.pc[data-running='false'] .pc-verdict__fill {
+  animation-play-state: paused;
+}
+
+/* The last tenth belongs to the hand-off into the next scene. */
+@keyframes pc-row-fill {
+  0% {
+    transform: scaleX(0);
+  }
+  86% {
+    transform: scaleX(0.9);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Responsive
+ * ---------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .pc-body {
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .pc-verdicts {
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 620px) {
+  .pc-body {
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Each scene is held on the frame that shows its outcome, so the states
+     below are reached without any of the movement between them. */
+  .pc-banner,
+  .pc-clip,
+  .pc-menu,
+  .pc-keyboard,
+  .pc-slot,
+  .pc-slot__digit,
+  .pc-suggestions__code,
+  .pc-suggestions__code b {
+    transition: none;
+  }
+
+  .pc-field[data-caret]:not([data-filled]) .pc-slot:first-child::after {
+    animation: none;
+    opacity: 1;
+  }
+}

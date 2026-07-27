@@ -20,13 +20,15 @@ type OTPInputBaseProps = OverrideProps<
 
     textAlign?: 'left' | 'center' | 'right'
 
-    onComplete?: (...args: any[]) => unknown
+    onComplete?: (value: string) => unknown
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
     pasteTransformer?: (pasted: string) => string
 
     containerClassName?: string
 
     noScriptCSSFallback?: string | null
+
+    nonce?: string
   }
 >
 type InputOTPRenderFn = (props: RenderProps) => React.ReactNode

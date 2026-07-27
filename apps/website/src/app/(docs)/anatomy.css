@@ -1,0 +1,139 @@
+/* ————— The "See it" stages —————
+   Three variants share one vocabulary: an amber input, a cyan container, and a
+   set of "peel" classes that undo — one property at a time — the styles the
+   library writes inline to make the real <input> disappear.
+
+   Everything here is scoped to .otp-stage so it can only affect a demo that
+   opted in, and every reveal needs !important: the library sets those same
+   properties as inline styles, which nothing weaker can outrank. */
+
+.otp-stage {
+  --amber: 28 90% 62%;
+  --cyan: 190 90% 60%;
+  /* Written from JS in the peel variant: the exact tracking that puts one
+     character over one slot, measured from the input's real font metrics. */
+  --peel-spacing: 2em;
+  --peel-indent: 0px;
+}
+
+.otp-stage [data-input-otp] {
+  transition:
+    color 420ms ease,
+    background-color 420ms ease,
+    caret-color 420ms ease,
+    outline-color 420ms ease,
+    letter-spacing 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    text-indent 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    font-size 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ——— The peels. Each one undoes exactly one hiding technique. ——— */
+
+.otp-peel-color [data-input-otp] {
+  color: hsl(var(--amber)) !important;
+}
+.otp-peel-caret [data-input-otp] {
+  caret-color: hsl(var(--amber)) !important;
+}
+.otp-peel-bg [data-input-otp] {
+  background-color: hsl(var(--amber) / 0.09) !important;
+  outline: 1px dashed hsl(var(--amber) / 0.6) !important;
+  outline-offset: 0 !important;
+}
+/* Higher specificity than the library's own [data-input-otp]::selection rule,
+   so this wins even though both are !important. */
+.otp-peel-selection [data-input-otp]::selection {
+  background: hsl(var(--amber) / 0.4) !important;
+  color: hsl(28 100% 92%) !important;
+}
+/* Undo letter-spacing: -.5em, and re-pitch the text so each character lands
+   over the slot that mirrors it. */
+.otp-peel-tracking [data-input-otp] {
+  font-size: 1.375rem !important;
+  letter-spacing: var(--peel-spacing) !important;
+  text-indent: var(--peel-indent);
+}
+
+/* The container's own footprint, drawn only while a stage asks for it. */
+.otp-stage-floor {
+  outline: 1px dashed hsl(var(--cyan) / 0.5);
+  outline-offset: 4px;
+  border-radius: 6px;
+  transition: opacity 420ms ease;
+}
+
+/* ——— Isometric board ———
+   Orthographic on purpose: no perspective, like a technical drawing. --tilt
+   goes 0 (flat) → 1 (isometric); --explode is the layer separation in px. */
+.otp-iso-board {
+  --board-scale: 1;
+  transform-style: preserve-3d;
+  /* Read right to left: rotate into isometric; nudge back to centre (+Z
+     projects up-and-left, so the stack drifts as it separates, and half the
+     vertical projection of --explode compensates); then scale to fit.
+     The lifted planes project outside this element's own box, so the fit is
+     handled by scaling rather than by measuring. */
+  transform: scale(var(--board-scale))
+    translateY(calc(var(--explode, 0) * 0.29px))
+    rotateX(calc(var(--tilt, 0) * 54deg)) rotateZ(calc(var(--tilt, 0) * -42deg));
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Phones: the separated planes project well outside the board's own box, so
+   shrink the whole drawing rather than clipping a corner off it. */
+@media (max-width: 40rem) {
+  .otp-iso-board {
+    --board-scale: 0.8;
+  }
+}
+.otp-iso-board [data-input-otp-container] {
+  transform-style: preserve-3d;
+}
+/* The wrapper the library puts around the real input — lift it to the top
+   plane. Matched by structure rather than a class, because it is the
+   library's element, not ours. */
+.otp-iso-board [data-input-otp-container] > div:has(> [data-input-otp]) {
+  transform: translateZ(calc(var(--explode, 0) * 1px));
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.otp-iso-slots {
+  transform: translateZ(calc(var(--explode, 0) * 0.42px));
+  transition:
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 320ms ease;
+}
+.otp-iso-plane-outline {
+  transform: translateZ(calc(var(--explode, 0) * 1px));
+  transition:
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 320ms ease;
+}
+
+/* ——— Assembly walkthrough ———
+   Slots rise into place, the input plate drops in from above. */
+.otp-assembly-slot {
+  opacity: var(--slot-in, 1);
+  transform: translateY(calc((1 - var(--slot-in, 1)) * 14px));
+  transition:
+    opacity 380ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+.otp-assembly-plate {
+  opacity: var(--plate-in, 0);
+  transform: translateY(calc((1 - var(--plate-in, 0)) * -22px));
+  transition:
+    opacity 380ms ease,
+    transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otp-stage [data-input-otp],
+  .otp-iso-board,
+  .otp-iso-board [data-input-otp-container] > div:has(> [data-input-otp]),
+  .otp-iso-slots,
+  .otp-iso-plane-outline,
+  .otp-assembly-slot,
+  .otp-assembly-plate {
+    transition-duration: 1ms;
+  }
+}

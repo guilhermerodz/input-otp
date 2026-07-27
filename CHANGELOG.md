@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.5.0-beta.1]
+
+Everything that landed after 1.4.2, in one beta. (A 1.5.0-beta.0 was drafted along the way but never published to npm; its items are folded in below.)
+
+The headline: the iOS native selection artifact — the thin, caret-tall line documented as a known limitation in #32 and reported in #75/#110 — is gone.
+
+- fix(input): eliminate the iOS native selection artifact
+  - On iOS there is now nothing visible at rest, at any fill state or selection size. During a tap or long-press, at most a ~2px fleck renders under the fingertip while the gesture is active, and iOS's copy/paste menu keeps working.
+  - How: iOS paints the selection highlight in a native layer that ignores `::selection`, CSS `opacity`, and ancestor clipping — but it tracks the rendered text geometry. So the text is parked offscreen (`text-indent: -9999px`) and revealed at the pointer's position only during pointer gestures, because the copy/paste menu can only anchor to an on-screen caret/selection rect. Collapsed `letter-spacing` keeps the revealed artifact the same size whether 1 or 6 chars are selected, and `font-size: 16px` + `transform: scale(0.1)` (with a compensating 10x layout box, so the tap area still exactly matches the container) compresses it to iOS's ~2px minimum painting size without ever dipping below the 16px focus-zoom threshold — no page zoom, no `maximum-scale=1` required from apps.
+  - Drop-in: no API changes and no markup/CSS/viewport changes required. Non-iOS browsers are byte-identical (the `@supports (-webkit-touch-callout: none)` guard is false on Blink/Gecko/desktop WebKit). iPhone Chrome/Firefox/in-app browsers are WebKit and get the fix.
+  - If you patched the artifact yourself (e.g. `font-size: 16px !important`, custom transforms or `text-indent` on `[data-input-otp]`), remove those workarounds — overriding the input's geometry can now interfere with the fix.
+  - Note: on iOS 12 and older (no Pointer Events, ~0.1% share) the artifact is hidden but edit-menu anchoring is unavailable; typing, autofill and keyboard paste are unaffected.
+- chore(input): measure `--root-height` from the container instead of the input (same value in practice; the input's layout box is enlarged 10x on iOS)
+- chore(playground): add manual device-test pages `/ios-probe` (parameterized probe) and `/shadcn` (faithful reproduction of the shadcn/ui input-otp demo), since the iOS code path cannot be exercised by the Playwright suite
+- fix(input): reserve the password manager badge gutter only where it fits
+  - Once a badge was detected, the input grew 40px past the container to push the badge off the last slot — and the only guard was the distance to the viewport's right edge. Inside a constrained scroll container (a card, a modal) that overhang registered as scrollable overflow: a horizontal scrollbar appeared and shifted the whole layout. The space check now measures the nearest ancestor that constrains horizontal overflow (scroll containers, `overflow: hidden`/`clip` ancestors, the container itself, and the real viewport width) and skips the push when the gutter doesn't fit; the badge then stays over the last slot, exactly as with `pushPasswordManagerStrategy="none"`. Nothing is ever clipped, so extensions keep rendering their badges.
+- fix(input): disable spellcheck by default
+  - Browsers would mark a filled code as a spelling error and underline it. `spellCheck` now defaults to `false`; passing your own `spellCheck` prop still overrides it.
+- fix(input): feature-detect ResizeObserver before observing
+  - Browsers without `ResizeObserver` (e.g. iOS Safari <13.4) crashed on mount. When the observer is unavailable, the root height is now simply measured once on mount.
+- fix(input): fall back to 16px font-size until `--root-height` resolves
+  - Before the variable is set, the invisible input inherited its font-size — and when that inherited size was under 16px, iOS Safari zoomed the whole page on focus or back-navigation.
+- fix(input): clear pending sync timeouts on unmount
+  - The autofill/selection sync timeouts could fire after unmount, causing state updates on an unmounted component — noisy `act()` warnings and flaky CI test runs.
+- feat(input): add `nonce` prop
+  - Applied to the `<style>` tag the library injects, so a `style-src` Content-Security-Policy that requires nonces no longer blocks it.
+- fix(input): use the guarded input reference inside the selectionchange listener
+  - Fixes a `null is not an object (evaluating 'setSelectionRange')` crash when the listener fired while the ref was already null.
+- fix(input): opt the container out of browser translation
+  - Chrome's translator rewrote the slots' text nodes (wrapping them in `<font>` elements), crashing React on the next re-render — easiest to hit with alphanumeric codes under an active page translation. The container now carries `translate="no"`; a one-time code is never meaningful to translate.
+- fix(input): log CSS rule insertion failures as warnings, not errors
+  - Some environments reject individual cosmetic selectors (`:autofill` in older Android WebViews, for instance). Nothing breaks when that happens, but the `console.error` was captured by Sentry and similar tools as if the application had failed. Same message, warning level.
+- chore(types): narrow `onComplete` to `(value: string) => unknown`
+  - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
+
+Beta while the iOS fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
+
 ## [1.4.2]
 
 - chore(input): remove unintentional log within internal pasteListener

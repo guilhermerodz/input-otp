@@ -1,0 +1,80 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "website",
+      "url": "http://localhost:3040",
+      "port": 3040
+    },
+    {
+      "name": "website-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3041"
+      ],
+      "port": 3041
+    },
+    {
+      "name": "website-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/landing-nits/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3042"
+      ],
+      "port": 3042
+    },
+    {
+      "name": "website-landing-updates",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/input-otp-landing-updates-e09c56/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3061"
+      ],
+      "port": 3061
+    },
+    {
+      "name": "beta-merge-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/input-otp-beta-merge-5a2a5b/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3063"
+      ],
+      "port": 3063
+    },
+    {
+      "name": "docs-worktree",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/docs-revamp/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3057"
+      ],
+      "port": 3057
+    }
+  ]
+}

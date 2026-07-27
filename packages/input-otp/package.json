@@ -38,19 +38,18 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "copy-readme": "cp ../../README.md ./README.md",
-    "build": "run-s build:* copy-readme",
+    "copy-license": "cp ../../LICENSE ./LICENSE",
+    "build": "run-s build:* copy-readme copy-license",
     "build:tsup": "tsup --dts --minify",
     "clean": "rimraf dist",
     "dev": "tsup --watch --dts",
     "lint": "run-p lint:*",
-    "lint:eslint": "eslint src --ext .ts",
-    "lint:eslint:fix": "eslint src --ext .ts --fix",
-    "lint:format": "prettier --check \"src/**/*.ts\"",
-    "lint:format:fix": "prettier --check \"src/**/*.ts\" --write",
+    "lint:eslint": "eslint src --ext .ts,.tsx",
+    "lint:eslint:fix": "eslint src --ext .ts,.tsx --fix",
+    "lint:format": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint:format:fix": "prettier --check \"src/**/*.{ts,tsx}\" --write",
     "lint:tsc": "tsc --project tsconfig.json --noEmit",
-    "format": "prettier --write .",
-    "release": "npm publish",
-    "release:beta": "npm publish --tag beta"
+    "format": "prettier --write ."
   },
   "eslintConfig": {
     "root": true,
@@ -111,6 +110,7 @@
   "devDependencies": {
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "eslint": "^8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typescript": "^5.3.3"

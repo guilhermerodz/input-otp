@@ -1,0 +1,479 @@
+import { ExternalLink } from 'lucide-react'
+
+import { RevealRoot } from './_reveal/reveal-root'
+
+import { ClerkParticles } from './_components/clerk-particles'
+import { CtaDaybreak } from './_components/cta-daybreak'
+import { FeatureBento } from './_components/feature-bento'
+import { GetStartedButton } from './_components/get-started-button'
+import { SponsorBorderBeam } from './_components/sponsor-border-beam'
+import { SponsorTiltGrid } from './_components/sponsor-tilt-grid'
+import { StoryIso } from './_components/story-iso'
+import { CopyCommand } from './_components/copy-command'
+import { FooterSignature } from './_components/footer-signature'
+import { HeroField } from './_components/hero-field'
+import { HeroOtp } from './_components/hero-otp'
+import { ScrollLink } from './_components/scroll-link'
+import { Preloader } from './_components/preloader'
+import { SpottedMarquee } from './_components/spotted-marquee'
+import { StatsOdometer } from './_components/stats-odometer'
+import { UsedByMarquee } from './_components/used-by-marquee'
+import { milestoneLabel, type DownloadStats } from './_data/npm-downloads'
+
+const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
+const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
+/* The docs live in this same app, under the (docs) route group. They have their
+   own root layout, so these stay plain anchors: a Link across root layouts is a
+   full document load anyway. */
+const DOCS_URL = '/docs'
+const DOCS_INSTALL_URL = '/docs/installation'
+const X_URL = 'https://x.com/guilherme_rodz'
+const CLERK_URL = 'https://go.clerk.com/input-otp'
+const RESEND_URL = 'https://go.resend.com/input-otp'
+const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
+
+const SILVER_SPONSORS = [
+  {
+    src: '/sponsors/resend-wordmark-white-trimmed.svg',
+    alt: 'Resend',
+    href: RESEND_URL,
+    logoHeight: 23,
+    beamDuration: 3.17,
+  },
+  {
+    src: '/sponsors/evomi-wordmark-white-trimmed.svg',
+    alt: 'Evomi',
+    href: EVOMI_URL,
+    logoHeight: 27,
+    beamDuration: 3.73,
+  },
+] as const
+
+const border = '1px solid #1c1c1f'
+const card = {
+  border: '1px solid #1f1f23',
+  background: '#0c0c0e',
+  borderRadius: 14,
+} as const
+
+/* Docs-style permalink: hidden until the heading is hovered. This is the one
+   kind of link that puts the hash in the URL — in-page navigation glides via
+   ScrollLink and leaves the address bar alone. */
+function HeadingAnchor({ id }: { id: string }) {
+  return (
+    <a href={`#${id}`} className="xp-anchor" aria-label="Link to this section">
+      #
+    </a>
+  )
+}
+
+function Logo() {
+  const cap = {
+    width: 22,
+    height: 27,
+    display: 'grid',
+    placeItems: 'center',
+    fontSize: 12,
+    fontWeight: 600,
+    color: '#fafafa',
+    border: '1px solid #3f3f46',
+  } as const
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex' }} className="xp-mono">
+        <div style={{ ...cap, borderRadius: '7px 0 0 7px' }}>o</div>
+        <div style={{ ...cap, borderLeft: 'none' }}>t</div>
+        <div
+          style={{ ...cap, borderLeft: 'none', borderRadius: '0 7px 7px 0' }}
+        >
+          p
+        </div>
+      </div>
+      <span style={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em' }}>
+        input-otp
+      </span>
+    </div>
+  )
+}
+
+export function ExperimentView({
+  starCount,
+  downloads,
+}: {
+  starCount: string | null
+  downloads: DownloadStats
+}) {
+  return (
+    <RevealRoot>
+    <div className="xp">
+      <Preloader milestone={milestoneLabel(downloads.total)} />
+
+      {/* Nav */}
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '18px 40px',
+          borderBottom: border,
+        }}
+        data-rv-group="hero"
+      >
+        <div data-rv="eyebrow">
+          {/* Clickable like the docs wordmark: home is home, even from home. */}
+          <a href="/" style={{ display: 'inline-flex' }}>
+            <Logo />
+          </a>
+        </div>
+        <nav
+          className="xp-nav-links"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 24,
+            fontSize: 14,
+            color: '#a1a1aa',
+          }}
+        >
+          <a data-rv="chrome" href={DOCS_URL}>
+            Docs
+          </a>
+          <ScrollLink data-rv="chrome" toId="how">
+            How I Built It
+          </ScrollLink>
+          <a data-rv="chrome" href="#sponsors">
+            Sponsors
+          </a>
+          <a
+            data-rv="chrome"
+            href={GITHUB_URL}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              border: '1px solid #27272a',
+              borderRadius: 999,
+              padding: '7px 14px',
+              color: '#fafafa',
+              fontSize: 13,
+            }}
+          >
+            ★ {starCount ?? '3.2k'}
+          </a>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <section
+        className="xp-hero"
+        style={{ textAlign: 'center', padding: '84px 40px 56px' }}
+        data-rv-group="hero"
+      >
+        <HeroField />
+        <div className="xp-hero-copy">
+          <h1
+            className="xp-hero-title"
+            data-rv="title"
+            style={{
+              margin: 0,
+              fontSize: 56,
+              fontWeight: 700,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+              maxWidth: 740,
+              textWrap: 'balance',
+            }}
+          >
+            Stop wasting time building OTP inputs.
+          </h1>
+          <p
+            data-rv="lede"
+            style={{
+              margin: '20px 0 0',
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: '#a1a1aa',
+              maxWidth: 540,
+            }}
+          >
+            One-time passcode input for React. Unstyled, accessible, and
+            copy-paste friendly out of the box.
+          </p>
+
+          <div data-rv="card">
+            <HeroOtp />
+          </div>
+
+          <div
+            data-rv="action"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginTop: 26,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            <GetStartedButton href={DOCS_INSTALL_URL} />
+            <CopyCommand />
+          </div>
+
+          {/* No chrome around this one: it is a footnote to the hero, and the
+              wordmark is the only thing that needs to carry weight. */}
+          {/* Inline flow rather than a flex row: on a phone the sentence wraps,
+              and the wordmark has to travel with the words it belongs to
+              instead of being pushed to the end of the line. */}
+          <a
+            data-rv="chrome"
+            href={CLERK_URL}
+            style={{
+              display: 'block',
+              /* Wide enough for one line where there is room; the phone falls
+                 back to two, breaking before "Get started with". */
+              maxWidth: 430,
+              marginTop: 22,
+              fontSize: 13,
+              lineHeight: 1.7,
+              color: '#a1a1aa',
+              textAlign: 'center',
+              textWrap: 'balance',
+            }}
+          >
+            Looking for an authentication solution?{' '}
+            <span
+              style={{
+                color: '#fafafa',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Get started with{' '}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                alt="Clerk"
+                style={{
+                  height: 15,
+                  width: 'auto',
+                  display: 'inline-block',
+                  verticalAlign: '-3px',
+                }}
+              />
+              <span
+                aria-hidden="true"
+                style={{ color: '#52525b', fontSize: 12, marginLeft: 5 }}
+              >
+                ↗
+              </span>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <UsedByMarquee />
+
+      <StatsOdometer downloads={downloads} />
+
+      <SpottedMarquee />
+
+      {/* Sponsors */}
+      <section
+        id="sponsors"
+        style={{ padding: '56px 40px', borderTop: border }}
+        data-rv-group
+      >
+        {/* Same path-as-heading device as ~/features: the logos below say
+            "sponsors" better than a sentence about them would. */}
+        <h2
+          data-rv="title"
+          className="xp-anchor-heading"
+          style={{
+            /* The grid brings its own 28px of top margin. */
+            margin: 0,
+            fontFamily: 'var(--font-jetbrains), ui-monospace, Menlo, monospace',
+            fontSize: 22,
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          <span style={{ color: '#52525b' }}>~/</span>sponsors
+          <HeadingAnchor id="sponsors" />
+        </h2>
+
+        <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
+          <SponsorBorderBeam tier="diamond" duration={4.1} revealRole="card">
+            <a
+              href={CLERK_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="xp-sponsor-card xp-sponsor-card--diamond"
+              style={{
+                border: '1px solid #29292f',
+                background: '#0c0c0e',
+                borderRadius: 14,
+                padding: 40,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              <ClerkParticles
+                src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                alt="Clerk"
+                height={44}
+              />
+              <span className="xp-sponsor-tier-label">
+                <span>DIAMOND SPONSOR</span>
+                <ExternalLink size={9} strokeWidth={1.75} aria-hidden="true" />
+              </span>
+            </a>
+          </SponsorBorderBeam>
+          <a
+            href={GITHUB_SPONSORS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="xp-sponsor-cta xp-sponsor-cta--filler"
+            data-rv="card"
+            aria-label="Become a sponsor"
+          >
+            <span className="xp-sponsor-cta-plus" aria-hidden="true">
+              +
+            </span>
+            <span className="xp-sponsor-cta-label" aria-hidden="true">
+              <span>Become a sponsor</span>
+              <ExternalLink size={12} strokeWidth={1.75} />
+            </span>
+          </a>
+          {SILVER_SPONSORS.map(
+            ({ src, alt, href, logoHeight, beamDuration }) => (
+              <SponsorBorderBeam
+                key={alt}
+                tier="silver"
+                duration={beamDuration}
+                revealRole="card"
+              >
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="xp-sponsor-card xp-sponsor-card--silver"
+                  style={{
+                    border: '1px solid #1f1f23',
+                    borderRadius: 14,
+                    padding: 30,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={alt}
+                    style={{ height: logoHeight, width: 'auto', opacity: 0.85 }}
+                  />
+                  <span className="xp-sponsor-tier-label">
+                    <span>SILVER SPONSOR</span>
+                    <ExternalLink
+                      size={9}
+                      strokeWidth={1.75}
+                      aria-hidden="true"
+                    />
+                  </span>
+                </a>
+              </SponsorBorderBeam>
+            ),
+          )}
+          <a
+            href={GITHUB_SPONSORS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="xp-sponsor-cta"
+            data-rv="card"
+            aria-label="Become a sponsor"
+          >
+            <span className="xp-sponsor-cta-plus" aria-hidden="true">
+              +
+            </span>
+            <span className="xp-sponsor-cta-label" aria-hidden="true">
+              <span>Become a sponsor</span>
+              <ExternalLink size={12} strokeWidth={1.75} />
+            </span>
+          </a>
+        </SponsorTiltGrid>
+      </section>
+
+      <FeatureBento />
+
+      {/* How I built it */}
+      <section id="how" style={{ padding: '56px 0 0', borderTop: border }}>
+        <div style={{ padding: '0 40px' }} data-rv-group>
+          <h2
+            data-rv="title"
+            className="xp-anchor-heading"
+            style={{
+              margin: 0,
+              fontSize: 28,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            How I built it
+            <HeadingAnchor id="how" />
+          </h2>
+          <div data-rv="lede" style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
+            One real input, wearing your design — the slots you see just mirror
+            its state. Keep scrolling<span style={{ color: '#3f3f46' }}>_</span>
+          </div>
+        </div>
+        <StoryIso />
+      </section>
+
+      <CtaDaybreak starCount={starCount} />
+
+      {/* Footer */}
+      <footer
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '24px 40px',
+          borderTop: border,
+          fontSize: 13,
+          color: '#71717a',
+          flexWrap: 'wrap',
+          gap: 12,
+        }}
+        data-rv-group
+      >
+        {/* The signature is a second door to X, same as the logo across
+            the footer. */}
+        <a data-rv="chrome" href={X_URL} aria-label="Guilherme Rodz on X">
+          <FooterSignature />
+        </a>
+        <a
+          data-rv="chrome"
+          className="xp-footer-x"
+          href={X_URL}
+          aria-label="Guilherme Rodz on X"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644Z" />
+          </svg>
+        </a>
+      </footer>
+    </div>
+    </RevealRoot>
+  )
+}

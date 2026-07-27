@@ -1,0 +1,114 @@
+name: Release
+
+# Publishing is triggered by a tag, never by a merge. Cut one with
+# `pnpm release:beta` / `pnpm release:minor` — see scripts/release.mjs.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish, e.g. v1.5.0-beta.1'
+        required: true
+
+permissions:
+  contents: write # create the GitHub release
+  id-token: write # provenance attestation + npm trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      # npm >= 11.5.1 is what supports trusted publishing (OIDC).
+      - run: npm install -g npm@latest
+
+      - name: Resolve tag, verify it matches package.json, pick dist-tag
+        id: meta
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          PKG_VERSION="$(node -p "require('./packages/input-otp/package.json').version")"
+
+          if [ "$VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag $TAG does not match packages/input-otp/package.json ($PKG_VERSION)"
+            exit 1
+          fi
+
+          # 1.5.0-beta.1 -> beta   |   1.5.0 -> latest
+          case "$VERSION" in
+            *-*) NPM_TAG="${VERSION#*-}"; NPM_TAG="${NPM_TAG%%.*}"; PRERELEASE=true ;;
+            *)   NPM_TAG=latest; PRERELEASE=false ;;
+          esac
+
+          {
+            echo "tag=$TAG"
+            echo "version=$VERSION"
+            echo "npm_tag=$NPM_TAG"
+            echo "prerelease=$PRERELEASE"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Publishing $TAG to npm dist-tag '$NPM_TAG'"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint:lib
+      - run: pnpm type-check
+
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/playground/playwright-report/
+          retention-days: 30
+
+      - run: pnpm build:lib
+
+      # Uses NPM_TOKEN today. To switch to npm trusted publishing: configure
+      # this repo + workflow as a trusted publisher on npmjs.com, then delete
+      # the `env:` block below — OIDC takes over and there is no token to rotate.
+      - name: Publish to npm
+        working-directory: packages/input-otp
+        run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.npm_tag }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          # Pull this version's section out of the hand-written changelog.
+          awk -v v="$VERSION" '
+            $0 ~ "^## *\\[?" v "\\]?" { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ -s release-notes.md ]; then
+            NOTES=(--notes-file release-notes.md)
+          else
+            NOTES=(--generate-notes)
+          fi
+
+          gh release create "$TAG" --title "$TAG" \
+            ${{ steps.meta.outputs.prerelease == 'true' && '--prerelease' || '--latest' }} \
+            "${NOTES[@]}"
