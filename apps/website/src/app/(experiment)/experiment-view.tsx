@@ -451,9 +451,11 @@ export function ExperimentView({
         }}
         data-rv-group
       >
-        <div data-rv="chrome">
+        {/* The signature is a second door to X, same as the logo across
+            the footer. */}
+        <a data-rv="chrome" href={X_URL} aria-label="Guilherme Rodz on X">
           <FooterSignature />
-        </div>
+        </a>
         <a
           data-rv="chrome"
           className="xp-footer-x"

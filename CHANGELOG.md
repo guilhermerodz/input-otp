@@ -14,6 +14,8 @@ The headline: the iOS native selection artifact — the thin, caret-tall line do
   - Note: on iOS 12 and older (no Pointer Events, ~0.1% share) the artifact is hidden but edit-menu anchoring is unavailable; typing, autofill and keyboard paste are unaffected.
 - chore(input): measure `--root-height` from the container instead of the input (same value in practice; the input's layout box is enlarged 10x on iOS)
 - chore(playground): add manual device-test pages `/ios-probe` (parameterized probe) and `/shadcn` (faithful reproduction of the shadcn/ui input-otp demo), since the iOS code path cannot be exercised by the Playwright suite
+- fix(input): reserve the password manager badge gutter only where it fits
+  - Once a badge was detected, the input grew 40px past the container to push the badge off the last slot — and the only guard was the distance to the viewport's right edge. Inside a constrained scroll container (a card, a modal) that overhang registered as scrollable overflow: a horizontal scrollbar appeared and shifted the whole layout. The space check now measures the nearest ancestor that constrains horizontal overflow (scroll containers, `overflow: hidden`/`clip` ancestors, the container itself, and the real viewport width) and skips the push when the gutter doesn't fit; the badge then stays over the last slot, exactly as with `pushPasswordManagerStrategy="none"`. Nothing is ever clipped, so extensions keep rendering their badges.
 - fix(input): disable spellcheck by default
   - Browsers would mark a filled code as a spelling error and underline it. `spellCheck` now defaults to `false`; passing your own `spellCheck` prop still overrides it.
 - fix(input): feature-detect ResizeObserver before observing

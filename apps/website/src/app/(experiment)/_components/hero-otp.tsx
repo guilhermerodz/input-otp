@@ -572,10 +572,9 @@ export function HeroOtp() {
 
   const steps: React.ReactNode[] = isMobile
     ? [
-        <>long-press the code and tap Select All</>,
+        <>double-tap the code and tap Select All</>,
         <>tap Cut — the whole code lifts out</>,
-        <>long-press and Paste it back</>,
-        <>drag the handles around part of it, then cut or paste just that</>,
+        <>double-tap and Paste it back</>,
       ]
     : [
         <>
@@ -602,7 +601,9 @@ export function HeroOtp() {
       ]
   const cutStep = 1
   const pasteStep = 2
-  const sliceStep = isMobile ? 3 : 4
+  /* Desktop only: the mobile tour ends at the paste — selection handles
+     aren't a thing input-otp supports yet, so there is no slice beat. */
+  const sliceStep = isMobile ? -1 : 4
   const finished = shown >= steps.length
 
   // Selection-driven steps advance when the user actually does the thing.
@@ -770,6 +771,36 @@ export function HeroOtp() {
             pointerEvents: 'none',
           }}
         />
+
+        {/* On phones the step also floats above the input, out of flow: the
+            iOS context menu opens right over the status line below, so the
+            copy has to survive in a second place. aria-hidden — it is a
+            visual echo of the line under the input, not new content. */}
+        {isMobile && mode === 'tutorial' && !finished && (
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 'max-content',
+              maxWidth: '90vw',
+              marginBottom: 14,
+              fontSize: 14,
+              textAlign: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              key={`step-${shown}`}
+              className={`xp-fade-text ${leaving ? 'xp-fade-text--out' : ''}`}
+              style={{ color: '#a1a1aa' }}
+            >
+              {steps[shown]}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Status line: error nudge → success → guided tour, all on fades */}
