@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.5.0-beta.0]
+
+- fix(input): disable spellcheck by default
+  - Browsers would mark a filled code as a spelling error and underline it. `spellCheck` now defaults to `false`; passing your own `spellCheck` prop still overrides it.
+- fix(input): feature-detect ResizeObserver before observing
+  - Browsers without `ResizeObserver` (e.g. iOS Safari <13.4) crashed on mount. When the observer is unavailable, the root height is now simply measured once on mount.
+- fix(input): fall back to 16px font-size until `--root-height` resolves
+  - Before the variable is set, the invisible input inherited its font-size — and when that inherited size was under 16px, iOS Safari zoomed the whole page on focus or back-navigation.
+- fix(input): clear pending sync timeouts on unmount
+  - The autofill/selection sync timeouts could fire after unmount, causing state updates on an unmounted component — noisy `act()` warnings and flaky CI test runs.
+- feat(input): add `nonce` prop
+  - Applied to the `<style>` tag the library injects, so a `style-src` Content-Security-Policy that requires nonces no longer blocks it.
+- fix(input): use the guarded input reference inside the selectionchange listener
+  - Fixes a `null is not an object (evaluating 'setSelectionRange')` crash when the listener fired while the ref was already null.
+- chore(types): narrow `onComplete` to `(value: string) => unknown`
+  - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
+
 ## [1.4.2]
 
 - chore(input): remove unintentional log within internal pasteListener
