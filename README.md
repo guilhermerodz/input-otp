@@ -20,20 +20,26 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <h4 align="center">Diamond Sponsor 💎</h4>
 <p align="center">
 <a href="https://go.clerk.com/input-otp" target="_blank">
-<img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="160" style="aspect-ratio: auto;"/>
+<img alt="Clerk" src="https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg" width="160"/>
 </a>
 </p>
 <p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a></sub></p>
 
 <h4 align="center">Silver Sponsors 🥈</h4>
-<p align="center">
+<table align="center">
+<tr>
+<td align="center">
 <a href="https://go.resend.com/input-otp" target="_blank">
-<img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
+<img alt="Resend" src="https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg" width="130"/>
 </a>
+</td>
+<td align="center">
 <a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
-<img alt="Evomi" src='https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
+<img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="130"/>
 </a>
-</p>
+</td>
+</tr>
+</table>
 <p align="center"><sub><a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
 
 ## Why
