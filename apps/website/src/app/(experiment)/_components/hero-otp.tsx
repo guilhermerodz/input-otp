@@ -7,6 +7,8 @@ import {
   type SlotProps,
 } from 'input-otp'
 
+import { ScrollLink } from './scroll-link'
+
 const CORRECT = '123456'
 
 /* Which physical key each chip in the tour stands for. ⌘ and Ctrl are the
@@ -805,8 +807,8 @@ export function HeroOtp() {
         {mode === 'tutorial' && finished && (
           <div key="fin" className="xp-fade-text" style={{ color: '#a1a1aa' }}>
             that&apos;s input-otp!{' '}
-            <a
-              href="#how"
+            <ScrollLink
+              toId="how"
               style={{
                 color: '#fafafa',
                 textDecoration: 'underline',
@@ -814,7 +816,7 @@ export function HeroOtp() {
               }}
             >
               I want to see how it works
-            </a>
+            </ScrollLink>
           </div>
         )}
       </div>

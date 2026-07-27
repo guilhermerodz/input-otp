@@ -10,8 +10,10 @@ import { SponsorBorderBeam } from './_components/sponsor-border-beam'
 import { SponsorTiltGrid } from './_components/sponsor-tilt-grid'
 import { StoryIso } from './_components/story-iso'
 import { CopyCommand } from './_components/copy-command'
+import { FooterSignature } from './_components/footer-signature'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
+import { ScrollLink } from './_components/scroll-link'
 import { Preloader } from './_components/preloader'
 import { SpottedMarquee } from './_components/spotted-marquee'
 import { StatsOdometer } from './_components/stats-odometer'
@@ -25,7 +27,7 @@ const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
    full document load anyway. */
 const DOCS_URL = '/docs'
 const DOCS_INSTALL_URL = '/docs/installation'
-const DOCS_EXAMPLES_URL = '/docs/examples'
+const X_URL = 'https://x.com/guilherme_rodz'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
 const RESEND_URL = 'https://go.resend.com/input-otp'
 const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
@@ -53,6 +55,17 @@ const card = {
   background: '#0c0c0e',
   borderRadius: 14,
 } as const
+
+/* Docs-style permalink: hidden until the heading is hovered. This is the one
+   kind of link that puts the hash in the URL — in-page navigation glides via
+   ScrollLink and leaves the address bar alone. */
+function HeadingAnchor({ id }: { id: string }) {
+  return (
+    <a href={`#${id}`} className="xp-anchor" aria-label="Link to this section">
+      #
+    </a>
+  )
+}
 
 function Logo() {
   const cap = {
@@ -108,7 +121,10 @@ export function ExperimentView({
         data-rv-group="hero"
       >
         <div data-rv="eyebrow">
-          <Logo />
+          {/* Clickable like the docs wordmark: home is home, even from home. */}
+          <a href="/" style={{ display: 'inline-flex' }}>
+            <Logo />
+          </a>
         </div>
         <nav
           className="xp-nav-links"
@@ -123,9 +139,9 @@ export function ExperimentView({
           <a data-rv="chrome" href={DOCS_URL}>
             Docs
           </a>
-          <a data-rv="chrome" href={DOCS_EXAMPLES_URL}>
-            Examples
-          </a>
+          <ScrollLink data-rv="chrome" toId="how">
+            How I Built It
+          </ScrollLink>
           <a data-rv="chrome" href="#sponsors">
             Sponsors
           </a>
@@ -272,6 +288,7 @@ export function ExperimentView({
             "sponsors" better than a sentence about them would. */}
         <h2
           data-rv="title"
+          className="xp-anchor-heading"
           style={{
             /* The grid brings its own 28px of top margin. */
             margin: 0,
@@ -282,6 +299,7 @@ export function ExperimentView({
           }}
         >
           <span style={{ color: '#52525b' }}>~/</span>sponsors
+          <HeadingAnchor id="sponsors" />
         </h2>
 
         <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
@@ -397,6 +415,7 @@ export function ExperimentView({
         <div style={{ padding: '0 40px' }} data-rv-group>
           <h2
             data-rv="title"
+            className="xp-anchor-heading"
             style={{
               margin: 0,
               fontSize: 28,
@@ -405,6 +424,7 @@ export function ExperimentView({
             }}
           >
             How I built it
+            <HeadingAnchor id="how" />
           </h2>
           <div data-rv="lede" style={{ fontSize: 14, color: '#71717a', marginTop: 6 }}>
             One real input, wearing your design — the slots you see just mirror
@@ -431,18 +451,25 @@ export function ExperimentView({
         }}
         data-rv-group
       >
-        <span data-rv="chrome">MIT © Guilherme Rodz</span>
-        <div style={{ display: 'flex', gap: 20 }}>
-          <a data-rv="chrome" href={DOCS_URL}>
-            Docs
-          </a>
-          <a data-rv="chrome" href={GITHUB_URL}>
-            GitHub
-          </a>
-          <a data-rv="chrome" href="https://twitter.com/guilherme_rodz">
-            Twitter
-          </a>
+        <div data-rv="chrome">
+          <FooterSignature />
         </div>
+        <a
+          data-rv="chrome"
+          className="xp-footer-x"
+          href={X_URL}
+          aria-label="Guilherme Rodz on X"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644Z" />
+          </svg>
+        </a>
       </footer>
     </div>
     </RevealRoot>

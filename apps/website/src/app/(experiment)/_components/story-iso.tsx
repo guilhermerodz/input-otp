@@ -17,6 +17,7 @@ import {
   STAGE_W,
   useStoryScrub,
 } from './story-shared'
+import { smoothScrollToY } from './scroll-link'
 
 /* ------------------------------------------------------------------ *
  * Phase tracking
@@ -830,15 +831,7 @@ export function StoryIso() {
     // hopping to it. The last beat is the exception — its input only goes
     // live, flat and typeable near the end — so that one lands late.
     const p = (i + (i === BEATS - 1 ? 0.92 : 0.5)) / BEATS
-    // 'instant', not 'auto': the page sets scroll-behavior: smooth on <html>,
-    // which 'auto' would defer to — the one case that must not glide.
-    const reduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
-    window.scrollTo({
-      top: window.scrollY + rect.top + p * total,
-      behavior: reduced ? 'instant' : 'smooth',
-    })
+    smoothScrollToY(window.scrollY + rect.top + p * total)
   }, [])
 
   return (
