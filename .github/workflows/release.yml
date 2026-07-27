@@ -30,13 +30,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org
+          # Trusted publishing (OIDC) requires Node >= 22.14. No registry-url:
+          # that would write an .npmrc token reference, and there is no token —
+          # the npm CLI detects the OIDC environment on its own.
+          node-version: 22
           cache: pnpm
 
       # npm >= 11.5.1 is what supports trusted publishing (OIDC). Pinned to
-      # the 11 line: npm 12 refuses to install on the Node 20 this job runs
-      # (EBADENGINE), which is how the v1.5.0-beta.1 publish first failed.
+      # the 11 line so a future npm major can't break this job again the way
+      # npm 12's Node floor did for v1.5.0-beta.1.
       - run: npm install -g npm@11
 
       - name: Resolve tag, verify it matches package.json, pick dist-tag
@@ -83,14 +85,13 @@ jobs:
 
       - run: pnpm build:lib
 
-      # Uses NPM_TOKEN today. To switch to npm trusted publishing: configure
-      # this repo + workflow as a trusted publisher on npmjs.com, then delete
-      # the `env:` block below — OIDC takes over and there is no token to rotate.
+      # npm trusted publishing: this repo + workflow are configured as a
+      # trusted publisher on npmjs.com, so the CLI authenticates via OIDC
+      # (id-token: write above) — no token to store or rotate, and provenance
+      # attestations are generated automatically.
       - name: Publish to npm
         working-directory: packages/input-otp
-        run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.npm_tag }}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --tag "${{ steps.meta.outputs.npm_tag }}"
 
       - name: Create GitHub release
         env:
