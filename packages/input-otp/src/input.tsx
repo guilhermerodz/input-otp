@@ -311,14 +311,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
         const input = inputRef.current
-        if (!pasteTransformer && (!initialLoadRef.current.isIOS || !e.clipboardData || !input)) {
+        if (
+          !pasteTransformer &&
+          (!initialLoadRef.current.isIOS || !e.clipboardData || !input)
+        ) {
           return
         }
-        
+
         const _content = e.clipboardData.getData('text/plain')
-        const content = pasteTransformer
-          ? pasteTransformer(_content)
-          : _content
+        const content = pasteTransformer ? pasteTransformer(_content) : _content
         e.preventDefault()
 
         const start = inputRef.current?.selectionStart
@@ -345,7 +346,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionStart(_start)
         setMirrorSelectionEnd(_end)
       },
-      [maxLength, onChange, regexp, value],
+      [maxLength, onChange, pasteTransformer, regexp, value],
     )
 
     /** Styles */
@@ -454,6 +455,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         maxLength,
         mirrorSelectionEnd,
         mirrorSelectionStart,
+        placeholder,
         props,
         regexp?.source,
         value,
@@ -472,7 +474,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               (slotIdx >= mirrorSelectionStart && slotIdx < mirrorSelectionEnd))
 
           const char = value[slotIdx] !== undefined ? value[slotIdx] : null
-          const placeholderChar = value[0] !== undefined ? null : placeholder?.[slotIdx] ?? null
+          const placeholderChar =
+            value[0] !== undefined ? null : placeholder?.[slotIdx] ?? null
 
           return {
             char,
@@ -490,6 +493,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       maxLength,
       mirrorSelectionEnd,
       mirrorSelectionStart,
+      placeholder,
       props.disabled,
       value,
     ])
