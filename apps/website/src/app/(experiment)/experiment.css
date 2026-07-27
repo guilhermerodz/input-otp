@@ -2050,3 +2050,53 @@ html {
     width: 100%;
   }
 }
+
+/* Heading anchors ---------------------------------------------------------- */
+
+/* Same device as the docs headings: a quiet # that shows itself on hover.
+   These are the only links that write the hash into the URL — the nav and
+   hero glide to the section without touching the address bar. */
+.xp-anchor {
+  margin-left: 12px;
+  font-weight: 500;
+  color: #52525b;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.xp-anchor-heading:hover .xp-anchor,
+.xp-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* Scoped through .xp so it wins over the page-wide `.xp a:hover`. */
+.xp .xp-anchor:hover {
+  opacity: 1;
+  color: #a1a1aa;
+}
+
+/* Footer ------------------------------------------------------------------- */
+
+/* The wrapper owns the box: before /rodz-signature.js upgrades it, the custom
+   element is an inline unknown with zero height, and the footer would collapse
+   then jump. The aspect ratio matches the component's 960x380 viewBox. */
+.xp-signature {
+  width: 180px;
+}
+
+.xp-signature rodz-signature {
+  display: block;
+  aspect-ratio: 960 / 380;
+}
+
+.xp-footer-x {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  color: #a1a1aa;
+}
+
+.xp .xp-footer-x:hover {
+  opacity: 1;
+  color: #fafafa;
+}

@@ -35,6 +35,20 @@
       "port": 3042
     },
     {
+      "name": "website-landing-updates",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "-C",
+        "/Users/rodz/www/rodz/input-otp/.claude/worktrees/input-otp-landing-updates-e09c56/apps/website",
+        "exec",
+        "next",
+        "dev",
+        "--port",
+        "3061"
+      ],
+      "port": 3061
+    },
+    {
       "name": "docs-worktree",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
