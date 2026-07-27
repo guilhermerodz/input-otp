@@ -873,11 +873,12 @@ export default function EdgeCasesPage() {
         </p>
         <p>
           <strong className="font-medium text-foreground">
-            The space check is viewport-relative.
+            A tight container skips the push.
           </strong>{' '}
-          It measures the distance to the edge of the window, not to the edge of
-          a scroll container. A field inside a narrow overflow container can
-          reserve space it doesn&apos;t have.
+          The space check walks up to the nearest ancestor that constrains
+          horizontal overflow, and the gutter is only reserved when the full
+          40px fit. When they don&apos;t, the badge stays over the last slot —
+          the same rendering as <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
         </p>
         <p>
           <strong className="font-medium text-foreground">

@@ -61,9 +61,12 @@ setTimeout(trackPWMBadge, 2000)
 setTimeout(trackPWMBadge, 5000)
 setTimeout(() => setDone(true), 6000)   // latch: stop looking`
 
-const SPACE_CHECK = `// Re-checked every second: is there even room to the right of the field?
-const distanceToRightEdge = window.innerWidth - container.getBoundingClientRect().right
-setHasPWMBadgeSpace(distanceToRightEdge >= 40)`
+const SPACE_CHECK = `// Re-checked every second, and once more synchronously before committing:
+// does the 40px gutter fit inside the nearest box that constrains
+// horizontal overflow? (any overflow-x other than visible — a scroll
+// container, an overflow-hidden card, the container itself — with the
+// viewport's clientWidth as the fallback)
+setHasPWMBadgeSpace(availableBadgeSpace(container) >= 40)`
 
 export default function PasswordManagersPage() {
   return (
@@ -191,16 +194,20 @@ export default function PasswordManagersPage() {
 
       <H3>Is there even room?</H3>
       <P>
-        Reserving space to the right is pointless if the field is already
-        against the edge of the viewport — the badge will be clamped inside
-        regardless. So the available space is measured, and re-measured once a
-        second:
+        Reserving space to the right is pointless if it doesn&apos;t fit.
+        Against the edge of the viewport the badge would be clamped inside
+        regardless; inside a scroll container the overhang becomes scrollable
+        overflow — a horizontal scrollbar that shifts the layout — and some
+        extensions refuse to render a badge whose anchor sits in a clipped
+        region. So the free space up to the nearest overflow-constraining
+        ancestor is measured, and re-measured once a second:
       </P>
       <CodeBlock code={SPACE_CHECK} lang="ts" />
       <P>
-        Both conditions have to hold: a badge was detected <em>and</em> there
-        are at least 40px to the right. Otherwise the width stays at <C>100%</C>
-        .
+        Both conditions have to hold: a badge was detected <em>and</em> the
+        full 40px gutter fits. Otherwise the width stays at <C>100%</C> and the
+        badge simply stays over the last slot — the same rendering as{' '}
+        <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
       </P>
 
       <H2>Opting out</H2>
