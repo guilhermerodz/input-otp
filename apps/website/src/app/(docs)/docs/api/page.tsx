@@ -454,9 +454,10 @@ export default function ApiPage() {
       <H2 id="ref">Ref</H2>
       <P>
         <C>ref</C> is forwarded to the real <C>&lt;input&gt;</C> — not to the
-        container. So <C>inputRef.current.focus()</C>, <C>.select()</C>,{' '}
-        <C>.setSelectionRange()</C> and <C>react-hook-form</C>&apos;s{' '}
-        <C>register()</C> all behave normally.
+        container. So <C>inputRef.current.focus()</C>, <C>.select()</C> and{' '}
+        <C>.setSelectionRange()</C> all behave normally, and{' '}
+        <C>react-hook-form</C> reaches the real input — see{' '}
+        <A href="/docs/forms">Forms</A> for the <C>register</C> typing caveat.
       </P>
 
       <H2 id="noscript">Default no-JS stylesheet</H2>
