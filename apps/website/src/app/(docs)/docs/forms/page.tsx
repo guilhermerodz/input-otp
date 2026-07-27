@@ -37,10 +37,16 @@ const FOCUS_BUTTON = `<OTPInput
 const RHF_REGISTER = `import { useForm } from 'react-hook-form'
 
 const { register, handleSubmit } = useForm<{ code: string }>()
+const field = register('code', { minLength: 6, required: true })
 
 <form onSubmit={handleSubmit(onValid)}>
-  {/* ref is forwarded to the real input, so register() just works */}
-  <OTPInput {...register('code', { minLength: 6, required: true })} maxLength={6} />
+  <OTPInput
+    {...field}
+    maxLength={6}
+    // register() types onChange for events, but input-otp hands it a
+    // string — wrap the string in the event shape react-hook-form reads
+    onChange={value => field.onChange({ target: { name: 'code', value } })}
+  />
 </form>`
 
 const RHF_CONTROLLER = `import { Controller, useForm } from 'react-hook-form'
@@ -204,16 +210,20 @@ export default function FormsPage() {
 
       <H2>react-hook-form</H2>
       <P>
-        <C>ref</C> is forwarded to the input itself, so <C>register</C> works
-        with no adapter:
-      </P>
-      <CodeBlock code={RHF_REGISTER} />
-      <P>
-        Use <C>Controller</C> when you need the value inside the render — to
-        drive a submit button&apos;s disabled state, or because you want{' '}
-        <C>onComplete</C> to call <C>handleSubmit</C>:
+        <C>Controller</C> is the path of least resistance — its{' '}
+        <C>field</C> hands you <C>value</C> and an <C>onChange</C> that accepts
+        exactly the string input-otp emits, so the spread type-checks as-is:
       </P>
       <CodeBlock code={RHF_CONTROLLER} />
+      <P>
+        <C>register</C> reaches the real input too (<C>ref</C> is forwarded),
+        but its TypeScript types say <C>onChange</C> takes an event while
+        input-otp calls it with a string. react-hook-form unwraps plain values
+        at runtime, so only the compiler objects — spread <C>register</C>{' '}
+        as-is and strict TypeScript rejects the <C>onChange</C> collision. A
+        one-line adapter satisfies it:
+      </P>
+      <CodeBlock code={RHF_REGISTER} />
 
       <H2>Labelling</H2>
       <P>
