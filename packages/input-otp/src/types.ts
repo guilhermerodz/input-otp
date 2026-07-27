@@ -20,7 +20,7 @@ type OTPInputBaseProps = OverrideProps<
 
     textAlign?: 'left' | 'center' | 'right'
 
-    onComplete?: (...args: any[]) => unknown
+    onComplete?: (value: string) => unknown
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
     pasteTransformer?: (pasted: string) => string
 
