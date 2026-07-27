@@ -2075,6 +2075,16 @@ html {
   color: #a1a1aa;
 }
 
+/* The eased scroll (scroll-link.tsx) hands focus to the section it lands on
+   so tabbing continues from there. The UA paints that focus as its stock
+   thick blue ring around the whole section — swap it for a hairline in the
+   page's greys. Scoped to [tabindex] so it only ever touches sections the
+   scroll handoff has focused. */
+.xp section[tabindex]:focus {
+  outline: 1px solid #3f3f46;
+  outline-offset: -1px;
+}
+
 /* Footer ------------------------------------------------------------------- */
 
 /* The wrapper owns the box: before /rodz-signature.js upgrades it, the custom
