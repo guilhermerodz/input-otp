@@ -34,8 +34,10 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
-      # npm >= 11.5.1 is what supports trusted publishing (OIDC).
-      - run: npm install -g npm@latest
+      # npm >= 11.5.1 is what supports trusted publishing (OIDC). Pinned to
+      # the 11 line: npm 12 refuses to install on the Node 20 this job runs
+      # (EBADENGINE), which is how the v1.5.0-beta.1 publish first failed.
+      - run: npm install -g npm@11
 
       - name: Resolve tag, verify it matches package.json, pick dist-tag
         id: meta
