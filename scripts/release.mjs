@@ -91,10 +91,15 @@ const versionArgs = [
   '--workspaces=false',
   ...(preid ? ['--preid', preid] : []),
 ]
+const revert = () =>
+  run('git', ['checkout', '--', 'packages/input-otp/package.json'])
+
 let version
 try {
   version = run('npm', versionArgs, { cwd: PKG_DIR }).replace(/^v/, '')
 } catch (err) {
+  // npm may have written the bump before failing — leave the tree clean.
+  revert()
   die(
     `npm could not apply the bump "${bump}":\n    ` +
       String(err.stderr || err.message)
@@ -104,8 +109,6 @@ try {
   )
 }
 const tag = `v${version}`
-const revert = () =>
-  run('git', ['checkout', '--', 'packages/input-otp/package.json'])
 
 const existingTags = run('git', ['tag', '--list', tag])
 if (existingTags) {
