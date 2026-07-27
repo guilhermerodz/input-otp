@@ -25,7 +25,10 @@ test.describe('Base tests - Typing', () => {
   test('should prevent typing greater than max length', async ({ page }) => {
     const input = page.getByRole('textbox')
 
-    await input.pressSequentially('1234567')
+    await input.pressSequentially('123456')
+    await expect(input).toHaveValue('123456')
+
+    await input.pressSequentially('7')
     await expect(input).toHaveValue('123457')
   })
 })

@@ -22,10 +22,13 @@
     "type-check": "turbo run type-check",
     "lint:lib": "turbo run lint --filter=input-otp",
     "format": "prettier --write .",
-    "release": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release && rimraf ./README.md && cd ../..",
-    "release:bypass": "run-s build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release && rimraf ./README.md && cd ../..",
-    "release:beta": "run-s test build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../..",
-    "release:beta:bypass": "run-s build:lib && cd ./packages/input-otp && cp ../../README.md . && pnpm release:beta && rimraf ./README.md && cd ../.."
+    "ship:site": "git push origin master:production",
+    "release:beta:first": "node scripts/release.mjs preminor --preid beta",
+    "release:beta": "node scripts/release.mjs prerelease --preid beta",
+    "release:patch": "node scripts/release.mjs patch",
+    "release:minor": "node scripts/release.mjs minor",
+    "release:major": "node scripts/release.mjs major",
+    "release:dry": "node scripts/release.mjs prerelease --preid beta --dry-run"
   },
   "prettier": {
     "tabWidth": 2,

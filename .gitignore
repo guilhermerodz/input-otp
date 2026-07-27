@@ -19,6 +19,9 @@ out/
 build
 next-env.d.ts
 
+# vercel
+.vercel
+
 # misc
 .DS_Store
 *.pem
@@ -44,3 +47,4 @@ yarn-error.log*
 # post-build
 packages/input-otp/README.md
 .env*
+packages/input-otp/LICENSE
