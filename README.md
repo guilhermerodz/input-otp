@@ -17,11 +17,15 @@ The accessible, unstyled, fully featured one-time-password component for React.
 
 <br />
 
-<h4 align="center">Hero Sponsors 🎖️</h4>
+<h4 align="center">Diamond Sponsor 💎</h4>
 <p align="center">
 <a href="https://go.clerk.com/input-otp" target="_blank">
-<img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
+<img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="160" style="aspect-ratio: auto;"/>
 </a>
+</p>
+
+<h4 align="center">Silver Sponsors 🥈</h4>
+<p align="center">
 <a href="https://go.resend.com/input-otp" target="_blank">
 <img alt="Resend" src='https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
 </a>
@@ -211,7 +215,11 @@ autofill and password manager badges **cannot** be covered headlessly — see
 
 ## Sponsors
 
+**Diamond**
+
 > [Clerk](https://go.clerk.com/input-otp) is the easiest way to add authentication to your application.
+
+**Silver**
 
 > [Resend](https://go.resend.com/input-otp) is email for developers.
 
