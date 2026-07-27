@@ -9,15 +9,13 @@ import { CopyButton } from './copy-button'
 export async function Code({
   code,
   toCopy,
-  dark = true,
 }: {
   code: string
   toCopy?: string
-  dark?: boolean
 }) {
-  const highlightedCode = await highlightCode(code, dark)
+  const highlightedCode = await highlightCode(code)
   return (
-    <div className={`relative code-example-${dark ? 'dark' : 'light'}`}>
+    <div className="relative">
       <pre
         dangerouslySetInnerHTML={{
           __html: highlightedCode,
@@ -33,13 +31,13 @@ export async function Code({
   )
 }
 
-async function highlightCode(code: string, dark: boolean) {
+async function highlightCode(code: string) {
   const file = await unified()
     .use(remarkParse)
     .use(remarkRehype)
     .use(rehypePrettyCode, {
       keepBackground: false,
-      theme: dark ? 'vesper' : 'github-light',
+      theme: 'vesper',
     })
     .use(rehypeStringify)
     .process(code)

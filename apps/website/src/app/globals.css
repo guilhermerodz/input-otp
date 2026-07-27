@@ -4,29 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 72.22% 50.59%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5% 64.9%;
     --radius: 0.5rem;
-  }
-
-  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -63,13 +41,142 @@
 }
 
 @layer utilities {
+  /* Fine dot grid — the "graph paper" the OTP world sits on. */
+  .bg-dot-grid {
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--foreground) / 0.09) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+
+  /* Tactile key cell — the atomic unit of the page. */
+  .keycap {
+    border: 1px solid hsl(var(--border));
+    background: linear-gradient(to bottom, hsl(240 5% 9%), hsl(240 6% 5.5%));
+    box-shadow:
+      0 2px 6px -2px rgb(0 0 0 / 0.6),
+      inset 0 1px 0 hsl(0 0% 100% / 0.07);
+  }
+}
+
+/* Hero atmosphere: a soft spotlight that leans in when the input is focused. */
+.hero-spotlight {
+  background: radial-gradient(
+    ellipse 62% 52% at 50% 12%,
+    hsl(0 0% 100% / 0.09),
+    transparent 68%
+  );
+  opacity: 0.55;
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-scene:has(input:focus) .hero-spotlight {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-spotlight {
+    transition: none;
+  }
+}
+
+/* ————— "How it's built" scroll story ————— */
+/* The --paint, --ghost, --boom and per-index --s/--f/--a values are written
+   once per scroll frame by anatomy.tsx; these rules just consume them. */
+.anatomy-paint {
+  opacity: var(--paint, 1);
+}
+.anatomy-ants {
+  stroke-dasharray: 7 7;
+}
+.anatomy-slot {
+  opacity: var(--st, 0);
+  transform: translateY(calc((1 - var(--st, 0)) * 12px));
+}
+.anatomy-slot-char {
+  opacity: var(--boom, 0);
+}
+.anatomy-flyer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: calc(1 - var(--boom, 0));
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--home) + var(--ft, 0) * var(--dx)));
+  will-change: transform;
+}
+.anatomy-attr {
+  opacity: var(--at, 0);
+  transform: translateY(calc((1 - var(--at, 0)) * 8px));
+}
+.anatomy-note {
+  opacity: min(calc(var(--sg, 0) * 5), calc((1 - var(--sg, 0)) * 5), 1);
+}
+/* The first note is visible on entry instead of fading in. */
+.anatomy-note-first {
+  opacity: min(calc((1 - var(--sg, 0)) * 5), 1);
+}
+/* Scrub-driven line drawing: paths carry pathLength=1. */
+.anatomy-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - min(calc(var(--sg, 0) * 2.5), 1));
+}
+/* Arrow heads wait for the body (done at --sg 0.4), then draw into the tip. */
+.anatomy-draw-head {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - clamp(0, calc(var(--sg, 0) * 5 - 2), 1));
+}
+/* Step bar: horizontal stepper. Labels grow/collapse straight from the
+   scroll position: expand over the first ~12% of the phase, collapse over
+   the last ~12%. Text is left-anchored, so growth reads left-to-right and
+   collapse right-to-left. */
+.anatomy5-item .keycap {
+  margin-top: 0;
+}
+.anatomy5-label {
+  overflow: hidden;
+  --t: min(calc(var(--sg, 0) * 8), 1, calc((1 - var(--sg, 0)) * 8));
+  max-width: calc(var(--t) * 240px);
+  opacity: var(--t);
+}
+/* The first label starts expanded on entry; the last stays expanded. */
+.anatomy5-item[data-first='true'] .anatomy5-label {
+  --t: min(1, calc((1 - var(--sg, 0)) * 8));
+}
+.anatomy5-item[data-last='true'] .anatomy5-label {
+  --t: min(calc(var(--sg, 0) * 8), 1);
+}
+.anatomy-segbar-fill {
+  transform: scaleX(var(--sg, 0));
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .anatomy-ants {
+    animation: anatomy-ants 1.3s linear infinite;
+  }
+  [data-live='true'] .anatomy-slot {
+    animation: anatomy-press 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+}
+@keyframes anatomy-ants {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+@keyframes anatomy-press {
+  0% {
+    transform: none;
+  }
+  35% {
+    transform: translateY(3px) scale(0.97);
+  }
+  100% {
+    transform: none;
+  }
 }
 
 [data-highlighted-chars] {
-  @apply bg-zinc-900 rounded;
-  box-shadow: 2px 2px 0 2px rgba(139, 139, 148, 0.5);
-}
-[data-highlighted-chars] .dark {
   @apply bg-zinc-700/50 rounded;
   box-shadow: 2px 2px 0 2px rgba(139, 139, 148, 0.5);
 }
@@ -83,15 +190,85 @@
   @apply inline-block min-h-4 w-full py-0.5 px-4;
 }
 
-html[class='light'] .code-example-light {
-  display: unset;
+
+/* ---------------------------------------------------------------------------
+   Scrollbars
+
+   The site is dark-only, and `color-scheme: dark` on <html> already earns a
+   dark native scrollbar on every platform. What it does not fix is the shape:
+   on Windows and Linux that bar is a wide opaque channel with a stepper arrow
+   at each end, sitting on a page whose entire visual language is hairline
+   borders and soft greys.
+
+   These rules rebuild it as the macOS overlay bar — a rounded translucent pill
+   in a transparent track, no arrows — and apply only where the browser draws a
+   classic scrollbar to begin with. That gate is the important part: defining
+   ::-webkit-scrollbar opts an element out of overlay scrollbars, so applying
+   this everywhere would hand macOS a permanent gutter it does not have. See
+   SCROLLBAR_PROBE in lib/scrollbars.ts for the detection.
+--------------------------------------------------------------------------- */
+
+/* Reserve the gutter up front so a page that toggles overflow does not shift
+   sideways when the bar returns — the landing intro locks scrolling while the
+   curtain is up. A no-op wherever scrollbars are overlays, so macOS is
+   untouched. */
+html {
+  scrollbar-gutter: stable;
 }
-html[class='light'] .code-example-dark {
+
+/* Firefox only. Chrome 121+ honours these standard properties *instead of* the
+   ::-webkit rules below when both are present, and its `thin` bar cannot be
+   inset the way the pill below is — so it must not see them. */
+@supports not selector(::-webkit-scrollbar) {
+  html[data-scrollbars='classic'] {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(250, 250, 250, 0.22) transparent;
+  }
+}
+
+/* Both forms throughout: the bare one styles the viewport's own bar, the
+   descendant one every scroller inside the page. */
+html[data-scrollbars='classic']::-webkit-scrollbar,
+html[data-scrollbars='classic'] ::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background: transparent;
+}
+
+html[data-scrollbars='classic']::-webkit-scrollbar-track,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* The pill is 6px of the 14px channel. A transparent border plus
+   background-clip: padding-box is the only way to inset a thumb — it has no
+   margin of its own — and it keeps the full 14px as the grab target. */
+html[data-scrollbars='classic']::-webkit-scrollbar-thumb,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-thumb {
+  background-color: rgba(250, 250, 250, 0.22);
+  border: 4px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+html[data-scrollbars='classic']::-webkit-scrollbar-thumb:hover,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(250, 250, 250, 0.38);
+}
+
+html[data-scrollbars='classic']::-webkit-scrollbar-thumb:active,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-thumb:active {
+  background-color: rgba(250, 250, 250, 0.5);
+}
+
+/* The stepper arrows, and the square where a vertical and horizontal bar meet:
+   macOS draws neither. */
+html[data-scrollbars='classic']::-webkit-scrollbar-button,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-button {
   display: none;
 }
-html[class='dark'] .code-example-dark {
-  display: unset;
-}
-html[class='dark'] .code-example-light {
-  display: none;
+
+html[data-scrollbars='classic']::-webkit-scrollbar-corner,
+html[data-scrollbars='classic'] ::-webkit-scrollbar-corner {
+  background: transparent;
 }

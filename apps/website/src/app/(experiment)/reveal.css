@@ -1,0 +1,50 @@
+/* ---------------------------------------------------------------------------
+   Reveal start states.
+
+   Only the *hidden* end of the reveal lives here; the motion itself is in
+   _reveal/choreography.ts. Keeping the start state in CSS is what stops the
+   page flashing its finished layout for a frame before the effect runs — and
+   scoping the whole file to `prefers-reduced-motion: no-preference` means
+   reduced-motion visitors, and anyone without JS, get the page intact.
+
+   Every rule opts out on [data-rv-done], which the engine stamps on an
+   element the moment its animation settles — that is what hands the element
+   back to the stylesheet with nothing left to flash back to.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-rv-root] [data-rv]:not([data-rv-done]):not([data-rv-hollow]) {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+
+  /* The heavier levels travel further and start blurrier — the same gesture
+     at a different volume. */
+  [data-rv-root] [data-rv='lede']:not([data-rv-done]):not([data-rv-hollow]),
+  [data-rv-root] [data-rv='body']:not([data-rv-done]):not([data-rv-hollow]) {
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+
+  /* A split title is a container of moving parts: it stays put, its words
+     are what animate. */
+  [data-rv-root] [data-rv][data-rv-hollow] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  [data-rv-root] [data-rv-word] {
+    display: inline-block;
+    /* Descenders and the blur radius both need room, or a glyph gets
+       sheared by its own overflow while it animates. */
+    will-change: auto;
+  }
+
+  [data-rv-root] [data-rv-word]:not([data-rv-done]) {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(9px);
+  }
+}

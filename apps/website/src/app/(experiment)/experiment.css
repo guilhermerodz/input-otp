@@ -1,0 +1,2052 @@
+/* Isolated styles for the /experiment page — intentionally not sharing globals.css */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.xp-body {
+  background: #09090b;
+  color: #fafafa;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.xp-mono {
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+}
+
+.xp {
+  max-width: 1120px;
+  margin: 0 auto;
+  border-left: 1px solid #1c1c1f;
+  border-right: 1px solid #1c1c1f;
+  min-height: 100dvh;
+}
+
+.xp a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.xp a:hover {
+  opacity: 0.8;
+}
+
+/* Buttons ---------------------------------------------------------------- */
+
+/* The call to action, after Resend's: glass rather than plastic. It carries
+   both ends of the page — the hero and the closing CTA — so it lives up here
+   with the base rules rather than inside either section. Both colour rules
+   carry the .xp prefix: `.xp a` sets colour: inherit, which would otherwise
+   paint the label white on the hovered white face, and `.xp a:hover` would
+   drop the whole button to 0.8. */
+.xp-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.xp .xp-btn,
+.xp .xp-btn:hover {
+  opacity: 1;
+}
+
+/* The face is a barely-there diagonal wash over whatever is behind it,
+   blurred, and the 2px border is white at 5% rather than a line —
+   background-origin puts the wash under it instead of stopping at it, so the
+   border reads as the same pane seen edge-on. */
+.xp .xp-btn:not(.xp-btn--quiet) {
+  color: #fafafa;
+  border-color: rgba(255, 255, 255, 0.05);
+  background-origin: border-box;
+  background-image: linear-gradient(
+    104deg,
+    rgba(253, 253, 253, 0.05) 5%,
+    rgba(240, 240, 228, 0.1) 100%
+  );
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Grain over the border as well as the face — hence the 2px overhang, and the
+   outer radius left at the inner one so the corners stay tight. The tile is
+   white at alphas 0-7/255, fine enough to read as a surface rather than as a
+   pattern; it survives the hover to white, which is where it does most of its
+   work. */
+.xp-btn:not(.xp-btn--quiet)::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  border-radius: 16px;
+  background: url('/button-grain.png') repeat;
+  pointer-events: none;
+}
+
+/* Inverts on hover, and the shadow becomes a bloom rather than a drop — the
+   button is lighter than everything around it, so it should throw light. */
+.xp .xp-btn:not(.xp-btn--quiet):hover,
+.xp .xp-btn:not(.xp-btn--quiet):focus-visible {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #09090b;
+}
+
+.xp .xp-btn:not(.xp-btn--quiet):hover {
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.06),
+    0 1px 14px rgba(255, 255, 255, 0.12),
+    0 3px 32px rgba(255, 255, 255, 0.18);
+}
+
+/* What Resend pairs the button with: no chrome at all, so the one button in
+   the row is unmistakably the one thing to press. */
+.xp .xp-btn--quiet {
+  background: transparent;
+  color: #a1a1aa;
+}
+
+.xp .xp-btn--quiet:hover {
+  color: #fafafa;
+}
+
+/* A ring rather than an outline: the button is already inverted by the time it
+   is focused, and an outline at an offset would sit off the grain overlay and
+   lose the corner radius. */
+.xp-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Pulled back into the right padding, so the label stays centred in the
+   button and the chevron reads as trailing it rather than as a second item. */
+.xp-btn-chevron {
+  margin-right: -8px;
+  color: #70757e;
+}
+
+/* Pointer spotlight rim ---------------------------------------------------- */
+
+/* The rim the cursor drags along a bordered box — the hero slots' trick (see
+   .xp-otp-spot below) made general. The span is appended by spotlight.ts, which
+   also writes --xp-mx / --xp-my (pointer, in the box's own coordinates) and
+   --xp-spot (how lit it is, by distance). Each host sets the geometry: the ring
+   has to land on the host's own border, so it is pulled out over it by the
+   border width and takes that box's radius. */
+.xp-spot-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  padding: var(--xp-spot-width, 1px);
+  background: radial-gradient(
+    var(--xp-spot-spread, 240px) circle at var(--xp-mx, -9999px)
+      var(--xp-my, -9999px),
+    rgba(232, 240, 255, 0.95) 0%,
+    rgba(226, 236, 255, 0.42) 30%,
+    rgba(214, 228, 255, 0) 72%
+  );
+  /* Ring only: punch the fill out and keep the rim. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: var(--xp-spot, 0);
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-spot-ring {
+    display: none;
+  }
+}
+
+/* The CTA carries a 2px border and a grain overlay that already overhangs it,
+   so the rim goes out to the same edge and is drawn as thick as the border. */
+.xp-btn > .xp-spot-ring {
+  inset: -2px;
+  padding: 2px;
+  border-radius: 16px;
+}
+
+/* Sits above the button's grain tile, which has no z-index of its own. */
+.xp-btn:not(.xp-btn--quiet) > .xp-spot-ring {
+  z-index: 1;
+}
+
+/* Nothing to catch on a button with no border to speak of. */
+.xp-btn--quiet > .xp-spot-ring {
+  display: none;
+}
+
+/* The install line: 1px border, same corner as the button beside it. */
+.xp-install {
+  position: relative;
+}
+
+.xp-install > .xp-spot-ring {
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: 16px;
+}
+
+@keyframes xp-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.xp-caret {
+  position: absolute;
+  width: 2px;
+  height: 44px;
+  background: #fafafa;
+  animation: xp-blink 1s step-end infinite;
+}
+
+/* Intro curtain ---------------------------------------------------------- */
+
+.xp-panel {
+  position: fixed;
+  background: #050506;
+  z-index: 50;
+}
+
+/* Set on <html> before first paint when the intro was already seen. The
+   exception is a replay: that visitor has seen it and is asking for it back,
+   so the overlay flags itself as invited. */
+.xp-intro-seen .xp-panel:not([data-xp-replay]),
+.xp-intro-seen .xp-pre-layer:not([data-xp-replay]) {
+  display: none !important;
+}
+
+.xp-panel--full {
+  inset: 0;
+}
+
+.xp-panel--up {
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(-100%);
+}
+
+/* Slot-machine reel: one decelerating spin to its final digit, blurred
+   while it is fast. --final and --dur are set inline per reel. */
+.xp-reel-strip {
+  animation:
+    xp-reel var(--dur) cubic-bezier(0.14, 0.8, 0.3, 1) var(--delay) both,
+    xp-reel-blur var(--dur) linear var(--delay) both;
+}
+
+/* The lever pulls itself once: the rod swings ~160deg around the elbow
+   as the reels launch, holds, then springs back while they spin. */
+.xp-lever-arm {
+  transform-origin: 50% calc(100% - 5px);
+  animation: xp-lever-pull 800ms cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+
+@keyframes xp-lever-pull {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(160deg);
+  }
+  52% {
+    transform: rotate(160deg);
+  }
+  85% {
+    transform: rotate(-8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* The caret sweep: the machine clips away from the right while the caret
+   travels to the left edge — same duration, same curve, so the caret is
+   always the clip edge. */
+.xp-machine--clip {
+  animation: xp-sweep-clip 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes xp-sweep-clip {
+  from {
+    clip-path: inset(-40px 0% -40px -40px);
+  }
+  to {
+    clip-path: inset(-40px 100% -40px -40px);
+  }
+}
+
+.xp-sweep-caret {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 132px;
+  margin-top: -66px;
+  background: #34d399;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+  animation: xp-sweep-move 620ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes xp-sweep-move {
+  from {
+    left: 100%;
+  }
+  to {
+    left: 0%;
+  }
+}
+
+/* Arcade win effects ------------------------------------------------------ */
+
+/* Border beam: a bright green segment racing around the machine frame
+   (after beam.jakubantalik.com). The ring is masked to a 3px border band;
+   the oversized conic gradient inside it spins fast. */
+.xp-beam-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 22px;
+  padding: 3px;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  overflow: hidden;
+  animation: xp-beam-in 0.25s ease-out both;
+}
+
+.xp-beam-spin {
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(
+    transparent 0deg,
+    transparent 250deg,
+    rgba(52, 211, 153, 0.55) 300deg,
+    #6ee7b7 330deg,
+    #d1fae5 344deg,
+    transparent 360deg
+  );
+  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.8));
+  animation: xp-beam-spin 0.65s linear infinite;
+}
+
+@keyframes xp-beam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes xp-beam-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Double flash on the jackpot frame. */
+.xp-win-flash {
+  position: absolute;
+  inset: -28px;
+  border-radius: 34px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(110, 231, 183, 0.55) 0%,
+    rgba(52, 211, 153, 0.22) 45%,
+    transparent 75%
+  );
+  animation: xp-win-flash 0.5s ease-out both;
+}
+
+@keyframes xp-win-flash {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  32% {
+    opacity: 0.15;
+  }
+  48% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cabinet shake, once, on the jackpot. */
+.xp-win-shake {
+  animation: xp-win-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes xp-win-shake {
+  10%,
+  90% {
+    transform: translate(-2px, 1px);
+  }
+  20%,
+  80% {
+    transform: translate(4px, -2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate(-7px, 2px) rotate(-0.4deg);
+  }
+  40%,
+  60% {
+    transform: translate(7px, -2px) rotate(0.4deg);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Radial sparks: little green dashes shot out of the centre. */
+.xp-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: #6ee7b7;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+  opacity: 0;
+  animation: xp-spark 0.55s cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+
+@keyframes xp-spark {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--dx) var(--dy);
+    scale: 0.35;
+  }
+}
+
+@keyframes xp-reel {
+  to {
+    transform: translateY(var(--final));
+  }
+}
+
+@keyframes xp-reel-blur {
+  0% {
+    filter: blur(0);
+  }
+  10% {
+    filter: blur(2.5px);
+  }
+  80% {
+    filter: blur(2.5px);
+  }
+  100% {
+    filter: blur(0);
+  }
+}
+
+/* Slide content floats above the panels and exits on its own. */
+.xp-pre-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 52;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.xp-pre-exit {
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s ease;
+  opacity: 0;
+  transform: translateY(-24px) scale(0.97);
+}
+
+@keyframes xp-pre-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.xp-pre-fade {
+  animation: xp-pre-fade 0.65s ease-out both;
+}
+
+@media (max-width: 900px) {
+  .xp-pre-scale {
+    transform: scale(0.55);
+  }
+}
+
+.xp-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-hero-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Two mask layers, intersected: an ellipse that keeps the field faint over
+     the centre (where the OTP input sits), strongest in a mid ring, and gone
+     at the far edges — plus the bottom fade into the next section. */
+  mask-image: radial-gradient(
+      ellipse 78% 98% at 50% 52%,
+      rgba(0, 0, 0, 0.04) 20%,
+      rgba(0, 0, 0, 0.2) 48%,
+      #00000000 100%
+    ),
+    linear-gradient(to bottom, #000 78%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(
+      ellipse 78% 98% at 50% 52%,
+      rgba(0, 0, 0, 0.04) 20%,
+      rgba(0, 0, 0, 0.2) 48%,
+      #00000000 100%
+    ),
+    linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  /* Fades up once motes has painted its first frame (see HeroField). */
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-hero-field[data-ready] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-hero-field {
+    transition-duration: 0.01ms;
+  }
+}
+
+.xp-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.xp-otp-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 52px 0 6px;
+  cursor: text;
+}
+
+.xp-slot {
+  position: relative;
+  width: 82px;
+  height: 104px;
+  display: grid;
+  place-items: center;
+  font-size: 50px;
+  font-weight: 500;
+  color: #fafafa;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  background: #0c0c0e;
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ————— Hero-only cursor spotlight —————
+   The pointer is a light source and the slot rims catch it. The gain is
+   baked per slot (--xp-lit, set from JS): the outer slots reflect nearly
+   all of it, the middle pair much less — the background field already
+   lights the hero from the sides, so the centre reads as the dimmest
+   part of the row and a rim that lit up evenly would break that. */
+.xp-otp-spot .xp-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(
+    var(--xp-reach, 240px) circle at var(--xp-mx, -9999px) var(--xp-my, -9999px),
+    rgba(232, 240, 255, calc(0.95 * var(--xp-lit, 0))) 0%,
+    rgba(226, 236, 255, calc(0.42 * var(--xp-lit, 0))) 30%,
+    rgba(214, 228, 255, 0) 72%
+  );
+  /* Ring only: punch the fill out and keep the 1.5px rim. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: var(--xp-spot, 0);
+  transition: opacity 0.2s linear;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-otp-spot .xp-slot::after {
+    display: none;
+  }
+}
+
+/* New digits slide up into the slot (after Luxe UI's input-otp). */
+.xp-char-in {
+  animation: xp-char-in 0.14s ease-out both;
+}
+
+@keyframes xp-char-in {
+  from {
+    opacity: 0.2;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.xp-slot--active {
+  border-color: #fafafa;
+  box-shadow: 0 0 0 1px #fafafa;
+}
+
+.xp-slot--error {
+  border-color: #ef4444;
+}
+
+.xp-slot--error.xp-slot--active {
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+.xp-slot--success {
+  border-color: #34d39999;
+}
+
+/* Success: a softer, vertical nod — the input agreeing with you. */
+.xp-otp-bounce {
+  animation: xp-otp-bounce 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes xp-otp-bounce {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+  72% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* The success line nods along with the input: same easing and duration as
+   .xp-otp-bounce, a third of the travel so it stays readable, and a small
+   per-letter delay (--i) so the nod ripples left to right instead of the
+   whole sentence hopping as one block. The step is small on purpose — at
+   ~30 letters the last one still starts inside the first half-second, so
+   the ripple finishes well before the tour takes the line (1300ms). */
+.xp-win-letter {
+  display: inline-block;
+  animation: xp-win-letter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 14ms);
+}
+
+@keyframes xp-win-letter {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-3.5px);
+  }
+  50% {
+    transform: translateY(1px);
+  }
+  72% {
+    transform: translateY(-1.5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-win-letter {
+    animation: none;
+  }
+}
+
+/* Hand-written note chip: optical legibility over the illustration —
+   generous tracking, a dark blurred panel, and breathing room. */
+.xp-note-chip {
+  padding: 7px 14px 8px;
+  border-radius: 12px;
+  background: rgba(5, 5, 7, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  font-size: 1.06rem;
+  letter-spacing: 0.025em;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Isometric story stage --------------------------------------------------
+   --tilt (0 flat, 1 isometric), --explode (layer separation) are written
+   per scroll frame by the shared scrub. No perspective on purpose: the
+   projection stays orthographic, like a technical drawing. */
+.xp-iso-board {
+  transform: rotateX(calc(var(--tilt, 0) * 55deg))
+    rotateZ(calc(var(--tilt, 0) * -45deg));
+  transform-style: preserve-3d;
+}
+
+.xp-iso-plane {
+  transform: translateZ(calc(var(--explode, 0) * 88px));
+}
+
+/* A character riding the input plane until its beat drops it into the
+   slot layer: x eases home->slot with --ft, z falls from the plane's
+   altitude to the board as the same --ft completes. */
+.xp-iso-flyer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  opacity: calc(1 - var(--boom, 0));
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--home) + var(--ft, 0) * var(--dx)))
+    translateZ(calc(var(--explode, 0) * (1 - var(--ft, 0)) * 88px));
+  will-change: transform;
+}
+
+/* A sentence in the story lecture, which doubles as a jump button. The
+   scrub writes its brightness into --o every frame, so the hover lift is a
+   floor under that rather than an override — and deliberately un-transitioned,
+   since a transition on this opacity would also smear the scroll scrub. */
+.xp-beat {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  opacity: max(var(--o, 1), var(--beat-lift, 0));
+}
+
+@media (hover: hover) {
+  .xp-beat:hover {
+    --beat-lift: 0.62;
+  }
+}
+
+/* The ring is drawn *inside* the box: a beat spans the full column, and the
+   lecture window clips anything past its edges — an offset ring would lose
+   its left and right sides to that clip and read as two stray rules. */
+.xp-beat:focus-visible {
+  --beat-lift: 0.62;
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+/* Highlighter sweep for the chalk-talk story variant: the pen drags
+   across the current sentence, driven by --hl. */
+.xp-hl {
+  background-image: linear-gradient(
+    rgba(52, 211, 153, 0.16),
+    rgba(52, 211, 153, 0.16)
+  );
+  background-repeat: no-repeat;
+  background-size: calc(var(--hl, 0) * 102%) 100%;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ————— Keyboard keys in the tour —————
+   Holds the chip and the pulse that fires out from under it. */
+.xp-kbd-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* Every chip is the same box: one square per key, so a chord reads as a
+   row of keys rather than a set of differently sized labels. Widths were
+   drifting before because the box grew with the glyph, and ⌘ is wider
+   than a capital in the fallback symbol font. */
+.xp-kbd {
+  --xp-cap: 0.73em; /* cap height of the chip's own type */
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #3f3f46;
+  border-bottom-width: 2px;
+  border-radius: 7px;
+  background: #18181b;
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: #e4e4e7;
+  transition:
+    transform 0.09s ease,
+    background-color 0.09s ease,
+    border-color 0.14s ease,
+    color 0.14s ease;
+}
+
+/* The worded keys (Shift, Ctrl) keep the height and grow sideways only. */
+.xp-kbd--wide {
+  width: auto;
+  min-width: 24px;
+  padding: 0 7px;
+}
+
+/* Drawn glyphs, cropped to their ink, so ⌘ and ← stand exactly as tall as
+   the X or V in the chip next door. */
+.xp-kbd-glyph {
+  width: var(--xp-cap);
+  height: var(--xp-cap);
+}
+
+/* Held down: the key drops onto its short edge, the way the border-bottom
+   suggests it would. */
+.xp-kbd--down {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+  border-color: #52525b;
+  background-color: #232327;
+  color: #fafafa;
+}
+
+/* One ring per keystroke, in the same cool light the hero throws. */
+.xp-kbd-pulse {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(226, 236, 255, 0.55);
+  border-radius: 8px;
+  animation: xp-kbd-pulse 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes xp-kbd-pulse {
+  from {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-kbd-pulse {
+    display: none;
+  }
+
+  .xp-kbd {
+    transition: none;
+  }
+}
+
+/* Status/tour copy fades in softly on every change. */
+.xp-fade-text {
+  animation: xp-fade-text 0.5s ease both;
+}
+
+@keyframes xp-fade-text {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* A tour step the reader has just satisfied leaves slowly — twice as long
+   as it took to arrive, and drifting up rather than down, so it reads as
+   the instruction being retired and not as another one landing. Timed with
+   STEP_FADE in hero-otp.tsx. Declared after the rule above so it wins the
+   animation shorthand on an element that carries both classes. */
+.xp-fade-text--out {
+  /* ease-in, not ease: the label should keep its opacity for most of the
+     fade and then go, rather than dropping to a fifth of it by the halfway
+     mark and lingering there where nobody can read it. */
+  animation: xp-fade-text-out 0.55s ease-in both;
+}
+
+@keyframes xp-fade-text-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+/* Wrong-code shake, the classic form-error gesture. */
+.xp-otp-shake {
+  animation: xp-otp-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes xp-otp-shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-8px);
+  }
+  40%,
+  60% {
+    transform: translateX(8px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.xp-copy-btn {
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: #71717a;
+}
+
+.xp-copy-btn:hover {
+  color: #fafafa;
+}
+
+/* Sponsor tiers ---------------------------------------------------------- */
+
+/* One grid for both tiers. Two stacked grids with different track counts
+   (2fr/1fr over 1fr/1fr/1fr) never line up: the fr units split a different
+   number of gaps, so the diamond card lands ~7px short of the two silver
+   cards under it. Spanning columns inside a single grid is the only way the
+   edges actually agree. */
+.xp-sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
+  grid-column: span 2;
+}
+
+.xp-sponsor-beam-wrap,
+.xp-sponsor-beam-wrap > .xp-sponsor-card {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Perspective per tile rather than on the grid: a shared vanishing point on
+   the container makes the outer cards shear instead of tilt. Only armed once
+   the tilt component has confirmed a fine, hovering pointer. */
+.xp-sponsors-grid[data-tilt] > .xp-sponsor-beam-wrap,
+.xp-sponsors-grid[data-tilt] > .xp-sponsor-cta {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  /* Long enough to glide back to flat on leave; the tilting state below cuts it
+     down so the card still feels stuck to the cursor while it's inside. */
+  transition: transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-sponsors-grid[data-tilt] > [data-tilting] {
+  transition-duration: 110ms;
+  will-change: transform;
+}
+
+.xp-sponsor-card {
+  position: relative;
+  justify-content: center;
+  cursor: pointer;
+  transition: box-shadow 180ms ease;
+}
+
+.xp-sponsor-card--diamond {
+  min-height: 148px;
+}
+
+.xp-sponsor-card--silver {
+  min-height: 114px;
+}
+
+.xp-sponsor-tier-label {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #71717a;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  opacity: 0.68;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.xp-sponsor-card--diamond .xp-sponsor-tier-label {
+  bottom: 18px;
+}
+
+/* [data-tilting] alongside :hover throughout — the tilt component decides that
+   flag from the card's resting box plus a safe area, while :hover is hit-tested
+   against the rotated geometry, which pulls a few px inside that box. Without
+   it the glow would blink off in the strip where the card is still tilting. */
+.xp-sponsor-card:hover,
+[data-tilting] .xp-sponsor-card {
+  box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.035);
+}
+
+.xp-sponsor-card:hover .xp-sponsor-tier-label,
+[data-tilting] .xp-sponsor-card .xp-sponsor-tier-label {
+  color: #8f9aa6;
+  opacity: 0.88;
+}
+
+.xp-sponsor-card:active {
+  box-shadow: inset 0 0 28px rgba(250, 250, 250, 0.065);
+}
+
+.xp-sponsor-card:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+.xp-sponsor-cta {
+  display: grid;
+  place-items: center;
+  min-height: 100px;
+  border: 1px dashed #27272a;
+  border-radius: 14px;
+  overflow: hidden;
+  color: #3f3f46;
+}
+
+.xp-sponsor-cta-plus,
+.xp-sponsor-cta-label {
+  grid-area: 1 / 1;
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease;
+}
+
+.xp-sponsor-cta-plus {
+  font-size: 24px;
+  opacity: 1;
+  filter: blur(0);
+}
+
+.xp-sponsor-cta-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a1a1aa;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.xp-sponsor-cta:hover .xp-sponsor-cta-plus,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-plus,
+.xp-sponsor-cta:focus-visible .xp-sponsor-cta-plus {
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.xp-sponsor-cta:hover .xp-sponsor-cta-label,
+.xp-sponsor-cta[data-tilting] .xp-sponsor-cta-label,
+.xp-sponsor-cta:focus-visible .xp-sponsor-cta-label {
+  opacity: 1;
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-sponsor-cta-plus,
+  .xp-sponsor-cta-label {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* Used by ---------------------------------------------------------------- */
+
+.xp-usedby-section {
+  padding: 46px 0 50px;
+  border-top: 1px solid #1c1c1f;
+}
+
+.xp-usedby-eyebrow {
+  margin-bottom: 30px;
+  color: #71717a;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+/* Columns sized to their own contents and pushed together in the middle, not
+   thirds of the full width: the lockups sit as close as the widest of them
+   allows. Each column is held open by a hidden stack of everything it can
+   show (see the component), so a name changing length — or scrambling into
+   junk — still never nudges the other two. */
+.xp-usedby-row {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
+  align-items: center;
+  column-gap: 30px;
+  padding: 0 24px;
+  /* The height every mark is normalized to, and the line they are all set on.
+     The line is the taller of the two on purpose: a mark is centred in it and
+     is free to overflow it, so the row keeps one height no matter which three
+     logos are on screen — including any added later. */
+  --usedby-mark: 38px;
+  --usedby-line: 46px;
+}
+
+.xp-usedby-cell {
+  display: grid;
+  justify-items: center;
+  align-items: center;
+}
+
+/* Sizer and link share one cell: the sizer sets the width, the link is what
+   you see. */
+.xp-usedby-cell > .xp-usedby-sizer,
+.xp-usedby-cell > .xp-usedby-item {
+  grid-area: 1 / 1;
+}
+
+/* Hit area over the whole column, so the pointer finds a short name as
+   easily as a long one. */
+.xp-usedby-cell > .xp-usedby-item {
+  justify-content: center;
+  width: 100%;
+}
+
+.xp-usedby-sizer {
+  display: flex;
+  flex-direction: column;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.xp-usedby-item {
+  display: flex;
+  align-items: center;
+  color: #fafafa;
+  opacity: 0.62;
+  transition: opacity 220ms ease;
+}
+
+/* The mark and the name travel together, one layer inside the link, so the
+   tear can move and slice them without touching the link's own box. */
+.xp-usedby-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--usedby-line);
+}
+
+/* Both viewBox and scale are per logo — see the component. The gap above is
+   from ink to ink, since the box is the ink. */
+.xp-usedby-mark {
+  height: calc(var(--usedby-mark) * var(--mark-scale, 1));
+  width: auto;
+  flex: none;
+}
+
+/* Scoped through the row so these win over the page-wide `.xp a:hover`. */
+.xp-usedby-row .xp-usedby-item:hover,
+.xp-usedby-row .xp-usedby-item:focus-visible {
+  opacity: 1;
+}
+
+/* Reading one company sends the other two back. */
+.xp-usedby-row:hover .xp-usedby-item:not(:hover),
+.xp-usedby-row:focus-within .xp-usedby-item:not(:focus-visible) {
+  opacity: 0.26;
+}
+
+.xp-usedby-item:focus-visible {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+.xp-usedby-name {
+  position: relative;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+/* Hover proof: a 16:9 screenshot of the company's own product using the
+   input, riding the cursor. This layer only carries the position — written
+   from JS on every move — so the card inside it is free to animate. */
+.xp-usedby-shot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* The shadow is a stack of five, each roughly double the last in blur and
+   offset: one big soft shadow reads as fog, a stack reads as a card sitting
+   above the page. --ox/--oy are the cursor in this card's own coordinates,
+   written by the component every frame, so the card grows out of the pointer
+   and collapses back into it — including when it has been flipped underneath
+   the cursor or slid sideways to clear an edge. */
+.xp-usedby-shot-card {
+  width: 420px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0c0c0e;
+  box-shadow:
+    0 0 0 1px rgba(250, 250, 250, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.32),
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.28),
+    0 18px 36px rgba(0, 0, 0, 0.26),
+    0 36px 72px rgba(0, 0, 0, 0.24);
+  transform-origin: var(--ox, 50%) var(--oy, 100%);
+  will-change: transform, opacity;
+}
+
+.xp-usedby-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Out of the pointer: a hard scale up off a decelerating curve, with the blur
+   resolving a little ahead of the size so it reads as coming into focus rather
+   than being inflated. */
+.xp-usedby-shot-card[data-state='open'] {
+  animation: xp-usedby-shot-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes xp-usedby-shot-in {
+  from {
+    opacity: 0;
+    transform: scale(0.26);
+    filter: blur(7px);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* And back into it, quicker and on an accelerating curve — leaving should feel
+   like the card is being pulled back to the cursor, not drifting away. */
+.xp-usedby-shot-card[data-state='closed'] {
+  animation: xp-usedby-shot-out 150ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
+}
+
+@keyframes xp-usedby-shot-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.26);
+    filter: blur(5px);
+  }
+}
+
+/* Not `animation: none`: the closed card unmounts on animationend, and an
+   animation that never runs never ends. */
+@media (prefers-reduced-motion: reduce) {
+  .xp-usedby-shot-card[data-state='open'],
+  .xp-usedby-shot-card[data-state='closed'] {
+    animation-duration: 1ms;
+  }
+}
+
+/* The real name stays in the flow, holding the width, while the junk lies over
+   it. Not `display: none` on the name: it is what the column is measured
+   against, and what a screen reader gets to keep. */
+.xp-usedby-name-under {
+  visibility: hidden;
+}
+
+/* Full size, because JetBrains Mono's capitals are the same height as Inter's:
+   the tear now changes the letters without changing how big they look. Only
+   the width is touched — mono sets a name about a fifth wider, and scaleX
+   takes that back without touching the caps, which font-size could not do. */
+.xp-usedby-name-junk {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  font-family: var(--font-jetbrains), ui-monospace, Menlo, monospace;
+  letter-spacing: 0;
+  transform: translateX(-50%) scaleX(0.9);
+}
+
+/* Stepped, never eased: the tear should read as dropped frames, not motion.
+   The swap happens under the noise, around the middle of this. */
+.xp-usedby-tear {
+  animation: xp-usedby-tear 500ms steps(1, end) both;
+}
+
+@keyframes xp-usedby-tear {
+  0% {
+    transform: translateX(0);
+    clip-path: inset(0 0 0 0);
+  }
+  10% {
+    opacity: 0.55;
+    transform: translateX(-5px);
+    clip-path: inset(46% 0 34% 0);
+  }
+  22% {
+    opacity: 0.85;
+    transform: translateX(4px);
+    clip-path: inset(10% 0 68% 0);
+  }
+  34% {
+    opacity: 0.25;
+    transform: translateX(-3px);
+    clip-path: inset(72% 0 6% 0);
+  }
+  46% {
+    opacity: 0.9;
+    transform: translateX(7px);
+    clip-path: inset(28% 0 52% 0);
+  }
+  58% {
+    opacity: 0.4;
+    transform: translateX(-2px);
+    clip-path: inset(0 0 0 0);
+  }
+  72% {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The component leaves the row alone at this setting; kill the tear too, in
+     case a swap was already in flight when it was turned on. */
+  .xp-usedby-tear {
+    animation: none;
+  }
+}
+
+/* The full-size row needs about 680px; below that the three lockups step down
+   together rather than one of them being dropped. */
+@media (max-width: 900px) {
+  .xp-usedby-shot-card {
+    width: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  .xp-usedby-section {
+    padding: 36px 0 38px;
+  }
+
+  .xp-usedby-row {
+    column-gap: 12px;
+    padding: 0 12px;
+    --usedby-mark: 22px;
+    --usedby-line: 28px;
+  }
+
+  .xp-usedby-lockup {
+    gap: 8px;
+  }
+
+  .xp-usedby-name {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-slot {
+    width: 44px;
+    height: 58px;
+    font-size: 26px;
+    border-radius: 10px;
+    /* Smaller slots need a tighter light or the whole row lights at once. */
+    --xp-reach: 130px;
+  }
+
+  .xp-caret {
+    height: 26px;
+  }
+
+  .xp-hero-title {
+    font-size: 38px !important;
+  }
+
+  .xp-stats {
+    gap: 32px !important;
+    flex-wrap: wrap;
+  }
+
+  .xp-sponsors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
+    grid-column: auto;
+  }
+
+  /* One column means the two "+" slots stack into a repeat. The top one only
+     exists to fill the diamond row's third track, so drop it and let the
+     column read sponsors first, invitation last. */
+  .xp-sponsor-cta--filler {
+    display: none;
+  }
+
+  .xp-nav-links {
+    display: none !important;
+  }
+}
+
+/* Spotted by --------------------------------------------------------------- */
+
+.xp-sp-section {
+  padding: 56px 0;
+  border-top: 1px solid #1c1c1f;
+}
+
+/* Centred: the belt underneath runs edge to edge, so a left-aligned heading
+   had nothing to line up with. */
+.xp-sp-title {
+  margin: 0 40px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.xp-sp-sub {
+  margin: 6px 40px 30px;
+  color: #71717a;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* The card borrows x.com's dark palette rather than the page's greys: #1d9bf0
+   for links and the check, #71767b for the metadata. Two colours are enough to
+   place a card as a tweet before anyone reads a word of it, and both sit
+   comfortably on the site's near-black. */
+.xp-tw {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  /* The last row takes the slack, so a card stretched to the height of the
+     tallest on the belt grows between the body and the metadata line rather
+     than under it. */
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas:
+    'avatar head x'
+    'reply reply reply'
+    'body body body'
+    'foot foot foot';
+  column-gap: 11px;
+  padding: 18px 20px 16px;
+  border: 1px solid #1f1f23;
+  border-radius: 16px;
+  background: #0c0c0e;
+  color: #e7e9ea;
+  text-align: left;
+}
+
+/* The link to the post, stretched over the card. It sits under the bio's own
+   links, so those stay clickable and everything else opens the tweet. */
+.xp-tw-open {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* Beats the page-wide `.xp a:hover { opacity: .8 }` — a card that dims on hover
+   reads as disabled, not as a link. */
+.xp a.xp-tw-open:hover {
+  opacity: 1;
+}
+
+.xp-tw:hover {
+  border-color: #2f3336;
+  background: #101014;
+}
+
+/* Out over the 1px border, at the card's own outer radius. */
+.xp-tw > .xp-spot-ring {
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: 16px;
+}
+
+/* The card is a div now, so the ring is drawn on it when the link inside takes
+   focus — an outline on the overlay itself would trace the padding box, not
+   the card's rounded edge. */
+.xp-tw:has(.xp-tw-open:focus-visible) {
+  outline: 2px solid rgba(250, 250, 250, 0.72);
+  outline-offset: 3px;
+}
+
+/* Reachable by a screen reader, absent from the layout. */
+.xp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.xp-tw-avatar {
+  grid-area: avatar;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.xp-tw-head {
+  grid-area: head;
+  min-width: 0;
+}
+
+.xp-tw-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.xp-tw-realname {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.xp-tw-check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: #1d9bf0;
+}
+
+/* The account's affiliation badge, at the size x.com renders it: a hair over
+   the cap height of the name beside it. */
+.xp-tw-badge {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-left: 1px;
+  border-radius: 3px;
+}
+
+.xp-tw-handle {
+  color: #71767b;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.xp-tw-x {
+  grid-area: x;
+  width: 16px;
+  height: 16px;
+  fill: #52525b;
+  transition: fill 200ms ease;
+}
+
+.xp-tw:hover .xp-tw-x {
+  fill: #e7e9ea;
+}
+
+.xp-tw-replying {
+  grid-area: reply;
+  margin-top: 12px;
+  color: #71767b;
+  font-size: 14px;
+}
+
+.xp-tw-body {
+  grid-area: body;
+  margin: 12px 0 0;
+  font-size: 15px;
+  /* The lines are real newlines, so the body wraps and breaks exactly where the
+     post does. */
+  white-space: pre-wrap;
+  line-height: 1.47;
+  overflow-wrap: break-word;
+}
+
+.xp-tw-blue {
+  color: #1d9bf0;
+}
+
+/* x.com's search highlight, which is how the line that names the library reads
+   on the post itself. */
+.xp-tw-mark {
+  border-radius: 3px;
+  padding: 1px 3px;
+  background: #1e2936;
+}
+
+/* Set off to the right, the way an attribution line is: the post is the card,
+   this is the byline under it. */
+.xp-tw-bio {
+  grid-area: foot;
+  align-self: end;
+  margin: 0;
+  padding-top: 16px;
+  color: #71767b;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
+  text-wrap: pretty;
+}
+
+/* Above the stretched link, so these open the project and not the tweet. */
+.xp-tw-bio-link {
+  position: relative;
+  z-index: 1;
+  color: #a1a1aa;
+  text-decoration: underline;
+  text-decoration-color: #3f3f46;
+  text-underline-offset: 2px;
+  transition:
+    color 200ms ease,
+    text-decoration-color 200ms ease;
+}
+
+.xp .xp-tw-bio-link:hover {
+  opacity: 1;
+  color: #e7e9ea;
+  text-decoration-color: #71767b;
+}
+
+.xp-sp-band {
+  position: relative;
+  padding: 4px 0 8px;
+  overflow: hidden;
+}
+
+/* Both ends are feathered on this static layer, never on the track: a mask on
+   the track would ride along with the travel. */
+.xp-sp-viewport {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 9%,
+    #000 91%,
+    transparent
+  );
+}
+
+/* Two identical belts. The offset is written here from the component, one belt
+   width per pass, so the seam never shows — see spotted-marquee.tsx for why the
+   travel is not a keyframe animation. */
+.xp-sp-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.xp-sp-belt {
+  display: flex;
+  /* Stretched, so every card on the row ends on the same metadata line however
+     long the post is. */
+  align-items: stretch;
+  gap: 18px;
+  padding-right: 18px;
+}
+
+.xp-sp-belt .xp-tw {
+  width: 344px;
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The component leaves the belt alone at this setting, so it only has to be
+     laid out as a static row. */
+  .xp-sp-track {
+    width: 100%;
+    will-change: auto;
+  }
+
+  .xp-sp-belt {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 40px;
+    row-gap: 18px;
+  }
+
+  .xp-sp-belt[aria-hidden='true'] {
+    display: none;
+  }
+
+  /* A pass carries the list twice so it can outrun its own viewport. Standing
+     still it is just a row, and a row only needs the list once. */
+  .xp-sp-belt > .xp-tw:nth-child(n + 4) {
+    display: none;
+  }
+
+  .xp-sp-viewport {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-sp-section {
+    padding: 40px 0;
+  }
+
+  .xp-sp-title {
+    margin-inline: 20px;
+    font-size: 24px;
+  }
+
+  .xp-sp-sub {
+    margin-inline: 20px;
+  }
+
+  .xp-sp-belt .xp-tw {
+    width: 300px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xp-sp-belt {
+      padding-inline: 20px;
+    }
+  }
+}
+
+/* Closing CTA ------------------------------------------------------------ */
+
+.xp-cta {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #1c1c1f;
+  padding: 96px 40px 124px;
+  text-align: center;
+}
+
+.xp-cta-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.xp-cta-title {
+  margin: 0;
+  max-width: 620px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.xp-cta-sub {
+  margin: -4px 0 0;
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #a1a1aa;
+  text-wrap: pretty;
+}
+
+.xp-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* The hero's field, turned over: brightest along the top border, gone by the
+   time it reaches the wordmark. The copy sits inside it rather than below it,
+   so the ceiling on the alpha is the same low one the hero uses — any higher
+   and the field stops being weather and starts being wallpaper. */
+.xp-cta-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: radial-gradient(
+      ellipse 95% 76% at 50% -12%,
+      rgba(0, 0, 0, 0.26) 18%,
+      rgba(0, 0, 0, 0.13) 58%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, #000 30%, transparent 76%);
+  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(
+      ellipse 95% 76% at 50% -12%,
+      rgba(0, 0, 0, 0.26) 18%,
+      rgba(0, 0, 0, 0.13) 58%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, #000 30%, transparent 76%);
+  -webkit-mask-composite: source-in;
+  /* Fades up once motes has painted its first frame (see CtaDaybreak). */
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.xp-cta-field[data-ready] {
+  opacity: 1;
+}
+
+/* The package name filled, sunk below the footer border, and taken over by the
+   particle shader once it is on screen (see ParticleWordmark). Nine
+   characters, so it is never allowed to break. The em here is the clamped
+   size, so how deep the letters sit scales with them. */
+.xp-cta-mark {
+  position: absolute;
+  left: 50%;
+  bottom: -0.3em;
+  translate: -50% 0;
+  font-size: clamp(52px, 13.2vw, 158px);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The DOM copy: what layout, no-JS and reduced motion get, and what the
+   canvas is measured against. A block with line-height 1, so its baseline is
+   predictable from the font metrics — an inline box would be sized by the
+   font instead, and the canvas would land in the wrong place. */
+.xp-cta-mark-text {
+  display: block;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  /* Matches MARK_ALPHA, which is what the particles are drawn at. */
+  color: rgba(255, 255, 255, 0.14);
+  transition: opacity 250ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-text {
+  opacity: 0;
+}
+
+/* Positioned from the measured ink box, so the two copies sit on top of each
+   other and the handover doesn't move the letters. */
+.xp-cta-mark-canvas {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.xp-cta-mark[data-live] .xp-cta-mark-canvas {
+  opacity: 1;
+}
+
+/* The border itself, with a light running the length of it. */
+.xp-cta-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(221, 234, 254, 0.55) 22%,
+    #fafafa 50%,
+    rgba(221, 234, 254, 0.55) 78%,
+    transparent
+  );
+  mask-image: linear-gradient(to right, transparent, #000 12%, transparent 24%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    transparent 24%
+  );
+  mask-size: 300% 100%;
+  -webkit-mask-size: 300% 100%;
+  animation: xp-cta-scan 7s linear infinite;
+}
+
+@keyframes xp-cta-scan {
+  from {
+    mask-position: -100% 0;
+    -webkit-mask-position: -100% 0;
+  }
+  to {
+    mask-position: 200% 0;
+    -webkit-mask-position: 200% 0;
+  }
+}
+
+/* The star keeps its colour through the hover — it is the only thing in the
+   row that is not text, and going white with the label loses it. */
+.xp .xp-btn--star span {
+  color: #eab308;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-cta-field {
+    transition-duration: 0.01ms;
+  }
+
+  .xp-cta-line {
+    animation: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .xp-cta {
+    padding: 76px 22px 104px;
+  }
+
+  .xp-cta-title {
+    font-size: 28px;
+  }
+
+  /* The section is shorter here, so the mask's bright top zone reaches much
+     further down the copy. Take the whole field back rather than re-cutting
+     the mask. */
+  .xp-cta-field[data-ready] {
+    opacity: 0.68;
+  }
+
+  .xp-cta-row {
+    flex-direction: column;
+    align-self: stretch;
+  }
+
+  .xp-cta-row .xp-btn {
+    width: 100%;
+  }
+}
