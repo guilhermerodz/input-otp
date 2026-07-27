@@ -2,7 +2,9 @@
 
 ## [1.5.0-beta.1]
 
-The iOS native selection artifact — the thin, caret-tall line documented as a known limitation in #32 and reported in #75/#110 — is gone.
+Everything that landed after 1.4.2, in one beta. (A 1.5.0-beta.0 was drafted along the way but never published to npm; its items are folded in below.)
+
+The headline: the iOS native selection artifact — the thin, caret-tall line documented as a known limitation in #32 and reported in #75/#110 — is gone.
 
 - fix(input): eliminate the iOS native selection artifact
   - On iOS there is now nothing visible at rest, at any fill state or selection size. During a tap or long-press, at most a ~2px fleck renders under the fingertip while the gesture is active, and iOS's copy/paste menu keeps working.
@@ -12,11 +14,6 @@ The iOS native selection artifact — the thin, caret-tall line documented as a 
   - Note: on iOS 12 and older (no Pointer Events, ~0.1% share) the artifact is hidden but edit-menu anchoring is unavailable; typing, autofill and keyboard paste are unaffected.
 - chore(input): measure `--root-height` from the container instead of the input (same value in practice; the input's layout box is enlarged 10x on iOS)
 - chore(playground): add manual device-test pages `/ios-probe` (parameterized probe) and `/shadcn` (faithful reproduction of the shadcn/ui input-otp demo), since the iOS code path cannot be exercised by the Playwright suite
-
-Beta while the fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
-
-## [1.5.0-beta.0]
-
 - fix(input): disable spellcheck by default
   - Browsers would mark a filled code as a spelling error and underline it. `spellCheck` now defaults to `false`; passing your own `spellCheck` prop still overrides it.
 - fix(input): feature-detect ResizeObserver before observing
@@ -35,6 +32,8 @@ Beta while the fix soaks on real devices. Verified so far on iOS 26.5 (Simulator
   - Some environments reject individual cosmetic selectors (`:autofill` in older Android WebViews, for instance). Nothing breaks when that happens, but the `console.error` was captured by Sentry and similar tools as if the application had failed. Same message, warning level.
 - chore(types): narrow `onComplete` to `(value: string) => unknown`
   - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
+
+Beta while the iOS fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
 
 ## [1.4.2]
 
