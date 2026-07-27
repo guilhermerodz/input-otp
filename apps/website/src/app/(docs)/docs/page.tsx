@@ -121,9 +121,11 @@ export default function IntroductionPage() {
           clip-path to walk the badge out — with no visible layout shift.
         </Li>
         <Li>
-          iOS renders the invisible text just wide enough to break the layout
-          and refuses to show the long-press paste menu on a zero-opacity input,
-          so there is a dedicated set of iOS-only rules and a paste handler.
+          iOS paints the selection and caret in a native layer no CSS can hide,
+          and refuses to show the long-press paste menu on a zero-opacity input
+          — so a dedicated set of iOS-only rules parks the text offscreen,
+          scales the field down 10x, and a paste handler does the insertion by
+          hand.
         </Li>
         <Li>
           Autofill paints its own background colour over a field you asked to be
