@@ -2,6 +2,8 @@
 
 ## [1.5.0-beta.0]
 
+- fix(input): reserve the password manager badge gutter only where it fits
+  - Once a badge was detected, the input grew 40px past the container to push the badge off the last slot — and the only guard was the distance to the viewport's right edge. Inside a constrained scroll container (a card, a modal) that overhang registered as scrollable overflow: a horizontal scrollbar appeared and shifted the whole layout. The space check now measures the nearest ancestor that constrains horizontal overflow (scroll containers, `overflow: hidden`/`clip` ancestors, the container itself, and the real viewport width) and skips the push when the gutter doesn't fit; the badge then stays over the last slot, exactly as with `pushPasswordManagerStrategy="none"`. Nothing is ever clipped, so extensions keep rendering their badges.
 - fix(input): disable spellcheck by default
   - Browsers would mark a filled code as a spelling error and underline it. `spellCheck` now defaults to `false`; passing your own `spellCheck` prop still overrides it.
 - fix(input): feature-detect ResizeObserver before observing
