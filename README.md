@@ -20,7 +20,7 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <h4 align="center">Diamond Sponsor 💎</h4>
 <p align="center">
 <a href="https://go.clerk.com/input-otp" target="_blank">
-<img alt="Clerk" src="https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg" width="160"/>
+<img alt="Clerk" src="https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg" width="240"/>
 </a>
 </p>
 <p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a></sub></p>
@@ -30,12 +30,12 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <tr>
 <td align="center">
 <a href="https://go.resend.com/input-otp" target="_blank">
-<img alt="Resend" src="https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg" width="130"/>
+<img alt="Resend" src="https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg" width="78"/>
 </a>
 </td>
 <td align="center">
 <a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
-<img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="130"/>
+<img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="78"/>
 </a>
 </td>
 </tr>
@@ -224,12 +224,6 @@ autofill and password manager badges **cannot** be covered headlessly — see
 **Diamond**
 
 > [Clerk](https://go.clerk.com/input-otp) is the easiest way to add authentication to your application.
-
-**Silver**
-
-> [Resend](https://go.resend.com/input-otp) is email for developers.
-
-> [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) offers Residential Proxies starting from $0.49.
 
 <br />
 
