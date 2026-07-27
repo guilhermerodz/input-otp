@@ -66,9 +66,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # `pnpm lint:lib` is deliberately absent: eslint is not installed for
-      # packages/input-otp, so the script fails on any machine. Add it back
-      # here once that devDependency exists.
+      - run: pnpm lint:lib
       - run: pnpm type-check
 
       - run: pnpm exec playwright install --with-deps
