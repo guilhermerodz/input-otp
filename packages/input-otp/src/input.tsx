@@ -423,6 +423,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           maxLength={maxLength}
           value={value}
           ref={inputRef}
+          spellCheck={false}
           onPaste={e => {
             _pasteListener(e)
             props.onPaste?.(e)
