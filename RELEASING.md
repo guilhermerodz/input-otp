@@ -8,7 +8,10 @@ Two things ship from this repo, and they ship independently.
 | The npm package (`input-otp`)      | tags `v*`           | you push a `v*` tag              |
 
 `master` is neither. It is the integration branch: merge into it freely, nothing
-user-facing moves. Vercel builds it as a preview at `next.input-otp.rodz.dev`.
+user-facing moves. Vercel builds every push to it as a preview, always reachable
+at the same URL:
+
+https://rodz-input-otp-git-master-rodzs-projects-5bc7c768.vercel.app
 
 ## Ship the website
 
@@ -54,11 +57,16 @@ If a publish fails halfway, re-run the workflow from the Actions tab with
 
 ## One-time setup
 
-- Vercel → Settings → Git → **Production Branch** = `production`
-- Vercel → Domains → assign `next.input-otp.rodz.dev` to branch `master`
+- ~~Vercel → Settings → Git → **Production Branch** = `production`~~ — done.
 - Repo secret `NPM_TOKEN` (automation token). To drop the token entirely,
   configure this repo + `release.yml` as a trusted publisher on npmjs.com and
   delete the `env:` block on the publish step — OIDC takes over.
+
+Optional: a prettier staging hostname. `rodz.dev` is on Google Cloud DNS, not
+Vercel, so it needs a `CNAME next.input-otp → cname.vercel-dns.com` record
+created there first, then the domain added to the project and assigned to branch
+`master`. The `*-git-master-*.vercel.app` alias above already works without any
+of that.
 
 ## Notes
 
