@@ -563,7 +563,11 @@ function safeInsertRule(sheet: CSSStyleSheet, rule: string) {
   try {
     sheet.insertRule(rule)
   } catch {
-    console.error('input-otp could not insert CSS rule:', rule)
+    // Some environments reject individual selectors (e.g. `:autofill` in
+    // older WebViews). Losing one of these cosmetic rules never breaks the
+    // input, so it must not look like an application error — error-level
+    // logs end up in monitoring tools like Sentry.
+    console.warn('input-otp could not insert CSS rule:', rule)
   }
 }
 
