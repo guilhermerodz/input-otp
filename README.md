@@ -49,7 +49,7 @@ gives a text field keeps working, because there is still a text field.
 - **Real paste** — including a partial paste into the middle of a half-filled code
 - **Form semantics** — one `name`, one entry in `FormData`, a real `<label>` that focuses it
 - **Unstyled** — no theme, no class names to override, no CSS to import
-- **~4 kB** minified + gzipped, zero dependencies, React 16.8 → 19
+- **Small** — zero dependencies, React 16.8 → 19 (see the size badge above)
 
 ## Install
 
@@ -124,15 +124,15 @@ npx shadcn@latest add input-otp
 The API is five props. The value is the list of things that go wrong when one
 invisible input has to behave like six boxes — and the fix for each:
 
-|                                             |                                                                                                                                                    |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A collapsed caret has no slot               | The selection is rewritten into a one-character range on every `selectionchange` — except at the append position, where a bare caret is meaningful |
-| `ArrowLeft` appears to skip a slot          | Direction is inferred from the previous selection, with a guard for leaving insert mode                                                            |
-| Deleting doesn't fire `selectionchange`     | The event is dispatched by hand when the value shrinks                                                                                             |
-| Password manager badges cover the last slot | Known extensions are detected and the input widens 40px behind a `clip-path` — no visible layout shift                                             |
-| iOS won't paste into an invisible input     | The field keeps `opacity: 1` and hides itself with transparent colours; paste is handled manually                                                  |
-| Autofill paints its own background          | `:autofill` is neutralised, and the state is shaken off with a synthetic `input` event                                                             |
-| No JavaScript means no visible field        | A `<noscript>` stylesheet turns the input back into a plain visible one                                                                            |
+|                                             |                                                                                                                                                                    |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A collapsed caret has no slot               | The selection is rewritten into a one-character range on every `selectionchange` — except at the append position, where a bare caret is meaningful                 |
+| `ArrowLeft` appears to skip a slot          | Direction is inferred from the previous selection, with a guard for leaving insert mode                                                                            |
+| Deleting doesn't fire `selectionchange`     | The event is dispatched by hand when the value shrinks                                                                                                             |
+| Password manager badges cover the last slot | A badge is detected by known extension markers, then by probing the field's top-right corner; the input widens 40px behind a `clip-path` — no visible layout shift |
+| iOS won't paste into an invisible input     | The field keeps `opacity: 1` and hides itself with transparent colours; paste is handled manually                                                                  |
+| Autofill paints its own background          | `:autofill` is neutralised, and the state is shaken off with a synthetic `input` event                                                                             |
+| No JavaScript means no visible field        | A `<noscript>` stylesheet turns the input back into a plain visible one                                                                                            |
 
 Each of these — and a dozen more — is written up with the reasoning and the exact
 code in [**Edge cases**](https://input-otp.rodz.dev/docs/edge-cases).
