@@ -548,14 +548,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
               position: 'absolute',
               inset: 0,
               pointerEvents: 'none',
-              // The input grows 40px past the container while pushing a
-              // password manager badge, which otherwise registers as
-              // scrollable overflow on ancestors and shifts the layout.
-              // The badge itself lives in the extension's own overlay, so
-              // clipping here hides nothing. `clip` rather than `hidden`:
-              // a hidden box is still programmatically scrollable, and a
-              // caret near the input's far edge could drag it sideways.
-              overflowX: 'clip',
             }}
           >
             {renderedInput}
