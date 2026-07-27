@@ -20,8 +20,8 @@ const y = container.getBoundingClientRect().top + container.offsetHeight / 2
 
 if (document.querySelectorAll(PASSWORD_MANAGERS_SELECTORS).length === 0) {
   const maybeBadgeEl = document.elementFromPoint(x, y)
-  if (!maybeBadgeEl || maybeBadgeEl === input) {
-    return // nothing sitting on top of the field
+  if (maybeBadgeEl === container) {
+    return // never true in practice — see the callout below
   }
 }
 
@@ -157,25 +157,30 @@ export default function PasswordManagersPage() {
       </P>
       <CodeBlock code={PROBE} lang="ts" />
 
-      <Callout type="warning" title="This probe was wrong in 1.4.2 and earlier">
+      <Callout type="warning" title="This probe over-reports">
         <p>
-          The comparison used to be against the <em>container</em>, not the
-          input. The topmost element at that point is always the invisible input
-          — it is the one node in the field with <C>pointer-events: all</C> — so{' '}
-          <C>maybeBadgeEl === container</C> was never true and the second pass
-          effectively always said yes, reserving the gutter for everyone.
+          The comparison is against the <em>container</em>, but the topmost
+          element at that point is always the invisible input — it is the one
+          node in the field with <C>pointer-events: all</C> — so{' '}
+          <C>maybeBadgeEl === container</C> is never true and the second pass
+          effectively always says yes, reserving the gutter for everyone.
         </p>
         <p>
-          It was invisible in practice: the clip-path hides the extra width and
-          also clips hit-testing, so nothing moved and nothing broke. If you are
-          on 1.4.2 or earlier and want the reservation gone, set{' '}
+          It is invisible in practice: the clip-path hides the extra width and
+          also clips hit-testing, so nothing moves and nothing breaks. If you
+          want the reservation gone, set{' '}
           <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
         </p>
         <p>
-          You can confirm the current behaviour in the simulator: set the
-          extension to <strong>None</strong>, focus the field, and{' '}
-          <C>input.style.width</C> stays at <C>100%</C>. Switch to a real vendor
-          and it becomes <C>calc(100% + 40px)</C>.
+          You can confirm this in the simulator: set the extension to{' '}
+          <strong>None</strong>, focus the field, and <C>input.style.width</C>{' '}
+          still becomes <C>calc(100% + 40px)</C> — the same as with a real
+          vendor. A corrected probe — compare against the input, and treat a{' '}
+          <C>null</C> hit as inconclusive — is staged in{' '}
+          <A href="https://github.com/guilhermerodz/input-otp/pull/118">
+            PR #118
+          </A>{' '}
+          for a future release.
         </p>
       </Callout>
 

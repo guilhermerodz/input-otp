@@ -23,6 +23,7 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <img alt="Clerk" src='https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg' width="160" style="aspect-ratio: auto;"/>
 </a>
 </p>
+<p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a></sub></p>
 
 <h4 align="center">Silver Sponsors 🥈</h4>
 <p align="center">
@@ -33,8 +34,7 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <img alt="Evomi" src='https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg' width="130" style="aspect-ratio: auto;"/>
 </a>
 </p>
-
-https://github.com/guilhermerodz/input-otp/assets/10366880/753751f5-eda8-4145-a4b9-7ef51ca5e453
+<p align="center"><sub><a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
 
 ## Why
 

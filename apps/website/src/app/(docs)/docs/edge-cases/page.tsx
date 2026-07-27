@@ -664,28 +664,33 @@ export default function EdgeCasesPage() {
       </EdgeCase>
 
       <EdgeCase
-        title="The gutter was reserved for everyone"
+        title="The gutter is reserved for everyone"
         platforms={['Extensions']}
         symptom={
           <>
-            With no extension installed, focusing the field still set{' '}
+            With no extension installed, focusing the field still sets{' '}
             <C>input.style.width</C> to <C>calc(100% + 40px)</C>.
           </>
         }
         cause={
           <>
-            The fallback probe bailed out only when <C>elementFromPoint</C>{' '}
-            returned the <em>container</em>. It never does — the invisible input
+            The fallback probe bails out only when <C>elementFromPoint</C>{' '}
+            returns the <em>container</em>. It never does — the invisible input
             is the one node in the field with <C>pointer-events: all</C>, so it
             is always the topmost element at the probe point.
           </>
         }
         fix={
           <>
-            Compare against the input instead, and treat a <C>null</C> hit — the
-            point is off-screen — as &ldquo;learned nothing&rdquo; rather than
-            as a badge. Fixed after 1.4.2. Nothing visibly changed either way:
-            the clip-path hid the extra width and clipped hit-testing with it.{' '}
+            Not released yet: a corrected probe — compare against the input, and
+            treat a <C>null</C> hit as &ldquo;learned nothing&rdquo; rather than
+            as a badge — is staged in{' '}
+            <A href="https://github.com/guilhermerodz/input-otp/pull/118">
+              PR #118
+            </A>
+            . Nothing visibly changes either way: the clip-path hides the extra
+            width and clips hit-testing with it. To drop the reservation today,
+            set <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.{' '}
             <A href="/docs/password-managers#how-detection-works">
               How detection works
             </A>
