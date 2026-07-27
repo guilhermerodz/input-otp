@@ -6,14 +6,17 @@ import {
   getDownloadStats,
 } from '../../(experiment)/_data/npm-downloads'
 
-/* The scheduled half of the refresh. vercel.json runs this every 12 hours; it
+/* The scheduled half of the refresh. vercel.json runs this once a day; it
    drops the cached npm-stat response and pulls a fresh one, which rebuilds the
    landing page's "trusted at scale" numbers whether or not anyone visited in
    the meantime.
 
-   The fetch in _data/npm-downloads.ts carries the same 12-hour window on its
-   own, so a deployment with no cron still refreshes — just lazily, on the first
-   visit after the window closes. */
+   Daily rather than twice-daily because the account is on Hobby, where any
+   expression that fires more than once a day fails the deployment outright.
+
+   The fetch in _data/npm-downloads.ts carries a 12-hour window on its own, so
+   the cron is an optimisation, not the mechanism — a deployment with no cron at
+   all still refreshes, just lazily, on the first visit after the window closes. */
 
 export const dynamic = 'force-dynamic'
 
