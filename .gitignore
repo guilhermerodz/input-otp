@@ -14,9 +14,13 @@ playwright/.cache/
 
 # next.js
 .next/
+.next-dev/
 out/
 build
 next-env.d.ts
+
+# vercel
+.vercel
 
 # misc
 .DS_Store
@@ -39,3 +43,4 @@ yarn-error.log*
 
 # post-build
 packages/input-otp/README.md
+packages/input-otp/LICENSE

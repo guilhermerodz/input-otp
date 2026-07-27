@@ -17,6 +17,7 @@ jobs:
         with:
           version: 9
       - run: pnpm install
+      - run: pnpm type-check
       - run: pnpm exec playwright install --with-deps
       - run: pnpm test
       - uses: actions/upload-artifact@v4
