@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.0-beta.1]
+
+The iOS native selection artifact — the thin, caret-tall line documented as a known limitation in #32 and reported in #75/#110 — is gone.
+
+- fix(input): eliminate the iOS native selection artifact
+  - On iOS there is now nothing visible at rest, at any fill state or selection size. During a tap or long-press, at most a ~2px fleck renders under the fingertip while the gesture is active, and iOS's copy/paste menu keeps working.
+  - How: iOS paints the selection highlight in a native layer that ignores `::selection`, CSS `opacity`, and ancestor clipping — but it tracks the rendered text geometry. So the text is parked offscreen (`text-indent: -9999px`) and revealed at the pointer's position only during pointer gestures, because the copy/paste menu can only anchor to an on-screen caret/selection rect. Collapsed `letter-spacing` keeps the revealed artifact the same size whether 1 or 6 chars are selected, and `font-size: 16px` + `transform: scale(0.1)` (with a compensating 10x layout box, so the tap area still exactly matches the container) compresses it to iOS's ~2px minimum painting size without ever dipping below the 16px focus-zoom threshold — no page zoom, no `maximum-scale=1` required from apps.
+  - Drop-in: no API changes and no markup/CSS/viewport changes required. Non-iOS browsers are byte-identical (the `@supports (-webkit-touch-callout: none)` guard is false on Blink/Gecko/desktop WebKit). iPhone Chrome/Firefox/in-app browsers are WebKit and get the fix.
+  - If you patched the artifact yourself (e.g. `font-size: 16px !important`, custom transforms or `text-indent` on `[data-input-otp]`), remove those workarounds — overriding the input's geometry can now interfere with the fix.
+  - Note: on iOS 12 and older (no Pointer Events, ~0.1% share) the artifact is hidden but edit-menu anchoring is unavailable; typing, autofill and keyboard paste are unaffected.
+- chore(input): measure `--root-height` from the container instead of the input (same value in practice; the input's layout box is enlarged 10x on iOS)
+- chore(playground): add manual device-test pages `/ios-probe` (parameterized probe) and `/shadcn` (faithful reproduction of the shadcn/ui input-otp demo), since the iOS code path cannot be exercised by the Playwright suite
+
+Beta while the fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
+
 ## [1.5.0-beta.0]
 
 - fix(input): disable spellcheck by default

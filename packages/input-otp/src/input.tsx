@@ -11,6 +11,13 @@ export const OTPInputContext = React.createContext<RenderProps>(
   {} as RenderProps,
 )
 
+/** Failsafe for the iOS text reveal (see the reveal logic in the effect
+ *  below): only fires when a gesture is interrupted before `pointerup`.
+ *  Generous on purpose — a normal interaction is ended by typing, blur or
+ *  scroll long before this, and being late here is harmless while being
+ *  early can dismiss the native edit menu. */
+const IOS_REVEAL_BACKSTOP_MS = 5000
+
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
   (
     {
@@ -193,10 +200,26 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             styleEl.sheet,
             `[data-input-otp]:-webkit-autofill { ${autofillStyles} }`,
           )
-          // iOS
+          // iOS does not allow styling `::selection` on inputs, so the native
+          // selection/caret artifact stays visible whenever a range is
+          // selected. The overlay ignores CSS opacity and ancestor clipping,
+          // but it does track the rendered text geometry, so:
+          // - `text-indent: -9999px` parks the text (and the artifact)
+          //   offscreen — nothing is ever visible at rest. The reveal logic
+          //   below brings it back only during pointer gestures, because the
+          //   copy/paste menu only appears when it can anchor to an
+          //   on-screen caret/selection rect.
+          // - `letter-spacing: -.6em` collapses the per-char pitch to ~0 so
+          //   a selection renders the same size whether 1 or 6 chars are
+          //   selected (no width growth during the reveal).
+          // - the 10x scale-down compresses the caret-height artifact; iOS
+          //   floors the painted highlight at ~2x2px, so the reveal shows at
+          //   most a constant 2px fleck.
+          // - computed font-size must stay >=16px or focusing the input
+          //   zooms the page (WebKit checks computed, not rendered, size).
           safeInsertRule(
             styleEl.sheet,
-            `@supports (-webkit-touch-callout: none) { [data-input-otp] { letter-spacing: -.6em !important; font-weight: 100 !important; font-stretch: ultra-condensed; font-optical-sizing: none !important; left: -1px !important; right: 1px !important; } }`,
+            `@supports (-webkit-touch-callout: none) { [data-input-otp] { font-size: 16px !important; width: 1000% !important; height: 1000% !important; transform: scale(0.1) !important; transform-origin: 0 0 !important; letter-spacing: -.6em !important; text-indent: -9999px !important; left: -1px !important; right: 1px !important; } }`,
           )
           // PWM badges
           safeInsertRule(
@@ -205,12 +228,14 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           )
         }
       }
-      // Track root height
+      // Track root height. Measured on the container, not the input,
+      // because on iOS the input's layout box is enlarged 10x (see the
+      // scale-down rule above) while the container keeps the true size.
       const updateRootHeight = () => {
         if (container) {
           container.style.setProperty(
             '--root-height',
-            `${input.clientHeight}px`,
+            `${container.clientHeight}px`,
           )
         }
       }
@@ -221,7 +246,98 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         typeof ResizeObserver === 'undefined'
           ? null
           : new ResizeObserver(updateRootHeight)
-      resizeObserver?.observe(input)
+      resizeObserver?.observe(container)
+
+      // iOS: the text is parked offscreen (see the iOS rule above) so the
+      // native selection artifact is never visible at rest. The copy/paste
+      // menu, however, only appears when the tap/long-press lands near an
+      // on-screen caret/selection rect — so reveal the text while the user
+      // is interacting and hide it again once the interaction ends. Inline
+      // `text-indent` wins over the stylesheet's `-9999px`; removing it
+      // falls back to hidden.
+      //
+      // Hiding is event-driven rather than timed: the edit menu tracks its
+      // anchor rect while it presents, so a timer racing that animation can
+      // dismiss the menu (measured: hiding 400ms after pointerup killed it,
+      // 1500ms did not — but that margin is device- and OS-dependent, so we
+      // don't rely on it). Instead we hide on the events that actually mean
+      // "the interaction is over" — typing, blur, scroll — and keep a long
+      // backstop timer purely so an interrupted gesture (a pointerup that
+      // never arrives) can't leave the text revealed indefinitely.
+      let cleanupIOSReveal: (() => void) | null = null
+      if (initialLoadRef.current.isIOS) {
+        let isPointerDown = false
+        let pointerX = 0
+        let backstopTimer: ReturnType<typeof setTimeout> | undefined
+        // The text is revealed at the pointer's x position, so the ~2px
+        // artifact renders under the fingertip (occluded by it) and the
+        // edit menu anchors at the touch point. offsetX is in the input's
+        // pre-transform coordinate space, matching text-indent.
+        const hideText = () => {
+          clearTimeout(backstopTimer)
+          input.style.removeProperty('text-indent')
+        }
+        // Armed whenever the text is revealed — not only on pointerup, since
+        // iOS's text-interaction gesture recognizer can swallow pointerup
+        // entirely (observed on iOS 18 when a tap opens the edit menu),
+        // which would otherwise leave the text revealed indefinitely. For
+        // the same reason the hide is unconditional: any "is the finger
+        // still down?" check can be permanently stale. Firing mid-gesture is
+        // safe in practice — the edit menu only dismisses if its anchor
+        // moves while it is still presenting, which is far shorter than this.
+        const armBackstop = () => {
+          clearTimeout(backstopTimer)
+          backstopTimer = setTimeout(hideText, IOS_REVEAL_BACKSTOP_MS)
+        }
+        const revealText = () => {
+          input.style.setProperty(
+            'text-indent',
+            `${Math.max(0, pointerX)}px`,
+            'important',
+          )
+          armBackstop()
+        }
+        const onPointerDown = (e: PointerEvent) => {
+          isPointerDown = true
+          pointerX = e.offsetX
+          if (document.activeElement === input) {
+            revealText()
+          }
+        }
+        const onPointerUp = () => {
+          isPointerDown = false
+          armBackstop()
+        }
+        // Long-press on an unfocused input: focus arrives while the pointer
+        // is still down and the menu will anchor on release.
+        const onFocus = () => {
+          if (isPointerDown) {
+            revealText()
+          }
+        }
+        input.addEventListener('pointerdown', onPointerDown)
+        input.addEventListener('pointerup', onPointerUp)
+        input.addEventListener('pointercancel', onPointerUp)
+        input.addEventListener('focus', onFocus)
+        input.addEventListener('input', hideText)
+        input.addEventListener('blur', hideText)
+        // Scrolling dismisses the edit menu natively, so it's a reliable
+        // end-of-interaction signal.
+        window.addEventListener('scroll', hideText, {
+          capture: true,
+          passive: true,
+        })
+        cleanupIOSReveal = () => {
+          clearTimeout(backstopTimer)
+          input.removeEventListener('pointerdown', onPointerDown)
+          input.removeEventListener('pointerup', onPointerUp)
+          input.removeEventListener('pointercancel', onPointerUp)
+          input.removeEventListener('focus', onFocus)
+          input.removeEventListener('input', hideText)
+          input.removeEventListener('blur', hideText)
+          window.removeEventListener('scroll', hideText, { capture: true })
+        }
+      }
 
       return () => {
         document.removeEventListener(
@@ -230,6 +346,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           { capture: true },
         )
         resizeObserver?.disconnect()
+        cleanupIOSReveal?.()
       }
       // The style tag is created once per document, so only the first
       // render's nonce can ever be used — a mount-only effect is intended.
