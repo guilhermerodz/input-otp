@@ -213,16 +213,29 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
       }
       updateRootHeight()
-      const resizeObserver = new ResizeObserver(updateRootHeight)
-      resizeObserver.observe(input)
 
+      // Feature detection for ResizeObserver
+      if (typeof ResizeObserver !== 'undefined') {
+        const resizeObserver = new ResizeObserver(updateRootHeight)
+        resizeObserver.observe(input)
+
+        return () => {
+          document.removeEventListener(
+            'selectionchange',
+            onDocumentSelectionChange,
+            { capture: true },
+          )
+          resizeObserver.disconnect()
+        }
+      }
+
+      // Fallback return for browsers without ResizeObserver
       return () => {
         document.removeEventListener(
           'selectionchange',
           onDocumentSelectionChange,
           { capture: true },
         )
-        resizeObserver.disconnect()
       }
     }, [])
 
