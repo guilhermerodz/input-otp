@@ -14,6 +14,12 @@
   - Applied to the `<style>` tag the library injects, so a `style-src` Content-Security-Policy that requires nonces no longer blocks it.
 - fix(input): use the guarded input reference inside the selectionchange listener
   - Fixes a `null is not an object (evaluating 'setSelectionRange')` crash when the listener fired while the ref was already null.
+- fix(input): opt the container out of browser translation
+  - Chrome's translator rewrote the slots' text nodes (wrapping them in `<font>` elements), crashing React on the next re-render — easiest to hit with alphanumeric codes under an active page translation. The container now carries `translate="no"`; a one-time code is never meaningful to translate.
+- fix(input): log CSS rule insertion failures as warnings, not errors
+  - Some environments reject individual cosmetic selectors (`:autofill` in older Android WebViews, for instance). Nothing breaks when that happens, but the `console.error` was captured by Sentry and similar tools as if the application had failed. Same message, warning level.
+- fix(input): clip the password manager gutter so it cannot shift the layout
+  - While pushing a password manager badge the invisible input grows 40px past the container. It was already visually clipped, but the box still counted as scrollable overflow, producing a horizontal scrollbar and a layout shift inside constrained containers. The input's wrapper now clips horizontally; badges are unaffected since extensions render them in their own overlay.
 - chore(types): narrow `onComplete` to `(value: string) => unknown`
   - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
 
