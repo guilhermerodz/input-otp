@@ -84,6 +84,11 @@ const versionArgs = [
   'version',
   bump,
   '--no-git-tag-version',
+  // The root package.json declares npm workspaces while the apps depend on
+  // input-otp via pnpm's `workspace:*` protocol, which npm cannot parse —
+  // without this flag `npm version` walks the workspace and dies with
+  // EUNSUPPORTEDPROTOCOL before touching the version.
+  '--workspaces=false',
   ...(preid ? ['--preid', preid] : []),
 ]
 let version
