@@ -137,6 +137,8 @@ invisible input has to behave like six boxes — and the fix for each:
 |                                             |                                                                                                                                                                    |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | A collapsed caret has no slot               | The selection is rewritten into a one-character range on every `selectionchange` — except at the append position, where a bare caret is meaningful                 |
+| Clicking a slot can't reach that slot       | Pointer gestures are mapped onto the rendered slots: click or tap selects the slot under the pointer, dragging extends the selection across slots                  |
+| iOS long-press must keep the paste menu     | A touch held still past ~400ms is handed back to the platform untouched, so the native caret loupe and edit menu present exactly as before                        |
 | `ArrowLeft` appears to skip a slot          | Direction is inferred from the previous selection, with a guard for leaving insert mode                                                                            |
 | Deleting doesn't fire `selectionchange`     | The event is dispatched by hand when the value shrinks                                                                                                             |
 | Password manager badges cover the last slot | A badge is detected by known extension markers, then by probing the field's top-right corner; the input widens 40px behind a `clip-path` — no visible layout shift |
@@ -198,6 +200,12 @@ interface SlotProps {
   hasFakeCaret: boolean
 }
 ```
+
+Tag each rendered slot element with `data-input-otp-slot` and pointer
+selection (click/tap/drag) maps hits to the exact slot geometry; shadcn/ui's
+`data-slot="input-otp-slot"` is detected automatically. Untagged renderers
+fall back to splitting the container width evenly — exact for uniform slots,
+approximate around separators.
 
 Every other `<input>` attribute is forwarded — `name`, `required`, `disabled`,
 `autoFocus`, `aria-*`, `data-*` — and `ref` points at the real input.
