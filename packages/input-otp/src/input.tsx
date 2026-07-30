@@ -6,6 +6,7 @@ import { syncTimeouts } from './sync-timeouts'
 import { OTPInputProps, RenderProps } from './types'
 import { usePrevious } from './use-previous'
 import { usePasswordManagerBadge } from './use-pwm-badge'
+import { useSlotSelection } from './use-slot-selection'
 
 export const OTPInputContext = React.createContext<RenderProps>(
   {} as RenderProps,
@@ -110,6 +111,14 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         if (document.activeElement !== input) {
           setMirrorSelectionStart(null)
           setMirrorSelectionEnd(null)
+          return
+        }
+
+        // A pointer gesture in progress owns the selection: re-assert its
+        // intended range when a competing native caret placement (the
+        // tap's default action, which lands after our pointer handlers)
+        // tries to move it. No-op outside a gesture window.
+        if (slotSelection.enforceSelection(input)) {
           return
         }
 
@@ -405,9 +414,24 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       isFocused,
     })
 
+    // Tap/click a slot to select it, drag to select a range. Mouse-only
+    // behaviors are re-implemented on top of prevented native defaults;
+    // touch cooperates with the native gestures (scroll, iOS/Android
+    // long-press menus) instead of preventing them.
+    const slotSelection = useSlotSelection({
+      inputRef,
+      containerRef,
+      maxLength,
+      inputMetadataRef,
+      setMirrorSelectionStart,
+      setMirrorSelectionEnd,
+    })
+
     /** Event handlers */
     const _changeListener = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Typing ends any pointer interaction with the selection
+        slotSelection.clearGesture()
         const newValue = e.currentTarget.value.slice(0, maxLength)
         if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
           e.preventDefault()
@@ -425,10 +449,12 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         }
         onChange(newValue)
       },
-      [maxLength, onChange, previousValue, regexp],
+      [maxLength, onChange, previousValue, regexp, slotSelection],
     )
     const _focusListener = React.useCallback(() => {
-      if (inputRef.current) {
+      // A pointer gesture reaching focus supplies the selection itself
+      // (the tapped slot / dragged range) instead of the default below
+      if (inputRef.current && !slotSelection.applySelectionOnFocus()) {
         const start = Math.min(inputRef.current.value.length, maxLength - 1)
         const end = inputRef.current.value.length
         inputRef.current?.setSelectionRange(start, end)
@@ -436,7 +462,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionEnd(end)
       }
       setIsFocused(true)
-    }, [maxLength])
+    }, [maxLength, slotSelection])
     // Fix iOS pasting
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -451,6 +477,9 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         const _content = e.clipboardData.getData('text/plain')
         const content = pasteTransformer ? pasteTransformer(_content) : _content
         e.preventDefault()
+
+        // Pasting replaces the selection — the gesture must not restore it
+        slotSelection.clearGesture()
 
         const start = inputRef.current?.selectionStart
         const end = inputRef.current?.selectionEnd
@@ -476,7 +505,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         setMirrorSelectionStart(_start)
         setMirrorSelectionEnd(_end)
       },
-      [maxLength, onChange, pasteTransformer, regexp, value],
+      [maxLength, onChange, pasteTransformer, regexp, slotSelection, value],
     )
 
     /** Styles */
@@ -507,6 +536,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         opacity: '1', // Mandatory for iOS hold-paste
         color: 'transparent',
         pointerEvents: 'all',
+        // Keep vertical page scrolling native while horizontal drags feed
+        // the slot-selection gesture (also disables double-tap zoom, so
+        // consecutive taps on slots don't zoom the page).
+        touchAction: 'pan-y',
         background: 'transparent',
         caretColor: 'transparent',
         border: '0 solid transparent',
@@ -567,11 +600,32 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
             setIsHoveringInput(false)
             props.onMouseLeave?.(e)
           }}
+          onPointerDown={e => {
+            slotSelection.onPointerDown(e)
+            props.onPointerDown?.(e)
+          }}
+          onPointerMove={e => {
+            slotSelection.onPointerMove(e)
+            props.onPointerMove?.(e)
+          }}
+          onPointerUp={e => {
+            slotSelection.onPointerUp(e)
+            props.onPointerUp?.(e)
+          }}
+          onPointerCancel={e => {
+            slotSelection.onPointerCancel(e)
+            props.onPointerCancel?.(e)
+          }}
+          onMouseDown={e => {
+            slotSelection.onMouseDown(e)
+            props.onMouseDown?.(e)
+          }}
           onFocus={e => {
             _focusListener()
             props.onFocus?.(e)
           }}
           onBlur={e => {
+            slotSelection.clearGesture()
             setIsFocused(false)
             props.onBlur?.(e)
           }}
@@ -589,6 +643,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         placeholder,
         props,
         regexp?.source,
+        slotSelection,
         value,
       ],
     )
