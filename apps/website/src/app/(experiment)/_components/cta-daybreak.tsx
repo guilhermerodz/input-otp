@@ -4,7 +4,7 @@
    effect, same accent — but here it is masked to the top of the section, so the
    light arrives from above and dies before it reaches the wordmark below.
    `input-otp` fills the floor, sunk into the footer border, running the same
-   particle shader as the diamond sponsor's mark: the cursor pushes the letters
+   particle shader as the Clerk sponsor card's mark: the cursor pushes the letters
    apart and they spring back. A light travels the border underneath. */
 
 import { Motes } from '@lucasmarkes/motes-react'
@@ -207,7 +207,9 @@ export function CtaDaybreak({ starCount }: { starCount: string | null }) {
       <ParticleWordmark />
 
       <div className="xp-cta-inner">
-        <h2 className="xp-cta-title" data-rv="title">Your last OTP input.</h2>
+        <h2 className="xp-cta-title" data-rv="title">
+          Your last OTP input.
+        </h2>
         <p className="xp-cta-sub" data-rv="lede">
           MIT licensed, zero dependencies, one real input under the slots.
         </p>
