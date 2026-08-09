@@ -2,7 +2,6 @@ import { ExternalLink } from 'lucide-react'
 
 import { RevealRoot } from './_reveal/reveal-root'
 
-import { ClerkParticles } from './_components/clerk-particles'
 import { CtaDaybreak } from './_components/cta-daybreak'
 import { FeatureBento } from './_components/feature-bento'
 import { GetStartedButton } from './_components/get-started-button'
@@ -42,7 +41,6 @@ const HERO_SPONSORS = [
     href: CLERK_URL,
     logoHeight: 30,
     beamDuration: 4.1,
-    particles: true,
   },
   {
     src: '/sponsors/resend-wordmark-white-trimmed.svg',
@@ -50,7 +48,6 @@ const HERO_SPONSORS = [
     href: RESEND_URL,
     logoHeight: 23,
     beamDuration: 3.17,
-    particles: false,
   },
   {
     src: '/sponsors/evomi-wordmark-white-trimmed.svg',
@@ -58,7 +55,6 @@ const HERO_SPONSORS = [
     href: EVOMI_URL,
     logoHeight: 27,
     beamDuration: 3.73,
-    particles: false,
   },
 ] as const
 
@@ -268,7 +264,7 @@ export function ExperimentView({
 
           <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
             {HERO_SPONSORS.map(
-              ({ src, alt, href, logoHeight, beamDuration, particles }) => (
+              ({ src, alt, href, logoHeight, beamDuration }) => (
                 <SponsorBorderBeam
                   key={alt}
                   duration={beamDuration}
@@ -291,20 +287,16 @@ export function ExperimentView({
                       overflow: 'hidden',
                     }}
                   >
-                    {particles ? (
-                      <ClerkParticles src={src} alt={alt} height={logoHeight} />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={src}
-                        alt={alt}
-                        style={{
-                          height: logoHeight,
-                          width: 'auto',
-                          opacity: 0.85,
-                        }}
-                      />
-                    )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={alt}
+                      style={{
+                        height: logoHeight,
+                        width: 'auto',
+                        opacity: 0.85,
+                      }}
+                    />
                     <span className="xp-sponsor-tier-label">
                       <span>HERO SPONSOR</span>
                       <ExternalLink
