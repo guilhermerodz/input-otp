@@ -1001,22 +1001,14 @@ html {
   color: #fafafa;
 }
 
-/* Sponsor tiers ---------------------------------------------------------- */
+/* Hero sponsors ---------------------------------------------------------- */
 
-/* One grid for both tiers. Two stacked grids with different track counts
-   (2fr/1fr over 1fr/1fr/1fr) never line up: the fr units split a different
-   number of gaps, so the diamond card lands ~7px short of the two silver
-   cards under it. Spanning columns inside a single grid is the only way the
-   edges actually agree. */
+/* One tier, one grid: three equal cards, then the full-width invitation. */
 .xp-sponsors-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 28px;
-}
-
-.xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
-  grid-column: span 2;
 }
 
 .xp-sponsor-beam-wrap,
@@ -1046,16 +1038,9 @@ html {
 .xp-sponsor-card {
   position: relative;
   justify-content: center;
+  min-height: 132px;
   cursor: pointer;
   transition: box-shadow 180ms ease;
-}
-
-.xp-sponsor-card--diamond {
-  min-height: 148px;
-}
-
-.xp-sponsor-card--silver {
-  min-height: 114px;
 }
 
 .xp-sponsor-tier-label {
@@ -1076,10 +1061,6 @@ html {
   transition:
     color 160ms ease,
     opacity 160ms ease;
-}
-
-.xp-sponsor-card--diamond .xp-sponsor-tier-label {
-  bottom: 18px;
 }
 
 /* [data-tilting] alongside :hover throughout — the tilt component decides that
@@ -1107,6 +1088,8 @@ html {
 }
 
 .xp-sponsor-cta {
+  /* The invitation reads as its own row, under the three equal cards. */
+  grid-column: 1 / -1;
   display: grid;
   place-items: center;
   min-height: 100px;
@@ -1500,17 +1483,6 @@ html {
 
   .xp-sponsors-grid {
     grid-template-columns: 1fr;
-  }
-
-  .xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
-    grid-column: auto;
-  }
-
-  /* One column means the two "+" slots stack into a repeat. The top one only
-     exists to fill the diamond row's third track, so drop it and let the
-     column read sponsors first, invitation last. */
-  .xp-sponsor-cta--filler {
-    display: none;
   }
 
   .xp-nav-links {

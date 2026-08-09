@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { useParticleMark } from './particle-mark'
 
-/* The diamond sponsor's wordmark, rasterized from its SVG and handed to the
+/* The Clerk wordmark, rasterized from its SVG and handed to the
    particle system (see particle-mark.tsx). The static <img> stays for layout,
    no-JS and reduced motion, and fades out as the particles fly in. */
 export function ClerkParticles({

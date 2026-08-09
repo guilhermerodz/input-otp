@@ -17,30 +17,27 @@ The accessible, unstyled, fully featured one-time-password component for React.
 
 <br />
 
-<h4 align="center">Diamond Sponsor 💎</h4>
-<p align="center">
-<a href="https://go.clerk.com/input-otp" target="_blank">
-<img alt="Clerk" src="https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg" width="240"/>
-</a>
-</p>
-<p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a></sub></p>
-
-<h4 align="center">Silver Sponsors 🥈</h4>
+<h4 align="center">Hero Sponsors</h4>
 <table align="center">
 <tr>
 <td align="center">
+<a href="https://go.clerk.com/input-otp" target="_blank">
+<img alt="Clerk" src="https://input-otp.rodz.dev/sponsors/clerk-wordmark-white-in-black-bg.svg" width="110"/>
+</a>
+</td>
+<td align="center">
 <a href="https://go.resend.com/input-otp" target="_blank">
-<img alt="Resend" src="https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg" width="78"/>
+<img alt="Resend" src="https://input-otp.rodz.dev/sponsors/resend-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
 </td>
 <td align="center">
 <a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
-<img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="78"/>
+<img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
 </td>
 </tr>
 </table>
-<p align="center"><sub><a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
+<p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a> · <a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
 
 ## Why
 
@@ -221,9 +218,9 @@ autofill and password manager badges **cannot** be covered headlessly — see
 
 ## Sponsors
 
-**Diamond**
-
-> [Clerk](https://go.clerk.com/input-otp) is the easiest way to add authentication to your application.
+- [Clerk](https://go.clerk.com/input-otp) — the easiest way to add authentication to your application
+- [Resend](https://go.resend.com/input-otp) — email for developers
+- [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) — residential proxies from $0.49
 
 <br />
 

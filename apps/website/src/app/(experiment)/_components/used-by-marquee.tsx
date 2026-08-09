@@ -51,7 +51,7 @@ const COMPANIES = [
     href: 'https://www.sanity.io',
   },
   // Clerk and Resend sponsor the library, so they get their tracked links here
-  // too — same URLs as the sponsor tiers below.
+  // too — same URLs as the sponsor cards below.
   {
     name: 'Clerk',
     src: '/logos/clerk.svg',
