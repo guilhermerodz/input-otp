@@ -3,8 +3,8 @@
 /* The closing CTA. The page opens on the motes field and closes on it — same
    effect, same accent — but here it is masked to the top of the section, so the
    light arrives from above and dies before it reaches the wordmark below.
-   `input-otp` fills the floor, sunk into the footer border, running the same
-   particle shader as the Clerk sponsor card's mark: the cursor pushes the letters
+   `input-otp` fills the floor, sunk into the footer border, drawn as a
+   particle field (see particle-mark.tsx): the cursor pushes the letters
    apart and they spring back. A light travels the border underneath. */
 
 import { Motes } from '@lucasmarkes/motes-react'
@@ -64,16 +64,15 @@ const MARK_TEXT = 'input-otp'
    reads — at rest and in flight. Low enough to stay floor, not headline. */
 const MARK_ALPHA = 0.14
 /* Room around the letters for particles to fly into, and how much of the
-   cursor's surroundings gets pushed. Both scale with a mark this size: the
-   sponsor logo is 44px tall and uses a fraction of these. The brush is wide
-   enough to take a whole letter at once — a cursor-sized one would look like
-   a fault in the render rather than something you are doing. */
+   cursor's surroundings gets pushed. Both scale with a mark this size. The
+   brush is wide enough to take a whole letter at once — a cursor-sized one
+   would look like a fault in the render rather than something you are
+   doing. */
 const MARK_PAD = 150
 const MARK_FLOW_RADIUS = 130
 /* Device pixels per particle: 8, so a particle is a 4pt square on a 2x screen.
-   The sponsor logo samples one particle per pixel because it is 44px tall and
-   has to stay legible; a section-wide wordmark can afford to break into pixels
-   you can actually see. */
+   A section-wide wordmark can afford to break into pixels you can actually
+   see. */
 const MARK_PITCH = 8
 
 /* Rasterizing text rather than an SVG means reading the font off the DOM copy
