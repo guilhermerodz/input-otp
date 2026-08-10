@@ -37,7 +37,7 @@ The accessible, unstyled, fully featured one-time-password component for React.
 </td>
 <td align="center">
 <a href="https://www.rapidproxy.io/?ref=inpu" target="_blank">
-<img alt="Rapidproxy" src="https://input-otp.rodz.dev/sponsors/rapidproxy-wordmark-white-in-black-bg.svg" width="110"/>
+<img alt="Rapidproxy" src="https://raw.githubusercontent.com/guilhermerodz/input-otp/8476b12529c0d82ae2615e1414de2702c1779fb3/apps/website/public/sponsors/rapidproxy-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
 </td>
 </tr>
