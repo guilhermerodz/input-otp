@@ -35,9 +35,14 @@ The accessible, unstyled, fully featured one-time-password component for React.
 <img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
 </td>
+<td align="center">
+<a href="https://www.rapidproxy.io/?ref=inpu" target="_blank">
+<img alt="Rapidproxy" src="https://input-otp.rodz.dev/sponsors/rapidproxy-wordmark-white-in-black-bg.svg" width="110"/>
+</a>
+</td>
 </tr>
 </table>
-<p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a> · <a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
+<p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a> · <a href="https://go.resend.com/input-otp"><b>Resend</b> — email for developers</a> · <a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a> · <a href="https://www.rapidproxy.io/?ref=inpu"><b>Rapidproxy</b> — residential proxies from $0.55</a></sub></p>
 
 ## Why
 

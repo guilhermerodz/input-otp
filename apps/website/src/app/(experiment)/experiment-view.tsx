@@ -30,6 +30,7 @@ const X_URL = 'https://x.com/guilherme_rodz'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
 const RESEND_URL = 'https://go.resend.com/input-otp'
 const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
+const RAPIDPROXY_URL = 'https://www.rapidproxy.io/?ref=inpu'
 
 /* One tier, equal cards. The heights differ per logo only to make the
    wordmarks read the same optical size — the SVGs have different aspect
@@ -55,6 +56,13 @@ const HERO_SPONSORS = [
     href: EVOMI_URL,
     logoHeight: 27,
     beamDuration: 3.73,
+  },
+  {
+    src: '/sponsors/rapidproxy-wordmark-white-trimmed.svg',
+    alt: 'Rapidproxy',
+    href: RAPIDPROXY_URL,
+    logoHeight: 17,
+    beamDuration: 3.43,
   },
 ] as const
 
