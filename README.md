@@ -226,6 +226,7 @@ autofill and password manager badges **cannot** be covered headlessly — see
 - [Clerk](https://go.clerk.com/input-otp) — the easiest way to add authentication to your application
 - [Resend](https://go.resend.com/input-otp) — email for developers
 - [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) — residential proxies from $0.49
+- [Rapidproxy](https://www.rapidproxy.io/?ref=inpu) — residential proxies from $0.55
 
 <br />
 
