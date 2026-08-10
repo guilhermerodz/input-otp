@@ -1003,10 +1003,10 @@ html {
 
 /* Hero sponsors ---------------------------------------------------------- */
 
-/* One tier, one grid: three equal cards, then the full-width invitation. */
+/* One tier, one grid: four equal cards, then the full-width invitation. */
 .xp-sponsors-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-top: 28px;
 }
@@ -1088,7 +1088,7 @@ html {
 }
 
 .xp-sponsor-cta {
-  /* The invitation reads as its own row, under the three equal cards. */
+  /* The invitation reads as its own row, under the equal cards. */
   grid-column: 1 / -1;
   display: grid;
   place-items: center;
