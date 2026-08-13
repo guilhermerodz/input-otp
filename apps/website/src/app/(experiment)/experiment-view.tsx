@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 
 import { RevealRoot } from './_reveal/reveal-root'
 
+import { ClerkParticles } from './_components/clerk-particles'
 import { CtaDaybreak } from './_components/cta-daybreak'
 import { FeatureBento } from './_components/feature-bento'
 import { GetStartedButton } from './_components/get-started-button'
@@ -28,28 +29,12 @@ const DOCS_URL = '/docs'
 const DOCS_INSTALL_URL = '/docs/installation'
 const X_URL = 'https://x.com/guilherme_rodz'
 const CLERK_URL = 'https://go.clerk.com/input-otp'
-const RESEND_URL = 'https://go.resend.com/input-otp'
 const EVOMI_URL = 'https://evomi.com/?utm_source=github&utm_campaign=otp'
 const RAPIDPROXY_URL = 'https://www.rapidproxy.io/?ref=inpu'
 
-/* One tier, equal cards. The heights differ per logo only to make the
-   wordmarks read the same optical size — the SVGs have different aspect
-   ratios. */
+/* Clerk leads as the single Diamond sponsor. The remaining wordmarks stay at
+   the Hero tier and use per-logo heights for equal optical weight. */
 const HERO_SPONSORS = [
-  {
-    src: '/sponsors/clerk-wordmark-white-trimmed.svg',
-    alt: 'Clerk',
-    href: CLERK_URL,
-    logoHeight: 30,
-    beamDuration: 4.1,
-  },
-  {
-    src: '/sponsors/resend-wordmark-white-trimmed.svg',
-    alt: 'Resend',
-    href: RESEND_URL,
-    logoHeight: 23,
-    beamDuration: 3.17,
-  },
   {
     src: '/sponsors/evomi-wordmark-white-trimmed.svg',
     alt: 'Evomi',
@@ -236,6 +221,56 @@ export function ExperimentView({
               <GetStartedButton href={DOCS_INSTALL_URL} />
               <CopyCommand />
             </div>
+
+            {/* No chrome around this one: it is a footnote to the hero, and the
+                wordmark is the only thing that needs to carry weight. */}
+            {/* Inline flow rather than a flex row: on a phone the sentence wraps,
+                and the wordmark has to travel with the words it belongs to
+                instead of being pushed to the end of the line. */}
+            <a
+              data-rv="chrome"
+              href={CLERK_URL}
+              style={{
+                display: 'block',
+                /* Wide enough for one line where there is room; the phone falls
+                   back to two, breaking before "Get started with". */
+                maxWidth: 430,
+                marginTop: 22,
+                fontSize: 13,
+                lineHeight: 1.7,
+                color: '#a1a1aa',
+                textAlign: 'center',
+                textWrap: 'balance',
+              }}
+            >
+              Looking for an authentication solution?{' '}
+              <span
+                style={{
+                  color: '#fafafa',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Get started with{' '}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                  alt="Clerk"
+                  style={{
+                    height: 15,
+                    width: 'auto',
+                    display: 'inline-block',
+                    verticalAlign: '-3px',
+                  }}
+                />
+                <span
+                  aria-hidden="true"
+                  style={{ color: '#52525b', fontSize: 12, marginLeft: 5 }}
+                >
+                  ↗
+                </span>
+              </span>
+            </a>
           </div>
         </section>
 
@@ -271,10 +306,60 @@ export function ExperimentView({
           </h2>
 
           <SponsorTiltGrid className="xp-sponsors-grid" data-rv-group>
+            <SponsorBorderBeam tier="diamond" duration={4.1} revealRole="card">
+              <a
+                href={CLERK_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="xp-sponsor-card xp-sponsor-card--diamond"
+                style={{
+                  border: '1px solid #29292f',
+                  background: '#0c0c0e',
+                  borderRadius: 14,
+                  padding: 40,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
+              >
+                <ClerkParticles
+                  src="/sponsors/clerk-wordmark-white-trimmed.svg"
+                  alt="Clerk"
+                  height={44}
+                />
+                <span className="xp-sponsor-tier-label">
+                  <span>DIAMOND SPONSOR</span>
+                  <ExternalLink
+                    size={9}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                </span>
+              </a>
+            </SponsorBorderBeam>
+            <a
+              href={GITHUB_SPONSORS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="xp-sponsor-cta xp-sponsor-cta--filler"
+              data-rv="card"
+              aria-label="Become a sponsor"
+            >
+              <span className="xp-sponsor-cta-plus" aria-hidden="true">
+                +
+              </span>
+              <span className="xp-sponsor-cta-label" aria-hidden="true">
+                <span>Become a sponsor</span>
+                <ExternalLink size={12} strokeWidth={1.75} />
+              </span>
+            </a>
             {HERO_SPONSORS.map(
               ({ src, alt, href, logoHeight, beamDuration }) => (
                 <SponsorBorderBeam
                   key={alt}
+                  tier="hero"
                   duration={beamDuration}
                   revealRole="card"
                 >
@@ -282,7 +367,7 @@ export function ExperimentView({
                     href={href}
                     target="_blank"
                     rel="noreferrer"
-                    className="xp-sponsor-card"
+                    className="xp-sponsor-card xp-sponsor-card--hero"
                     style={{
                       border: '1px solid #29292f',
                       background: '#0c0c0e',
