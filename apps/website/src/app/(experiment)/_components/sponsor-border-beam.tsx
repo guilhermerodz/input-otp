@@ -4,10 +4,12 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { BorderBeam } from 'border-beam'
 
 export function SponsorBorderBeam({
+  tier,
   duration,
   revealRole,
   children,
 }: {
+  tier: 'diamond' | 'hero'
   duration: number
   /** Reveal role for the grid item. The beam runs on the wrapper, so the
    *  wrapper — not the card inside it — is what has to stay hidden until
@@ -15,6 +17,8 @@ export function SponsorBorderBeam({
   revealRole?: string
   children: React.ReactNode
 }) {
+  const isDiamond = tier === 'diamond'
+  const wrapClassName = `xp-sponsor-beam-wrap xp-sponsor-beam-wrap--${tier}`
   const reveal: Record<string, string> = revealRole
     ? { 'data-rv': revealRole }
     : {}
@@ -24,7 +28,7 @@ export function SponsorBorderBeam({
 
   if (!mounted) {
     return (
-      <div className="xp-sponsor-beam-wrap" {...reveal}>
+      <div className={wrapClassName} {...reveal}>
         {children}
       </div>
     )
@@ -34,13 +38,15 @@ export function SponsorBorderBeam({
     <BorderBeam
       {...reveal}
       size="pulse-inner"
-      colorVariant="colorful"
-      strength={1}
+      colorVariant={isDiamond ? 'colorful' : 'mono'}
+      strength={isDiamond ? 1 : 0.6}
       duration={duration}
       theme="dark"
       borderRadius={14}
-      className="xp-sponsor-beam-wrap"
-      style={{ '--pulse-glow-boost': 1.9 } as CSSProperties}
+      className={wrapClassName}
+      style={
+        isDiamond ? ({ '--pulse-glow-boost': 1.9 } as CSSProperties) : undefined
+      }
     >
       {children}
     </BorderBeam>

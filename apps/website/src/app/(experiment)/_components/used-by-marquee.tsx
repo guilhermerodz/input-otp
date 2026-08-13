@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-/* Nine companies, three on screen. Every few seconds one of them — never all
+/* Eight companies, three on screen. Every few seconds one of them — never all
    three — tears itself apart, swaps underneath the noise and comes back as
    another, its name scrambling through junk characters on the way. The row
    itself never moves, so the section can sit under the hero without competing
@@ -50,19 +50,13 @@ const COMPANIES = [
     scale: 0.96,
     href: 'https://www.sanity.io',
   },
-  // Clerk and Resend sponsor the library, so they get their tracked links here
-  // too — same URLs as the sponsor cards below.
+  // Clerk sponsors the library, so it gets the same tracked link as the
+  // Diamond card below.
   {
     name: 'Clerk',
     src: '/logos/clerk.svg',
     scale: 1.02,
     href: 'https://go.clerk.com/input-otp',
-  },
-  {
-    name: 'Resend',
-    src: '/logos/resend.svg',
-    scale: 1.02,
-    href: 'https://go.resend.com/input-otp',
   },
   {
     name: 'Cluely',
@@ -78,9 +72,9 @@ const COMPANIES = [
   },
 ] as const
 
-/* Each cell only ever advances by the number of cells, so every cell owns its
-   own third of the list and the three on screen are always distinct. Holds as
-   long as the list divides evenly by CELLS. */
+/* Each cell advances by the number of visible cells. Because turns are
+   round-robin, the three indexes always remain consecutive and distinct as
+   long as the list contains at least CELLS entries. */
 const CELLS = 3
 /* How often a cell turns over. The tear itself is the two constants below and
    is deliberately not tied to this one — the row can cycle faster without the

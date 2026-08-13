@@ -1,9 +1,8 @@
 'use client'
 
-/* The page's one call to action, after Resend's — see .xp-btn in
-   experiment.css. It appears twice, at the top of the hero and at the foot of
-   the closing CTA, and the two have to be the same object: they are the same
-   promise made at the start and at the end of the page. */
+/* The page's one call to action appears twice, at the top of the hero and at
+   the foot of the closing CTA. The two have to be the same object: they are
+   the same promise made at the start and at the end of the page. */
 
 import { useSpotlight } from './spotlight'
 

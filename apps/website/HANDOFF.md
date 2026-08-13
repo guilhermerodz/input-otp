@@ -40,7 +40,7 @@ misled by the folder name.
    tour (select → cut → paste → grow → slice → reveal). This is the most
    intricate, state-heavy component on the page.
 3. **Stats + used-by + sponsors** — static content in `experiment-view.tsx`.
-   The Clerk gold-sponsor card now renders the **particle-shader logo** (see
+   The Clerk Diamond Sponsor card renders the **particle-shader logo** (see
    below) instead of a flat `<img>`.
 4. **"How I built it"** isometric scroll-story (`_components/story-iso.tsx`,
    `story-shared.tsx`) — the live variant, wired into the page. `story-v1.tsx`
@@ -73,9 +73,9 @@ How it works:
 Design decisions worth knowing before you touch it:
 
 - **It is logo-agnostic.** Props are `src` / `alt` / `height`; it reads any
-  image's alpha channel. Reusing it for Resend/Evomi is a one-liner. The name
+  image's alpha channel. Reusing it for another logo is a one-liner. The name
   and the gold glow tint (`vec3(1.0, 0.85, 0.55)` in `POINTS_FS`, chosen to
-  match the GOLD SPONSOR card) are the only Clerk-specific bits. If you
+  match the Diamond Sponsor card) are the only Clerk-specific bits. If you
   generalize it, rename to something like `LogoParticles` and lift the glow
   color to a prop.
 - **Only alpha is used** — particles render white/gold, so a full-color logo
@@ -120,6 +120,6 @@ screenshotting. Remember to set `xp-intro-seen` to skip the intro, and capture
 
 ## Note for the person merging
 
-The particle work replaced the Clerk `<img>` in two spots originally; only the
-gold-sponsor card uses `ClerkParticles` now. The 17px hero badge still uses the
-flat SVG on purpose — it's too small for the grid to read.
+The Diamond Sponsor card is the only `ClerkParticles` caller. The compact
+Clerk lockup in "Used by" keeps its flat SVG on purpose — it is too small for
+the particle grid to read.
