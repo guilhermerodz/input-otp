@@ -123,9 +123,10 @@ export default function IntroductionPage() {
         <Li>
           iOS paints the selection and caret in a native layer no CSS can hide,
           and refuses to show the long-press paste menu on a zero-opacity input
-          — so a dedicated set of iOS-only rules parks the text offscreen,
-          scales the field down 10x, and a paste handler does the insertion by
-          hand.
+          — so stable 1.5 accepts a thin cosmetic line and handles paste by
+          hand. The 1.6 beta experiments with parking the text offscreen and
+          scaling its geometry while preserving an anchor for the native edit
+          menu.
         </Li>
         <Li>
           Autofill paints its own background colour over a field you asked to be

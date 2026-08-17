@@ -1,19 +1,49 @@
 # Changelog
 
+## [1.6.0-beta.0]
+
+Experimental beta that reintroduces the iOS native-selection workaround withdrawn before 1.5.0 stable. This is not a stable candidate: promote it only after a fresh real-device soak covering SMS AutoFill, Select All → Paste, type-over-when-full, RTL and iPadOS input methods.
+
+- fix(input): experimentally eliminate the iOS native selection artifact
+  - Park the underlying text offscreen at rest, then reveal it at the pointer position only while the native edit menu needs an on-screen anchor.
+  - Collapse and scale the rendered text while keeping a compensating layout box and a 16px computed font size.
+  - On iOS 12 and older, the artifact stays hidden but edit-menu anchoring may be unavailable because Pointer Events are not supported.
+- chore(input): measure `--root-height` from the container while the iOS input uses an enlarged layout box
+- chore(playground): add `/ios-probe` and `/shadcn` pages for manual device testing
+- docs: mark the workaround as 1.6 beta-only and keep the 1.5 stable behavior explicit
+
+## [1.5.0]
+
+Promotes the safe 1.5.0-beta.2 code without functional changes. The experimental iOS native-selection workaround from 1.5.0-beta.1 is not included; the thin native selection artifact remains a known cosmetic limitation.
+
+- fix(input): reserve the password manager badge gutter only where it fits
+- fix(input): disable spellcheck by default
+- fix(input): feature-detect `ResizeObserver` before observing
+- fix(input): use a 16px fallback until `--root-height` resolves, preventing iOS focus zoom
+- fix(input): clear pending synchronization timeouts on unmount
+- feat(input): add a `nonce` prop for Content-Security-Policy support
+- fix(input): guard the input reference used by the `selectionchange` listener
+- fix(input): opt the container out of browser translation
+- fix(input): report cosmetic CSS rule failures as warnings instead of errors
+- chore(types): narrow `onComplete` to `(value: string) => unknown`
+- docs: document the stable iOS selection behavior and its cosmetic limitation
+
+## [1.5.0-beta.2]
+
+Safe release candidate for 1.5.0. This release withdraws the experimental iOS native-selection workaround from 1.5.0-beta.1 after compatibility review. The edit menu, paste, typing, selection and focus behavior return to the proven 1.4.x implementation; the thin native selection artifact remains a known iOS limitation.
+
+- revert(input): withdraw the experimental iOS native-selection workaround from 1.5.0-beta.1
+- docs: align the mobile and edge-case documentation with the stable candidate
+- test: verify focus, typing, editing, deletion, paste, Select All → Paste and the native edit menu on iOS 18.0 and 26.5 simulators
+
 ## [1.5.0-beta.1]
 
-Everything that landed after 1.4.2, in one beta. (A 1.5.0-beta.0 was drafted along the way but never published to npm; its items are folded in below.)
+Deprecated experimental release. It introduced an iOS native-selection workaround that moved and scaled the underlying input. The workaround was withdrawn in 1.5.0-beta.2 and is not planned for 1.5.0 stable. Existing installs remain reproducible, but new beta users should use 1.5.0-beta.2 or later.
 
-The headline: the iOS native selection artifact — the thin, caret-tall line documented as a known limitation in #32 and reported in #75/#110 — is gone.
+## [1.5.0-beta.0]
 
-- fix(input): eliminate the iOS native selection artifact
-  - On iOS there is now nothing visible at rest, at any fill state or selection size. During a tap or long-press, at most a ~2px fleck renders under the fingertip while the gesture is active, and iOS's copy/paste menu keeps working.
-  - How: iOS paints the selection highlight in a native layer that ignores `::selection`, CSS `opacity`, and ancestor clipping — but it tracks the rendered text geometry. So the text is parked offscreen (`text-indent: -9999px`) and revealed at the pointer's position only during pointer gestures, because the copy/paste menu can only anchor to an on-screen caret/selection rect. Collapsed `letter-spacing` keeps the revealed artifact the same size whether 1 or 6 chars are selected, and `font-size: 16px` + `transform: scale(0.1)` (with a compensating 10x layout box, so the tap area still exactly matches the container) compresses it to iOS's ~2px minimum painting size without ever dipping below the 16px focus-zoom threshold — no page zoom, no `maximum-scale=1` required from apps.
-  - Drop-in: no API changes and no markup/CSS/viewport changes required. Non-iOS browsers are byte-identical (the `@supports (-webkit-touch-callout: none)` guard is false on Blink/Gecko/desktop WebKit). iPhone Chrome/Firefox/in-app browsers are WebKit and get the fix.
-  - If you patched the artifact yourself (e.g. `font-size: 16px !important`, custom transforms or `text-indent` on `[data-input-otp]`), remove those workarounds — overriding the input's geometry can now interfere with the fix.
-  - Note: on iOS 12 and older (no Pointer Events, ~0.1% share) the artifact is hidden but edit-menu anchoring is unavailable; typing, autofill and keyboard paste are unaffected.
-- chore(input): measure `--root-height` from the container instead of the input (same value in practice; the input's layout box is enlarged 10x on iOS)
-- chore(playground): add manual device-test pages `/ios-probe` (parameterized probe) and `/shadcn` (faithful reproduction of the shadcn/ui input-otp demo), since the iOS code path cannot be exercised by the Playwright suite
+Prepared but not published. Its safe changes are included in 1.5.0-beta.2.
+
 - fix(input): reserve the password manager badge gutter only where it fits
   - Once a badge was detected, the input grew 40px past the container to push the badge off the last slot — and the only guard was the distance to the viewport's right edge. Inside a constrained scroll container (a card, a modal) that overhang registered as scrollable overflow: a horizontal scrollbar appeared and shifted the whole layout. The space check now measures the nearest ancestor that constrains horizontal overflow (scroll containers, `overflow: hidden`/`clip` ancestors, the container itself, and the real viewport width) and skips the push when the gutter doesn't fit; the badge then stays over the last slot, exactly as with `pushPasswordManagerStrategy="none"`. Nothing is ever clipped, so extensions keep rendering their badges.
 - fix(input): disable spellcheck by default
@@ -34,8 +64,6 @@ The headline: the iOS native selection artifact — the thin, caret-tall line do
   - Some environments reject individual cosmetic selectors (`:autofill` in older Android WebViews, for instance). Nothing breaks when that happens, but the `console.error` was captured by Sentry and similar tools as if the application had failed. Same message, warning level.
 - chore(types): narrow `onComplete` to `(value: string) => unknown`
   - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
-
-Beta while the iOS fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
 
 ## [1.4.2]
 
@@ -111,7 +139,7 @@ I'm sorry to skip `1.3.0` due to an issue I've had while publishing the NPM pack
 - fix(input): reinforce wrapper to pointerEvents none
 - feat(input): add experimental push pwm badge
 - chore(input): rename prop to pushPasswordManagerStrategy
-- chore(input): move focus logic to _focusListener
+- chore(input): move focus logic to \_focusListener
 - fix(input): reinforce no box shadows
 - perf(input): rewrite core in a single event listener
 - fix(input): safe insert css rules

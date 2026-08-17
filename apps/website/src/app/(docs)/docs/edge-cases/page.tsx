@@ -429,7 +429,8 @@ export default function EdgeCasesPage() {
             <A href="https://github.com/guilhermerodz/input-otp/issues/32">
               #32
             </A>
-            . Fixed in <C>1.5.0-beta.1</C>.
+            . It remains a cosmetic limitation in stable 1.5.0;{' '}
+            <C>1.6.0-beta.0</C> carries an experimental mitigation.
           </>
         }
         cause={
@@ -441,17 +442,13 @@ export default function EdgeCasesPage() {
         }
         fix={
           <>
-            An iOS-only block parks the text offscreen (<C>text-indent</C>) so
-            nothing paints at rest, and scales the input down 10x — with a
-            compensating 10x layout box, so the tap area still matches the
-            container — which floors the highlight at iOS&apos;s ~2px minimum.
-            Computed <C>font-size</C> stays at 16px, below which focusing would
-            zoom the page. During a pointer gesture the text is revealed at the
-            fingertip via an inline <C>text-indent</C> so the copy/paste menu
-            can anchor, and hidden again on typing, blur or scroll. The{' '}
-            <C>left: -1px</C> / <C>right: 1px</C> pair survives from the old
-            metrics fix: the nudge that repositioned the glyphs also moved the
-            field, so the second declaration restores it.
+            The 1.6 beta parks the text offscreen at rest and scales the input
+            down 10x with a compensating 10x layout box. During a pointer
+            gesture, it reveals the text at the fingertip so the copy/paste menu
+            can anchor, then hides it on typing, blur or scroll. Computed{' '}
+            <C>font-size</C> stays at 16px to avoid focus zoom. This is an
+            experiment, not the stable 1.5 behavior, until the geometry has
+            completed a real-device soak.
           </>
         }
       >
@@ -560,9 +557,8 @@ export default function EdgeCasesPage() {
           <>
             A <C>ResizeObserver</C> publishes the container&apos;s pixel height
             as <C>--root-height</C>, and the input&apos;s <C>font-size</C> is
-            set from it. It is measured on the container rather than the input
-            because on iOS the input&apos;s layout box is enlarged 10x by the
-            scale-down fix. Native UI then matches the boxes the user can see.
+            set from it. The 1.6 beta measures the container because its iOS
+            input layout box is enlarged 10x by the scale-down experiment.
           </>
         }
       >
@@ -883,7 +879,8 @@ export default function EdgeCasesPage() {
           The space check walks up to the nearest ancestor that constrains
           horizontal overflow, and the gutter is only reserved when the full
           40px fit. When they don&apos;t, the badge stays over the last slot —
-          the same rendering as <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
+          the same rendering as{' '}
+          <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
         </p>
         <p>
           <strong className="font-medium text-foreground">

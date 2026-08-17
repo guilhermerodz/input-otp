@@ -145,35 +145,29 @@ export default function MobilePage() {
       <P>
         iOS draws the selection highlight and the caret in a layer of its own —
         one that ignores <C>::selection</C>, CSS <C>opacity</C> and ancestor
-        clipping. That is why, up to 1.4.x, a thin caret-tall line could show
-        through the invisible input whenever a range was selected. What that
-        native layer <em>does</em> respect is the rendered text geometry, so
-        since <C>1.5.0-beta.1</C> an iOS-only block rewrites it:
+        clipping. Stable 1.5 keeps its geometry conservative and accepts a thin
+        cosmetic line. <C>1.6.0-beta.0</C> tests a more aggressive workaround
+        that rewrites the rendered text geometry:
       </P>
       <CodeBlock code={IOS_CSS} lang="css" />
       <P>
         The text is parked offscreen with <C>text-indent</C>, so at rest there
-        is nothing for the native layer to paint — no artifact, at any fill
-        state or selection size. The <C>scale(0.1)</C> pair shrinks the
-        rendered text (and with it the painted highlight, which iOS floors at
-        roughly 2×2px) while the enlarged layout box keeps the tap area
-        exactly matching the container, and the computed <C>font-size</C> stays
-        at 16px so focusing the field never zooms the page.
+        is nothing for the native layer to paint. The <C>scale(0.1)</C> pair
+        shrinks the rendered text and highlight while the enlarged layout box
+        keeps the tap area matching the container. The computed <C>font-size</C>{' '}
+        stays at 16px so focusing does not zoom the page.
       </P>
       <P>
-        The copy/paste menu still works because it only needs an on-screen
-        caret rect <em>during a gesture</em>: on <C>pointerdown</C> the library
-        reveals the text at the fingertip&apos;s position (an inline{' '}
-        <C>text-indent</C> beats the stylesheet&apos;s <C>-9999px</C>), and
-        hides it again on typing, blur or scroll — at most a ~2px fleck under
-        the finger while the gesture is active.
+        The copy/paste menu still needs an on-screen caret rect during a
+        gesture. On <C>pointerdown</C>, the beta reveals the text at the
+        fingertip&apos;s position and hides it again on typing, blur or scroll.
       </P>
-      <Callout type="note" title="Remove your own artifact workarounds">
+      <Callout type="warning" title="Experimental beta behavior">
         <p>
-          If you patched the old artifact yourself — <C>font-size: 16px</C>{' '}
-          overrides, custom transforms or <C>text-indent</C> on{' '}
-          <C>[data-input-otp]</C> — remove those: overriding the input&apos;s
-          geometry can now interfere with the fix.
+          This geometry rewrite is available only in the 1.6 beta line. Do not
+          treat it as stable until it completes a real-device soak covering SMS
+          AutoFill, Select All → Paste, type-over-when-full, RTL and iPadOS
+          input methods.
         </p>
       </Callout>
       <P>
