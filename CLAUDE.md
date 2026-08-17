@@ -54,6 +54,8 @@ All tests are Playwright E2E tests in `apps/playground/src/tests/`. Test files c
 
 Set `WINDOWED_TESTS=1` to run tests in headed mode with slow-mo.
 
+Simulating paste with a synthetic `new ClipboardEvent('paste', { clipboardData })` works in Chromium and WebKit, but Firefox's constructor silently discards a custom `clipboardData` (returns an empty `DataTransfer`) — and no cross-browser real-OS-paste alternative works either (`grantPermissions(['clipboard-read','clipboard-write'])` is unrecognized in Firefox/WebKit, and even where Chromium grants it, a synthetic keypress doesn't trigger a real paste under Playwright automation). Paste tests should `test.skip` on `browserName === 'firefox'`.
+
 ## Code Style
 
 - 2 spaces, no semicolons, single quotes, trailing commas, LF line endings
