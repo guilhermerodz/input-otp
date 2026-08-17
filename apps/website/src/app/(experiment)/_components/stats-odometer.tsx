@@ -7,10 +7,9 @@
    wheel that fast looks like. Nobody reads the last two digits. Nobody is meant
    to: the blur is the statistic. */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import type { DownloadStats } from '../_data/npm-downloads'
-import { canReplayIntro, replayIntro } from './preloader'
 
 /* The two figures behind everything below — the running total as of a known
    instant, and the last seven days — arrive from npm-stat on the server and are
@@ -146,13 +145,6 @@ export function StatsOdometer({ downloads }: { downloads: DownloadStats }) {
 
   const drums = useRef<(HTMLSpanElement | null)[]>([])
 
-  /* The number is the way back into the intro — the only one. Rendered
-     disabled and enabled on mount rather than swapped in: the markup is the
-     same on both passes, and a visitor on reduced motion (or with no JS) is
-     left with a number that plainly does not offer anything. */
-  const [replayable, setReplayable] = useState(false)
-  useEffect(() => setReplayable(canReplayIntro()), [])
-
   const hostRef = useDownloadClock(anchorAt, anchorTotal, perSecond, frame => {
     for (let j = 0; j < digits; j++) {
       const drum = drums.current[j]
@@ -169,45 +161,36 @@ export function StatsOdometer({ downloads }: { downloads: DownloadStats }) {
         TRUSTED AT SCALE<span style={{ color: '#3f3f46' }}>_</span>
       </div>
 
-      <button
-        type="button"
-        className="xp-st-odo-btn"
-        onClick={replayIntro}
-        disabled={!replayable}
-        aria-label="Replay the downloads intro"
-        title="Replay the intro"
-      >
-        <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
-          {Array.from({ length: digits }, (_, j) => {
-            const power = digits - 1 - j
-            return (
-              <span className="xp-st-odo-group" key={power}>
-                {j > 0 && power % 3 === 2 && (
-                  <span className="xp-st-odo-sep">,</span>
-                )}
+      <div className="xp-st-odo xp-mono" aria-hidden="true" data-rv="title">
+        {Array.from({ length: digits }, (_, j) => {
+          const power = digits - 1 - j
+          return (
+            <span className="xp-st-odo-group" key={power}>
+              {j > 0 && power % 3 === 2 && (
+                <span className="xp-st-odo-sep">,</span>
+              )}
+              <span
+                className="xp-st-odo-col"
+                data-spin={drumSpin(power, perSecond)}
+              >
                 <span
-                  className="xp-st-odo-col"
-                  data-spin={drumSpin(power, perSecond)}
+                  className="xp-st-odo-drum"
+                  ref={el => {
+                    drums.current[j] = el
+                  }}
+                  style={{
+                    transform: shift(drumAt(anchorTotal, power, perSecond)),
+                  }}
                 >
-                  <span
-                    className="xp-st-odo-drum"
-                    ref={el => {
-                      drums.current[j] = el
-                    }}
-                    style={{
-                      transform: shift(drumAt(anchorTotal, power, perSecond)),
-                    }}
-                  >
-                    {CELLS.map((n, i) => (
-                      <span key={i}>{n}</span>
-                    ))}
-                  </span>
+                  {CELLS.map((n, i) => (
+                    <span key={i}>{n}</span>
+                  ))}
                 </span>
               </span>
-            )
-          })}
-        </div>
-      </button>
+            </span>
+          )
+        })}
+      </div>
       {/* The drums are decoration to a screen reader; this is the number. */}
       <p className="xp-st-sr">
         {NUMBER.format(anchorTotal)} total downloads, growing by about{' '}

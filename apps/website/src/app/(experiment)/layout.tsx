@@ -90,14 +90,6 @@ export default function RootLayout({
       style={{ colorScheme: 'dark' }}
     >
       <body className="xp-body">
-        {/* Runs before first paint: repeat visitors never see the intro
-            overlay, not even for a frame. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{localStorage.getItem('xp-intro-seen')&&document.documentElement.classList.add('xp-intro-seen')}catch(e){}",
-          }}
-        />
         {/* Decides whether this browser gets the hand-drawn scrollbar. Also
             pre-paint: the answer changes the width of the page's gutter. */}
         <script dangerouslySetInnerHTML={{ __html: SCROLLBAR_PROBE }} />
