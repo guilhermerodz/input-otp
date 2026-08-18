@@ -20,7 +20,10 @@ type OTPInputBaseProps = OverrideProps<
 
     textAlign?: 'left' | 'center' | 'right'
 
-    onComplete?: (value: string) => unknown
+    // Deliberately variadic until 2.0.0: narrowing to `(value: string)`
+    // breaks compilation of handlers typed with extra or non-string params
+    // (e.g. react-hook-form's `handleSubmit(onSubmit)` passed directly).
+    onComplete?: (...args: any[]) => unknown
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
     pasteTransformer?: (pasted: string) => string
 
