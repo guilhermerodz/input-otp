@@ -148,13 +148,14 @@ export default function ApiPage() {
           },
           {
             name: 'onComplete',
-            type: '(...args: any[]) => unknown',
+            type: '(value: string) => unknown',
             description: (
               <>
                 Called once when the value transitions from shorter than{' '}
-                <code>maxLength</code> to exactly <code>maxLength</code>.
-                Editing a full code and refilling it fires it again;
-                re-rendering with the same full value does not.
+                <code>maxLength</code> to exactly <code>maxLength</code>, with
+                the complete value as a string. Editing a full code and
+                refilling it fires it again; re-rendering with the same full
+                value does not.
               </>
             ),
           },
@@ -282,9 +283,9 @@ export default function ApiPage() {
           Unless you pass your own, the input gets{' '}
           <C>autoComplete=&quot;one-time-code&quot;</C>, which is what lets iOS
           and Android offer the code straight from the SMS. Overriding it turns
-          SMS autofill off. <C>spellCheck</C> likewise defaults to{' '}
-          <C>false</C> — browsers would underline a full code as a typo — and
-          passing your own value overrides it.
+          SMS autofill off. <C>spellCheck</C> likewise defaults to <C>false</C>{' '}
+          — browsers would underline a full code as a typo — and passing your
+          own value overrides it.
         </p>
       </Callout>
 
