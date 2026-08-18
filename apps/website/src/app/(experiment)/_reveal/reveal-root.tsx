@@ -11,29 +11,17 @@ import { CASCADE, type Role, ROLES, type SplitMode } from './choreography'
  * a stagger unit, `data-rv="<role>"` for a level inside it — and hands them
  * to the choreography. The markup never mentions timing.
  *
- * Two things gate the start:
- *
- *  - the intro. Nothing may animate behind the slot machine's curtain, so
- *    every group waits for it, and the hero deliberately starts *during*
- *    the lift (see HERO_LEAD) so the page is already in motion by the time
- *    the curtain clears it. Otherwise the two read as separate events.
- *  - the viewport. Below-the-fold groups fire on an IntersectionObserver
- *    tuned to trip a little before the inner components' own observers, so
- *    a section is never mid-reveal while the demo inside it has already
- *    started playing.
+ * Below-the-fold groups fire on an IntersectionObserver tuned to trip a
+ * little before the inner components' own observers, so a section is never
+ * mid-reveal while the demo inside it has already started playing.
  *
  * Elements start hidden from CSS (reveal.css), not from JS, so there is no
  * flash before this effect runs — and reduced-motion users never hide them
  * at all.
  */
 
-/** How long after the curtain starts lifting the hero begins. The lift is
- *  700ms and uncovers the hero around 55% through it. */
-const HERO_LEAD = 300
-/** Repeat visitors skip the intro; give the first paint a beat anyway. */
+/** Give the first paint a beat so the CSS start state is committed. */
 const HERO_INSTANT = 90
-/** If the intro never reports in, reveal regardless. */
-const FAILSAFE = 6000
 
 type Item = {
   el: HTMLElement
@@ -157,7 +145,6 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
 
     const animations: Animation[] = []
     const timers: ReturnType<typeof setTimeout>[] = []
-    const cleanups: (() => void)[] = []
     let disposed = false
 
     const groups = Array.from(
@@ -285,7 +272,7 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
     const restGroups = groups.filter(g => g.dataset.rvGroup !== 'hero')
 
     let armed = false
-    /** Below-fold groups that came into view before the intro finished. */
+    /** Below-fold groups that came into view before the hero armed. */
     const pending = new Set<HTMLElement>()
 
     const observer = new IntersectionObserver(
@@ -306,43 +293,17 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
 
     for (const group of restGroups) observer.observe(group)
 
-    const arm = (lead: number) => {
+    const arm = () => {
       if (armed || disposed) return
       armed = true
-      for (const group of heroGroups) play(group, lead)
+      for (const group of heroGroups) play(group)
       // Anything already on screen joins the same wave, offset so it does
       // not race the hero.
-      pending.forEach(group => play(group, lead + 120))
+      pending.forEach(group => play(group, 120))
       pending.clear()
     }
 
-    const w = window as unknown as { __xpIntroDone?: boolean }
-    let heroTimer: ReturnType<typeof setTimeout> | undefined
-
-    if (w.__xpIntroDone) {
-      heroTimer = setTimeout(() => arm(0), HERO_INSTANT)
-    } else {
-      // The curtain is still up. Start with the lift if we hear about it,
-      // otherwise fall back to the "fully gone" signal.
-      const onLift = () => {
-        clearTimeout(heroTimer)
-        heroTimer = setTimeout(() => arm(0), HERO_LEAD)
-      }
-      const onDone = () => {
-        if (!armed) {
-          clearTimeout(heroTimer)
-          arm(0)
-        }
-      }
-      window.addEventListener('xp:intro-lift', onLift, { once: true })
-      window.addEventListener('xp:intro-done', onDone, { once: true })
-      heroTimer = setTimeout(() => arm(0), FAILSAFE)
-      cleanups.push(() => {
-        window.removeEventListener('xp:intro-lift', onLift)
-        window.removeEventListener('xp:intro-done', onDone)
-      })
-    }
-    if (heroTimer) timers.push(heroTimer)
+    timers.push(setTimeout(arm, HERO_INSTANT))
 
     // A tab that goes away mid-cascade comes back finished, not frozen
     // halfway through a blur.
@@ -356,7 +317,6 @@ export function RevealRoot({ children }: { children: React.ReactNode }) {
       observer.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       timers.forEach(clearTimeout)
-      cleanups.forEach(fn => fn())
       for (const anim of animations) {
         try {
           anim.cancel()

@@ -97,12 +97,3 @@ export async function getDownloadStats(): Promise<DownloadStats> {
     return FALLBACK
   }
 }
-
-/** The round number the intro celebrates — the last hundred million crossed.
- *  Always four characters wide, which the slot machine's four reels and the
- *  typed thank-you both count on. */
-export function milestoneLabel(total: number) {
-  const hundreds = Math.floor(total / 1e8)
-  if (hundreds < 10) return `${hundreds * 100}M`
-  return `${(hundreds / 10).toFixed(1)}B`
-}

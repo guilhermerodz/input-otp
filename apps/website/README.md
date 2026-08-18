@@ -22,8 +22,8 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Download stats
 
-The landing page's "trusted at scale" counter (and the milestone the intro
-celebrates) comes from npm-stat, not from numbers typed into the source — see
+The landing page's "trusted at scale" counter comes from npm-stat, not from
+numbers typed into the source — see
 `src/app/(experiment)/_data/npm-downloads.ts`.
 
 Two things keep it fresh, and **either one is enough on its own**:

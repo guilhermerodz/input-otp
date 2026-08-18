@@ -14,11 +14,10 @@ import { FooterSignature } from './_components/footer-signature'
 import { HeroField } from './_components/hero-field'
 import { HeroOtp } from './_components/hero-otp'
 import { ScrollLink } from './_components/scroll-link'
-import { Preloader } from './_components/preloader'
 import { SpottedMarquee } from './_components/spotted-marquee'
 import { StatsOdometer } from './_components/stats-odometer'
 import { UsedByMarquee } from './_components/used-by-marquee'
-import { milestoneLabel, type DownloadStats } from './_data/npm-downloads'
+import type { DownloadStats } from './_data/npm-downloads'
 
 const GITHUB_URL = 'https://github.com/guilhermerodz/input-otp'
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/guilhermerodz'
@@ -109,8 +108,6 @@ export function ExperimentView({
   return (
     <RevealRoot>
       <div className="xp">
-        <Preloader milestone={milestoneLabel(downloads.total)} />
-
         {/* Nav */}
         <header
           style={{
