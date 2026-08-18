@@ -2,19 +2,52 @@ import * as React from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-import { getDocsPage, getDocsPager } from '../_lib/nav'
+import { getDocsPage, getDocsPager, hrefInVersion } from '../_lib/nav'
+import { latestDocsVersion, versionForPathname } from '../_lib/versions'
 import { DocsToc } from './docs-toc'
 import { Lede } from './prose'
 
-/** Builds a page's <head> from the same nav entry that titles it. */
+/**
+ * Builds a page's <head> from the same nav entry that titles it. Frozen
+ * snapshot pages are kept out of search results and point their canonical
+ * at the latest equivalent, so old-version pages never outrank current ones.
+ */
 export function docsMetadata(href: string): Metadata {
   const page = getDocsPage(href)
   if (!page) return {}
-  return {
+  const metadata: Metadata = {
     title: page.title,
     description: page.description,
     openGraph: { title: page.title, description: page.description },
   }
+  if (versionForPathname(href).status === 'frozen') {
+    metadata.robots = { index: false }
+    metadata.alternates = {
+      canonical: hrefInVersion(href, latestDocsVersion),
+    }
+  }
+  return metadata
+}
+
+/** Shown at the top of every frozen snapshot page. */
+function FrozenVersionBanner({ href }: { href: string }) {
+  const version = versionForPathname(href)
+  if (version.status !== 'frozen') return null
+
+  return (
+    <div className="mb-8 flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-lg border border-border/70 bg-foreground/[0.03] px-4 py-3 text-[0.8125rem] leading-6 text-muted-foreground">
+      <span>
+        These docs are for <strong>input-otp {version.label}</strong>. The
+        latest line is {latestDocsVersion.label} —
+      </span>
+      <Link
+        href={hrefInVersion(href, latestDocsVersion)}
+        className="font-medium text-foreground underline decoration-foreground/30 underline-offset-2 transition-colors duration-150 hover:decoration-foreground"
+      >
+        view this page in the current docs
+      </Link>
+    </div>
+  )
 }
 
 function Pager({ href }: { href: string }) {
@@ -77,6 +110,8 @@ export function DocsPage({
   return (
     <div className="flex min-w-0 flex-1 justify-center gap-12 xl:gap-16">
       <div className="min-w-0 max-w-3xl flex-1 py-10 lg:py-14">
+        <FrozenVersionBanner href={href} />
+
         <header>
           <h1 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-[2.125rem]">
             {page?.title}
