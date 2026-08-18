@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.0]
+
+Promotes the safe 1.5.0-beta.2 code without functional changes. Everything in this release is backwards-compatible: no public type changes and no behavior changes beyond the bug fixes below. Two beta.1 experiments are deliberately excluded — the iOS native-selection workaround (the thin native selection artifact remains a known cosmetic limitation) and the `onComplete` type narrowing, which returns in 2.0.0 as a documented breaking change.
+
+- fix(input): reserve the password manager badge gutter only where it fits
+- fix(input): disable spellcheck by default
+- fix(input): feature-detect `ResizeObserver` before observing
+- fix(input): use a 16px fallback until `--root-height` resolves, preventing iOS focus zoom
+- fix(input): clear pending synchronization timeouts on unmount
+- feat(input): add a `nonce` prop for Content-Security-Policy support
+- fix(input): guard the input reference used by the `selectionchange` listener
+- fix(input): opt the container out of browser translation
+- fix(input): report cosmetic CSS rule failures as warnings instead of errors
+- docs: document the stable iOS selection behavior and its cosmetic limitation
+
 ## [1.5.0-beta.2]
 
 Safe release candidate for 1.5.0. This release withdraws the experimental iOS native-selection workaround from 1.5.0-beta.1 after compatibility review. The edit menu, paste, typing, selection and focus behavior return to the proven 1.4.x implementation; the thin native selection artifact remains a known iOS limitation.

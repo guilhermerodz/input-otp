@@ -175,7 +175,8 @@ type OTPInputProps = {
 
   value?: string
   onChange?: (newValue: string) => unknown   // a string, not an event
-  onComplete?: (value: string) => unknown    // fires once, on the transition to full
+  onComplete?: (...args: any[]) => unknown // fires once, on the transition to full;
+                                           // receives the value as a string (narrows in 2.0)
 
   pattern?: string | RegExp               // gates every change; no default
   placeholder?: string                    // per-slot placeholder characters
