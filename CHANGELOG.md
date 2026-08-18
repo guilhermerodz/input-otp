@@ -2,7 +2,7 @@
 
 ## [1.5.0]
 
-Promotes the safe 1.5.0-beta.2 code without functional changes. The experimental iOS native-selection workaround from 1.5.0-beta.1 is not included; the thin native selection artifact remains a known cosmetic limitation.
+Promotes the safe 1.5.0-beta.2 code without functional changes. Everything in this release is backwards-compatible: no public type changes and no behavior changes beyond the bug fixes below. Two beta.1 experiments are deliberately excluded — the iOS native-selection workaround (the thin native selection artifact remains a known cosmetic limitation) and the `onComplete` type narrowing, which returns in 2.0.0 as a documented breaking change.
 
 - fix(input): reserve the password manager badge gutter only where it fits
 - fix(input): disable spellcheck by default
@@ -13,7 +13,6 @@ Promotes the safe 1.5.0-beta.2 code without functional changes. The experimental
 - fix(input): guard the input reference used by the `selectionchange` listener
 - fix(input): opt the container out of browser translation
 - fix(input): report cosmetic CSS rule failures as warnings instead of errors
-- chore(types): narrow `onComplete` to `(value: string) => unknown`
 - docs: document the stable iOS selection behavior and its cosmetic limitation
 
 ## [1.5.0-beta.2]
