@@ -209,9 +209,8 @@
 --------------------------------------------------------------------------- */
 
 /* Reserve the gutter up front so a page that toggles overflow does not shift
-   sideways when the bar returns — the landing intro locks scrolling while the
-   curtain is up. A no-op wherever scrollbars are overlays, so macOS is
-   untouched. */
+   sideways when the bar returns. A no-op wherever scrollbars are overlays, so
+   macOS is untouched. */
 html {
   scrollbar-gutter: stable;
 }
