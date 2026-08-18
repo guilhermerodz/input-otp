@@ -5,6 +5,8 @@ export interface PropRow {
   type: string
   default?: string
   required?: boolean
+  /** The release that introduced the prop, when newer than the line's first release. */
+  since?: string
   description: React.ReactNode
 }
 
@@ -30,6 +32,11 @@ export function PropsTable({ rows }: { rows: PropRow[] }) {
                 {row.required && (
                   <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1 py-px text-[0.625rem] font-medium uppercase tracking-wide text-amber-400/90">
                     required
+                  </span>
+                )}
+                {row.since && (
+                  <span className="rounded border border-border/70 bg-foreground/[0.04] px-1 py-px text-[0.625rem] font-medium tracking-wide text-muted-foreground">
+                    since {row.since}
                   </span>
                 )}
               </div>

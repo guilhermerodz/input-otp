@@ -437,14 +437,14 @@ export function HeroOtp() {
   /**
    * Whether the field is still worth handing the keyboard to.
    *
-   * The hint lands about 1.7s after the intro clears, which is long enough
-   * for someone to have started reading further down the page. Focusing an
-   * input that has scrolled away pulls the whole page back up to it — and
-   * because the page scrolls smoothly, it does so as a long glide that
-   * reads like the site fighting you. It also hands the keyboard to a
-   * field the reader can no longer see, and on a phone opens the keyboard
-   * for it. Mostly-visible is the bar: a field peeking in at the edge is
-   * not one you want to start typing into.
+   * The hint lands about 1.7s after load, which is long enough for someone
+   * to have started reading further down the page. Focusing an input that
+   * has scrolled away pulls the whole page back up to it — and because the
+   * page scrolls smoothly, it does so as a long glide that reads like the
+   * site fighting you. It also hands the keyboard to a field the reader can
+   * no longer see, and on a phone opens the keyboard for it. Mostly-visible
+   * is the bar: a field peeking in at the edge is not one you want to start
+   * typing into.
    */
   const fieldOnScreen = () => {
     const box = wrapRef.current?.getBoundingClientRect()
@@ -511,22 +511,12 @@ export function HeroOtp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locked])
 
-  // On load, once the intro curtain is gone, the hint plays by itself.
+  // On load, the hint plays by itself.
   React.useEffect(() => {
-    const begin = () => {
-      if (valueRef.current !== '') return
-      runHint(900)
-    }
-    const w = window as unknown as { __xpIntroDone?: boolean }
-    if (w.__xpIntroDone) {
-      begin()
-    } else {
-      window.addEventListener('xp:intro-done', begin, { once: true })
-    }
-    // Failsafe: never leave the input locked if the intro signal is lost.
+    if (valueRef.current === '') runHint(900)
+    // Failsafe: never leave the input locked if the hint does not finish.
     const failsafe = setTimeout(() => setLocked(false), 10000)
     return () => {
-      window.removeEventListener('xp:intro-done', begin)
       clearTimeout(failsafe)
       clearHint()
     }

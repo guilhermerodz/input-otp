@@ -27,28 +27,21 @@ misled by the folder name.
 
 `experiment-view.tsx` is the top-level composition. Sections in order:
 
-1. **Preloader / intro** (`_components/preloader.tsx`) — an odometer /
-   slot-machine spin that lands on `700.000.000`, with a lever pull and a
-   caret that types a thank-you. Plays **once per session**, gated on
-   `localStorage['xp-intro-seen']`, and is skipped before first paint when
-   already seen (blocking script) to avoid a flash. **To see the page without
-   it, set that key** — e.g. in Playwright:
-   `page.addInitScript(() => localStorage.setItem('xp-intro-seen', '1'))`.
-2. **Hero OTP input** (`_components/hero-otp.tsx`, `hero-field.tsx`) — a
+1. **Hero OTP input** (`_components/hero-otp.tsx`, `hero-field.tsx`) — a
    Luxe-style live OTP field with sliding digits, a gliding focus ring, ghost
    typing, an error shake on a wrong code, and a scripted 6-beat interactive
    tour (select → cut → paste → grow → slice → reveal). This is the most
    intricate, state-heavy component on the page.
-3. **Stats + used-by + sponsors** — static content in `experiment-view.tsx`.
+2. **Stats + used-by + sponsors** — static content in `experiment-view.tsx`.
    The Clerk Diamond Sponsor card renders the **particle-shader logo** (see
    below) instead of a flat `<img>`.
-4. **"How I built it"** isometric scroll-story (`_components/story-iso.tsx`,
+3. **"How I built it"** isometric scroll-story (`_components/story-iso.tsx`,
    `story-shared.tsx`) — the live variant, wired into the page. `story-v1.tsx`
    / `story-v2.tsx` (routes `/story-1`, `/story-2`) are **earlier alternates
    kept for reference**, not linked from `/`.
-5. **Style gallery** (`_components/gallery.tsx`) — the same OTP component under
+4. **Style gallery** (`_components/gallery.tsx`) — the same OTP component under
    different render props, all live/typeable.
-6. CTA + footer.
+5. CTA + footer.
 
 ## Most recent work — Clerk particle-shader logo
 
@@ -104,8 +97,8 @@ Tunable constants at the top of the file: `FLOW_RADIUS_CSS`, `FORCE`,
 
 There's no visual test harness; iterate with the playground's Playwright
 (`apps/playground` has `@playwright/test`) driving `localhost:3040` and
-screenshotting. Remember to set `xp-intro-seen` to skip the intro, and capture
-`scale: 'device'` for retina-accurate pixels when judging the particle grid.
+screenshotting. Capture `scale: 'device'` for retina-accurate pixels when
+judging the particle grid.
 
 ## Suggested next steps
 
