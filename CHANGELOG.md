@@ -1,6 +1,23 @@
 # Changelog
 
+## [1.5.0-beta.2]
+
+Safe release candidate for 1.5.0. This release withdraws the experimental iOS native-selection workaround from 1.5.0-beta.1 after compatibility review. The edit menu, paste, typing, selection and focus behavior return to the proven 1.4.x implementation; the thin native selection artifact remains a known iOS limitation.
+
+It also withdraws the `onComplete` type narrowing from 1.5.0-beta.1. Although type-level only, it can fail compilation of existing handlers typed with extra or non-string parameters (a common example is passing react-hook-form's `handleSubmit(onSubmit)` directly), which makes it a breaking change under semver. It will return in 2.0.0 with a documented migration path.
+
+- revert(input): withdraw the experimental iOS native-selection workaround from 1.5.0-beta.1
+- revert(types): withdraw the `onComplete` narrowing from 1.5.0-beta.1, deferring it to 2.0.0
+- docs: align the mobile and edge-case documentation with the stable candidate
+- test: verify focus, typing, editing, deletion, paste, Select All → Paste and the native edit menu on iOS 18.0 and 26.5 simulators
+
+## [1.5.0-beta.1]
+
+Deprecated experimental release. It introduced an iOS native-selection workaround that moved and scaled the underlying input, and narrowed the `onComplete` type in a way that can break compilation of existing apps. Both were withdrawn in 1.5.0-beta.2 and are not planned for 1.5.0 stable. Existing installs remain reproducible, but new beta users should use 1.5.0-beta.2 or later.
+
 ## [1.5.0-beta.0]
+
+Prepared but not published. Its safe changes are included in 1.5.0-beta.2.
 
 - fix(input): reserve the password manager badge gutter only where it fits
   - Once a badge was detected, the input grew 40px past the container to push the badge off the last slot — and the only guard was the distance to the viewport's right edge. Inside a constrained scroll container (a card, a modal) that overhang registered as scrollable overflow: a horizontal scrollbar appeared and shifted the whole layout. The space check now measures the nearest ancestor that constrains horizontal overflow (scroll containers, `overflow: hidden`/`clip` ancestors, the container itself, and the real viewport width) and skips the push when the gutter doesn't fit; the badge then stays over the last slot, exactly as with `pushPasswordManagerStrategy="none"`. Nothing is ever clipped, so extensions keep rendering their badges.
@@ -20,10 +37,8 @@
   - Chrome's translator rewrote the slots' text nodes (wrapping them in `<font>` elements), crashing React on the next re-render — easiest to hit with alphanumeric codes under an active page translation. The container now carries `translate="no"`; a one-time code is never meaningful to translate.
 - fix(input): log CSS rule insertion failures as warnings, not errors
   - Some environments reject individual cosmetic selectors (`:autofill` in older Android WebViews, for instance). Nothing breaks when that happens, but the `console.error` was captured by Sentry and similar tools as if the application had failed. Same message, warning level.
-- chore(types): narrow `onComplete` to `(value: string) => unknown`
-  - The declaration was a variadic `(...args: any[]) => unknown`, but the only call site has always passed a single string. Handlers declaring extra parameters (which could never receive values) now fail to compile; every zero-arg or `(code: string)` handler keeps compiling unchanged.
-
-Beta while the iOS fix soaks on real devices. Verified so far on iOS 26.5 (Simulator + manual pass): no artifact at rest, no focus zoom, tap-to-focus, edit menu via double-tap and long-press, paste into full and empty inputs, typing. Still being validated across iOS versions before stable: Select All → Paste from the edit menu, SMS AutoFill from Messages, type-over-when-full, RTL, and iPadOS (Scribble, pointer).
+- ~~chore(types): narrow `onComplete` to `(value: string) => unknown`~~
+  - Withdrawn in 1.5.0-beta.2: the narrowing fails compilation of handlers typed with extra or non-string parameters, so it is a breaking change. Deferred to 2.0.0.
 
 ## [1.4.2]
 
@@ -99,7 +114,7 @@ I'm sorry to skip `1.3.0` due to an issue I've had while publishing the NPM pack
 - fix(input): reinforce wrapper to pointerEvents none
 - feat(input): add experimental push pwm badge
 - chore(input): rename prop to pushPasswordManagerStrategy
-- chore(input): move focus logic to _focusListener
+- chore(input): move focus logic to \_focusListener
 - fix(input): reinforce no box shadows
 - perf(input): rewrite core in a single event listener
 - fix(input): safe insert css rules

@@ -17,15 +17,11 @@ const SMS_FORMAT = `Your verification code is 123456
 
 const IOS_CSS = `@supports (-webkit-touch-callout: none) {
   [data-input-otp] {
-    font-size: 16px !important;       /* the iOS focus-zoom threshold */
-    width: 1000% !important;          /* enlarge the layout box 10x…   */
-    height: 1000% !important;
-    transform: scale(0.1) !important; /* …and paint it at 1/10th, so the
-                                         tap area still matches the container */
-    transform-origin: 0 0 !important;
-    letter-spacing: -.6em !important; /* collapse the per-char pitch */
-    text-indent: -9999px !important;  /* park the text offscreen */
-    left: -1px !important;            /* nudge, then compensate */
+    letter-spacing: -.6em !important;
+    font-weight: 100 !important;
+    font-stretch: ultra-condensed;
+    font-optical-sizing: none !important;
+    left: -1px !important;
     right: 1px !important;
   }
 }`
@@ -145,35 +141,23 @@ export default function MobilePage() {
       <P>
         iOS draws the selection highlight and the caret in a layer of its own —
         one that ignores <C>::selection</C>, CSS <C>opacity</C> and ancestor
-        clipping. That is why, up to 1.4.x, a thin caret-tall line could show
-        through the invisible input whenever a range was selected. What that
-        native layer <em>does</em> respect is the rendered text geometry, so
-        since <C>1.5.0-beta.1</C> an iOS-only block rewrites it:
+        clipping. The library compresses the underlying text metrics to reduce
+        what that native layer can paint:
       </P>
       <CodeBlock code={IOS_CSS} lang="css" />
       <P>
-        The text is parked offscreen with <C>text-indent</C>, so at rest there
-        is nothing for the native layer to paint — no artifact, at any fill
-        state or selection size. The <C>scale(0.1)</C> pair shrinks the
-        rendered text (and with it the painted highlight, which iOS floors at
-        roughly 2×2px) while the enlarged layout box keeps the tap area
-        exactly matching the container, and the computed <C>font-size</C> stays
-        at 16px so focusing the field never zooms the page.
+        Collapsed letter spacing and light, condensed text keep the native
+        selection narrow. They cannot hide it completely: a thin caret-tall line
+        may still appear while a range is selected. The input remains in its
+        normal layout box so focus, selection handles and the edit menu use the
+        platform&apos;s proven geometry.
       </P>
-      <P>
-        The copy/paste menu still works because it only needs an on-screen
-        caret rect <em>during a gesture</em>: on <C>pointerdown</C> the library
-        reveals the text at the fingertip&apos;s position (an inline{' '}
-        <C>text-indent</C> beats the stylesheet&apos;s <C>-9999px</C>), and
-        hides it again on typing, blur or scroll — at most a ~2px fleck under
-        the finger while the gesture is active.
-      </P>
-      <Callout type="note" title="Remove your own artifact workarounds">
+      <Callout type="warning" title="Known iOS limitation">
         <p>
-          If you patched the old artifact yourself — <C>font-size: 16px</C>{' '}
-          overrides, custom transforms or <C>text-indent</C> on{' '}
-          <C>[data-input-otp]</C> — remove those: overriding the input&apos;s
-          geometry can now interfere with the fix.
+          The selection artifact is cosmetic. Typing, SMS AutoFill, Select All,
+          Paste and the native edit menu continue to work. Avoid moving, scaling
+          or hiding <C>[data-input-otp]</C>; those workarounds can break the
+          native interactions they are trying to preserve.
         </p>
       </Callout>
       <P>

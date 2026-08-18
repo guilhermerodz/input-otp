@@ -66,13 +66,10 @@ const SYNC_TIMEOUTS = `export function syncTimeouts(cb: () => unknown) {
 
 const IOS_METRICS = `@supports (-webkit-touch-callout: none) {
   [data-input-otp] {
-    font-size: 16px !important;       /* the focus-zoom threshold */
-    width: 1000% !important;          /* 10x layout box…           */
-    height: 1000% !important;
-    transform: scale(0.1) !important; /* …painted at 1/10th        */
-    transform-origin: 0 0 !important;
     letter-spacing: -.6em !important;
-    text-indent: -9999px !important;  /* park the text offscreen   */
+    font-weight: 100 !important;
+    font-stretch: ultra-condensed;
+    font-optical-sizing: none !important;
     left: -1px !important;
     right: 1px !important;
   }
@@ -81,10 +78,10 @@ const IOS_METRICS = `@supports (-webkit-touch-callout: none) {
 const OPACITY = `opacity: '1', // Mandatory for iOS hold-paste`
 
 const ROOT_HEIGHT = `const updateRootHeight = () => {
-  container.style.setProperty('--root-height', \`\${container.clientHeight}px\`)
+  container.style.setProperty('--root-height', \`\${input.clientHeight}px\`)
 }
 updateRootHeight()
-new ResizeObserver(updateRootHeight).observe(container)
+new ResizeObserver(updateRootHeight).observe(input)
 
 // …consumed by the input's own style:
 fontSize: 'var(--root-height)'`
@@ -429,7 +426,7 @@ export default function EdgeCasesPage() {
             <A href="https://github.com/guilhermerodz/input-otp/issues/32">
               #32
             </A>
-            . Fixed in <C>1.5.0-beta.1</C>.
+            . It remains a cosmetic limitation in 1.5.0.
           </>
         }
         cause={
@@ -441,17 +438,13 @@ export default function EdgeCasesPage() {
         }
         fix={
           <>
-            An iOS-only block parks the text offscreen (<C>text-indent</C>) so
-            nothing paints at rest, and scales the input down 10x — with a
-            compensating 10x layout box, so the tap area still matches the
-            container — which floors the highlight at iOS&apos;s ~2px minimum.
-            Computed <C>font-size</C> stays at 16px, below which focusing would
-            zoom the page. During a pointer gesture the text is revealed at the
-            fingertip via an inline <C>text-indent</C> so the copy/paste menu
-            can anchor, and hidden again on typing, blur or scroll. The{' '}
-            <C>left: -1px</C> / <C>right: 1px</C> pair survives from the old
-            metrics fix: the nudge that repositioned the glyphs also moved the
-            field, so the second declaration restores it.
+            The stable implementation compresses the underlying text with
+            collapsed letter spacing and light, condensed metrics. This keeps
+            the native highlight narrow but cannot remove it completely. The
+            input stays in its normal layout box because moving or scaling it
+            can destabilise focus, selection handles and the native edit menu.
+            The artifact is cosmetic; typing, AutoFill, Select All and Paste
+            continue to work.
           </>
         }
       >
@@ -558,11 +551,10 @@ export default function EdgeCasesPage() {
         }
         fix={
           <>
-            A <C>ResizeObserver</C> publishes the container&apos;s pixel height
-            as <C>--root-height</C>, and the input&apos;s <C>font-size</C> is
-            set from it. It is measured on the container rather than the input
-            because on iOS the input&apos;s layout box is enlarged 10x by the
-            scale-down fix. Native UI then matches the boxes the user can see.
+            A <C>ResizeObserver</C> publishes the input&apos;s pixel height as{' '}
+            <C>--root-height</C>, and the input&apos;s <C>font-size</C> is set
+            from it. Native UI then tracks the height of the field while the
+            rendered slots remain fully controlled by your layout.
           </>
         }
       >
@@ -883,7 +875,8 @@ export default function EdgeCasesPage() {
           The space check walks up to the nearest ancestor that constrains
           horizontal overflow, and the gutter is only reserved when the full
           40px fit. When they don&apos;t, the badge stays over the last slot —
-          the same rendering as <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
+          the same rendering as{' '}
+          <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
         </p>
         <p>
           <strong className="font-medium text-foreground">
