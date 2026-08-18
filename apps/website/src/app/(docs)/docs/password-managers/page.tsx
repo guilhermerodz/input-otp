@@ -209,10 +209,14 @@ export default function PasswordManagersPage() {
       </P>
       <CodeBlock code={SPACE_CHECK} lang="ts" />
       <P>
-        Both conditions have to hold: a badge was detected <em>and</em> the
-        full 40px gutter fits. Otherwise the width stays at <C>100%</C> and the
-        badge simply stays over the last slot — the same rendering as{' '}
-        <C>pushPasswordManagerStrategy=&quot;none&quot;</C>.
+        Both conditions have to hold: a badge was detected <em>and</em> the full
+        40px gutter fits. Otherwise the width stays at <C>100%</C> and the badge
+        simply stays over the last slot — the same rendering as{' '}
+        <C>pushPasswordManagerStrategy=&quot;none&quot;</C>. The
+        overflow-constraining-ancestor measurement shipped in 1.5.0; before
+        that, only the distance to the viewport&apos;s right edge was checked,
+        so inside a card or modal the overhang could register as scrollable
+        overflow and shift the layout.
       </P>
 
       <H2>Opting out</H2>

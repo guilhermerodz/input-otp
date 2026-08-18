@@ -6,14 +6,16 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
-import { docsNav } from '../_lib/nav'
+import { docsNavForVersion } from '../_lib/nav'
+import { versionForPathname } from '../_lib/versions'
 
 export function DocsSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const nav = docsNavForVersion(versionForPathname(pathname))
 
   return (
     <nav aria-label="Docs" className="text-sm">
-      {docsNav.map(section => (
+      {nav.map(section => (
         <div key={section.title} className="pb-6">
           <p className="mb-2 px-3 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground/70">
             {section.title}

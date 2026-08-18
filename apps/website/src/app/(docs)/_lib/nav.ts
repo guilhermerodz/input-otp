@@ -4,6 +4,12 @@
  * sidebar and the pager pick it up automatically.
  */
 
+import {
+  latestDocsVersion,
+  versionForPathname,
+  type DocsVersion,
+} from './versions'
+
 export interface DocsPageMeta {
   title: string
   href: string
@@ -117,22 +123,57 @@ export const docsNav: DocsSection[] = [
   },
 ]
 
+/**
+ * Every version's nav, keyed by version id. The latest line lives in
+ * `docsNav` above; a frozen major gets its own literal snapshot file (so
+ * future edits to the latest nav can't leak into it) registered here.
+ */
+const navByVersion: Record<string, DocsSection[]> = {
+  [latestDocsVersion.id]: docsNav,
+}
+
+export function docsNavForVersion(version: DocsVersion): DocsSection[] {
+  return navByVersion[version.id] ?? docsNav
+}
+
+export function docsPagesForVersion(version: DocsVersion): DocsPageMeta[] {
+  return docsNavForVersion(version).flatMap(section => section.pages)
+}
+
 /** Flat, ordered list of every docs page — used for prev/next. */
 export const docsPages: DocsPageMeta[] = docsNav.flatMap(
   section => section.pages,
 )
 
 export function getDocsPage(href: string): DocsPageMeta | undefined {
-  return docsPages.find(page => page.href === href)
+  return docsPagesForVersion(versionForPathname(href)).find(
+    page => page.href === href,
+  )
 }
 
+/** Prev/next never cross a version boundary: the pager is scoped to the version the page belongs to. */
 export function getDocsPager(href: string) {
-  const index = docsPages.findIndex(page => page.href === href)
+  const pages = docsPagesForVersion(versionForPathname(href))
+  const index = pages.findIndex(page => page.href === href)
   if (index === -1) {
     return { prev: undefined, next: undefined }
   }
   return {
-    prev: index > 0 ? docsPages[index - 1] : undefined,
-    next: index < docsPages.length - 1 ? docsPages[index + 1] : undefined,
+    prev: index > 0 ? pages[index - 1] : undefined,
+    next: index < pages.length - 1 ? pages[index + 1] : undefined,
   }
+}
+
+/**
+ * The equivalent of `pathname` in `target` — or the target's root when the
+ * page has no counterpart there (a page added after the snapshot, say).
+ */
+export function hrefInVersion(pathname: string, target: DocsVersion): string {
+  const current = versionForPathname(pathname)
+  const suffix =
+    pathname === current.base ? '' : pathname.slice(current.base.length)
+  const candidate = target.base + suffix
+  return docsPagesForVersion(target).some(page => page.href === candidate)
+    ? candidate
+    : target.base
 }

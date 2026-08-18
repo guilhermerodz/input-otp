@@ -265,6 +265,7 @@ export default function ApiPage() {
           {
             name: 'nonce',
             type: 'string',
+            since: '1.5.0',
             description: (
               <>
                 Applied to the <code>&lt;style&gt;</code> tag the library
@@ -282,8 +283,8 @@ export default function ApiPage() {
           Unless you pass your own, the input gets{' '}
           <C>autoComplete=&quot;one-time-code&quot;</C>, which is what lets iOS
           and Android offer the code straight from the SMS. Overriding it turns
-          SMS autofill off. <C>spellCheck</C> likewise defaults to{' '}
-          <C>false</C> — browsers would underline a full code as a typo — and
+          SMS autofill off. <C>spellCheck</C> likewise defaults to <C>false</C>{' '}
+          since 1.5.0 — browsers would underline a full code as a typo — and
           passing your own value overrides it.
         </p>
       </Callout>
