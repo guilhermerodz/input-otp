@@ -9,6 +9,7 @@ The accessible, unstyled, fully featured one-time-password component for React.
 [![npm](https://img.shields.io/npm/v/input-otp?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/input-otp)
 [![downloads](https://img.shields.io/npm/dm/input-otp?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/input-otp)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/input-otp?style=flat&label=size&colorA=000000&colorB=000000)](https://bundlephobia.com/package/input-otp)
+[![inspect.software](https://raw.githubusercontent.com/inspect-software/badges/main/v1/g/guilhermerodz/input-otp.svg)](https://inspect.software/software/guilhermerodz/input-otp)
 [![license](https://img.shields.io/npm/l/input-otp?style=flat&colorA=000000&colorB=000000)](./LICENSE)
 
 [**Documentation**](https://input-otp.rodz.dev/docs) · [Examples](https://input-otp.rodz.dev/docs/examples) · [API](https://input-otp.rodz.dev/docs/api) · [Edge cases](https://input-otp.rodz.dev/docs/edge-cases)
