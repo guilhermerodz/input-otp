@@ -81,7 +81,7 @@ test.describe('Base tests - Paste', () => {
     await input.evaluate(el => {
       const input = el as HTMLInputElement
       const dt = new DataTransfer()
-      dt.setData('text/plain', '123456')
+      dt.setData('text/plain', '1234567')
       input.dispatchEvent(
         new ClipboardEvent('paste', {
           bubbles: true,
