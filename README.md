@@ -25,13 +25,22 @@ The accessible, unstyled, fully featured one-time-password component for React.
 </p>
 <p align="center"><sub><a href="https://go.clerk.com/input-otp"><b>Clerk</b> — the easiest way to add authentication to your application</a></sub></p>
 
-<h4 align="center">Hero Sponsor</h4>
-<p align="center">
+<h4 align="center">Hero Sponsors</h4>
+<table align="center">
+<tr>
+<td align="center">
 <a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
 <img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
-</p>
-<p align="center"><sub><a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a></sub></p>
+</td>
+<td align="center">
+<a href="https://www.rapidproxy.io/?ref=inpu" target="_blank">
+<img alt="Rapidproxy" src="https://raw.githubusercontent.com/guilhermerodz/input-otp/8476b12529c0d82ae2615e1414de2702c1779fb3/apps/website/public/sponsors/rapidproxy-wordmark-white-in-black-bg.svg" width="110"/>
+</a>
+</td>
+</tr>
+</table>
+<p align="center"><sub><a href="https://evomi.com/?utm_source=github&utm_campaign=otp"><b>Evomi</b> — residential proxies from $0.49</a> · <a href="https://www.rapidproxy.io/?ref=inpu"><b>Rapidproxy</b> — residential proxies from $0.55</a></sub></p>
 
 ## Why
 
@@ -220,15 +229,25 @@ autofill and password manager badges **cannot** be covered headlessly — see
 </a>
 </p>
 
-<h4 align="center">Hero Sponsor</h4>
-<p align="center">
+<h4 align="center">Hero Sponsors</h4>
+<table align="center">
+<tr>
+<td align="center">
 <a href="https://evomi.com/?utm_source=github&utm_campaign=otp" target="_blank">
 <img alt="Evomi" src="https://input-otp.rodz.dev/sponsors/evomi-wordmark-white-in-black-bg.svg" width="110"/>
 </a>
-</p>
+</td>
+<td align="center">
+<a href="https://www.rapidproxy.io/?ref=inpu" target="_blank">
+<img alt="Rapidproxy" src="https://raw.githubusercontent.com/guilhermerodz/input-otp/8476b12529c0d82ae2615e1414de2702c1779fb3/apps/website/public/sponsors/rapidproxy-wordmark-white-in-black-bg.svg" width="110"/>
+</a>
+</td>
+</tr>
+</table>
 
 - [Clerk](https://go.clerk.com/input-otp) — the easiest way to add authentication to your application
 - [Evomi](https://evomi.com/?utm_source=github&utm_campaign=otp) — residential proxies from $0.49
+- [Rapidproxy](https://www.rapidproxy.io/?ref=inpu) — residential proxies from $0.55
 
 <br />
 

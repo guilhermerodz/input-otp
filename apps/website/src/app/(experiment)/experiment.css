@@ -711,7 +711,7 @@ html {
 /* Sponsor tiers ---------------------------------------------------------- */
 
 /* One three-column grid keeps the two-column Diamond card aligned with the
-   Hero card below it. The filler invitation completes the first row. */
+   two Hero cards below it. The filler invitation completes the first row. */
 .xp-sponsors-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -719,8 +719,7 @@ html {
   margin-top: 28px;
 }
 
-.xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond,
-.xp-sponsors-grid > .xp-sponsor-beam-wrap--hero {
+.xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
   grid-column: span 2;
 }
 
@@ -1207,8 +1206,7 @@ html {
     grid-template-columns: 1fr;
   }
 
-  .xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond,
-  .xp-sponsors-grid > .xp-sponsor-beam-wrap--hero {
+  .xp-sponsors-grid > .xp-sponsor-beam-wrap--diamond {
     grid-column: auto;
   }
 
