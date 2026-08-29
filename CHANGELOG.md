@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.0.0]
+
+One deliberate breaking change, nothing else. If your project compiles against 1.5.0 without the patterns below, 2.0.0 is a drop-in upgrade.
+
+### BREAKING CHANGE: `onComplete` is now typed `(value: string) => unknown`
+
+The declaration used to be a variadic `(...args: any[]) => unknown`. The runtime has always passed exactly one argument — the complete value as a string — so autocomplete and hover showed a signature no call site could ever populate. The type now matches reality.
+
+**This is a type-level change only. Runtime behavior is identical.** JavaScript projects are unaffected. TypeScript projects compile unchanged unless they relied on the loose `any[]` in one of two ways:
+
+1. **Passing a form-submission handler directly** (most common with react-hook-form):
+
+   ```tsx
+   // Before — compiled only because the params were any[]:
+   <OTPInput maxLength={6} onComplete={handleSubmit(onSubmit)} />
+
+   // After — wrap it; the submit handler expects an event, not the value:
+   <OTPInput maxLength={6} onComplete={() => handleSubmit(onSubmit)()} />
+   ```
+
+2. **Annotating the parameter with a non-string type:**
+
+   ```tsx
+   // Before — compiled, but `code` was never a number at runtime:
+   <OTPInput maxLength={6} onComplete={(code: number) => verify(code)} />
+
+   // After — take the string the input actually passes:
+   <OTPInput maxLength={6} onComplete={(code) => verify(Number(code))} />
+   ```
+
+   This one was always a latent bug: the handler received a string no matter what the annotation claimed.
+
+Zero-parameter handlers (`onComplete={() => submit()}`) and string handlers (`onComplete={(code) => …}`, `onComplete={(code: string) => …}`) keep compiling unchanged.
+
 ## [1.5.0]
 
 Promotes the safe 1.5.0-beta.2 code without functional changes. Everything in this release is backwards-compatible: no public type changes and no behavior changes beyond the bug fixes below. Two beta.1 experiments are deliberately excluded — the iOS native-selection workaround (the thin native selection artifact remains a known cosmetic limitation) and the `onComplete` type narrowing, which returns in 2.0.0 as a documented breaking change.

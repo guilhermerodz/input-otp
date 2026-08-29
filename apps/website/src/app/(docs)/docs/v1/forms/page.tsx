@@ -1,13 +1,13 @@
-import { CodeBlock } from '../../_components/code-block'
-import { ComponentPreview } from '../../_components/component-preview'
-import { DocsPage, docsMetadata } from '../../_components/docs-page'
-import { A, C, Callout, H2, H3, Li, P, Ul } from '../../_components/prose'
-import { AutoSubmitDemo } from '../../_demos/auto-submit'
-import { ControlledDemo } from '../../_demos/controlled'
-import { DisabledDemo } from '../../_demos/disabled'
-import { InvalidDemo } from '../../_demos/invalid'
+import { CodeBlock } from '../../../_components/code-block'
+import { ComponentPreview } from '../../../_components/component-preview'
+import { DocsPage, docsMetadata } from '../../../_components/docs-page'
+import { A, C, Callout, H2, H3, Li, P, Ul } from '../../../_components/prose'
+import { AutoSubmitDemo } from '../../../_demos/auto-submit'
+import { ControlledDemo } from '../../../_demos/controlled'
+import { DisabledDemo } from '../../../_demos/disabled'
+import { InvalidDemo } from '../../../_demos/invalid'
 
-const HREF = '/docs/forms'
+const HREF = '/docs/v1/forms'
 export const metadata = docsMetadata(HREF)
 
 const UNCONTROLLED = `// The component keeps its own value; the form reads it by name.
@@ -215,17 +215,6 @@ export default function FormsPage() {
         string input-otp emits, so the spread type-checks as-is:
       </P>
       <CodeBlock code={RHF_CONTROLLER} />
-      <Callout type="note" title="Since 2.0, the wrap is enforced">
-        <p>
-          Passing <C>handleSubmit(onValid)</C> to <C>onComplete</C> directly
-          used to compile because the prop was typed <C>(...args: any[])</C> —
-          but the submit handler expected a form event and received the code
-          string instead. 2.0 types the prop <C>(value: string)</C>, so the
-          direct pass is now a compile error; the wrapped form above is the fix.
-          See <A href="/docs/troubleshooting">Troubleshooting</A> for the other
-          pattern this catches.
-        </p>
-      </Callout>
       <P>
         <C>register</C> reaches the real input too (<C>ref</C> is forwarded),
         but its TypeScript types say <C>onChange</C> takes an event while
@@ -239,8 +228,8 @@ export default function FormsPage() {
       <H2>Labelling</H2>
       <P>
         One input means one <C>&lt;label&gt;</C>. See{' '}
-        <A href="/docs/accessibility">Accessibility</A> — it is a short page and
-        it matters more than most of this one.
+        <A href="/docs/v1/accessibility">Accessibility</A> — it is a short page
+        and it matters more than most of this one.
       </P>
     </DocsPage>
   )

@@ -19,7 +19,8 @@ export interface DocsVersion {
 }
 
 export const docsVersions: DocsVersion[] = [
-  { id: 'v1', label: 'v1.x', base: '/docs', status: 'latest' },
+  { id: 'v2', label: 'v2.x', base: '/docs', status: 'latest' },
+  { id: 'v1', label: 'v1.x', base: '/docs/v1', status: 'frozen' },
 ]
 
 export const latestDocsVersion = docsVersions.find(

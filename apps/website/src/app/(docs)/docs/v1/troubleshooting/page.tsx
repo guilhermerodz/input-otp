@@ -1,8 +1,8 @@
-import { CodeBlock } from '../../_components/code-block'
-import { DocsPage, docsMetadata } from '../../_components/docs-page'
-import { A, C, H2, H3, Li, P, Ul } from '../../_components/prose'
+import { CodeBlock } from '../../../_components/code-block'
+import { DocsPage, docsMetadata } from '../../../_components/docs-page'
+import { A, C, H2, H3, Li, P, Ul } from '../../../_components/prose'
 
-const HREF = '/docs/troubleshooting'
+const HREF = '/docs/v1/troubleshooting'
 export const metadata = docsMetadata(HREF)
 
 const FOCUS_RING = `<OTPInput
@@ -68,19 +68,6 @@ const [value, setValue] = React.useState('123')
 const CONTROLLED_STUCK = `// onChange gives you a string, not an event.
 <OTPInput value={value} onChange={setValue} />          // ✓
 <OTPInput value={value} onChange={e => setValue(e.target.value)} />  // ✗`
-
-const ONCOMPLETE_TYPE = `// ✗ Compiled before 2.0 only because the type was (...args: any[]).
-//   handleSubmit(onSubmit) expects a form event — it never got one.
-<OTPInput maxLength={6} onComplete={handleSubmit(onSubmit)} />
-
-// ✓ Wrap it:
-<OTPInput maxLength={6} onComplete={() => handleSubmit(onSubmit)()} />
-
-// ✗ The handler always received a string, whatever the annotation said.
-<OTPInput maxLength={6} onComplete={(code: number) => verify(code)} />
-
-// ✓ Take the string and convert:
-<OTPInput maxLength={6} onComplete={(code) => verify(Number(code))} />`
 
 export default function TroubleshootingPage() {
   return (
@@ -168,27 +155,7 @@ export default function TroubleshootingPage() {
         and refilling it fires again — that is intended. If you are seeing
         duplicate network requests, disable the field while the request is in
         flight; see{' '}
-        <A href="/docs/forms#while-the-request-is-in-flight">Forms</A>.
-      </P>
-
-      <H3>
-        Type error on <C>onComplete</C> after upgrading to 2.0
-      </H3>
-      <P>
-        2.0.0&apos;s one breaking change: <C>onComplete</C> is typed{' '}
-        <C>(value: string) =&gt; unknown</C> instead of the old variadic{' '}
-        <C>(...args: any[]) =&gt; unknown</C>. Runtime behavior is identical —
-        the input has always called it with the complete value as a single
-        string — so this only surfaces where the old looseness hid a mismatch:
-      </P>
-      <CodeBlock code={ONCOMPLETE_TYPE} />
-      <P>
-        Zero-parameter handlers and <C>(code: string)</C> handlers compile
-        unchanged. See the{' '}
-        <A href="https://github.com/guilhermerodz/input-otp/blob/master/CHANGELOG.md">
-          changelog
-        </A>{' '}
-        for the full migration notes.
+        <A href="/docs/v1/forms#while-the-request-is-in-flight">Forms</A>.
       </P>
 
       <H2>Setup</H2>
@@ -243,14 +210,15 @@ export default function TroubleshootingPage() {
       <P>
         Or check whether the accommodation ran at all — <C>input.style.width</C>{' '}
         should read <C>calc(100% + 40px)</C>. The{' '}
-        <A href="/docs/password-managers">simulator</A> shows both values live.
+        <A href="/docs/v1/password-managers">simulator</A> shows both values
+        live.
       </P>
 
       <H3>I don&apos;t want a badge on this field at all</H3>
       <P>
         Turn off the library&apos;s accommodation and opt out with each
         vendor&apos;s own attribute —{' '}
-        <A href="/docs/password-managers#blocking-the-badge-altogether">
+        <A href="/docs/v1/password-managers#blocking-the-badge-altogether">
           the exact set is here
         </A>
         . Do both, or you get no badge and 40px reserved for one.
@@ -281,8 +249,8 @@ export default function TroubleshootingPage() {
           </strong>{' '}
           Password manager accommodation. The extra width is clipped away and
           hit-testing is unaffected;{' '}
-          <A href="/docs/password-managers">the details</A>, including a note on
-          when it fires more eagerly than intended.
+          <A href="/docs/v1/password-managers">the details</A>, including a note
+          on when it fires more eagerly than intended.
         </Li>
         <Li>
           <strong>

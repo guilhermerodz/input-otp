@@ -1,9 +1,9 @@
-import { CodeBlock } from '../../_components/code-block'
-import { DocsPage, docsMetadata } from '../../_components/docs-page'
-import { A, C, Callout, H2, H3, Li, P, Ul } from '../../_components/prose'
-import { AttributesTable, PropsTable } from '../../_components/props-table'
+import { CodeBlock } from '../../../_components/code-block'
+import { DocsPage, docsMetadata } from '../../../_components/docs-page'
+import { A, C, Callout, H2, H3, Li, P, Ul } from '../../../_components/prose'
+import { AttributesTable, PropsTable } from '../../../_components/props-table'
 
-const HREF = '/docs/api'
+const HREF = '/docs/v1/api'
 export const metadata = docsMetadata(HREF)
 
 const IMPORTS = `import {
@@ -128,7 +128,7 @@ export default function ApiPage() {
                 which receives a string rather than an event. Omit both and the
                 component keeps its own state, seeded from{' '}
                 <code>defaultValue</code> — though that combination{' '}
-                <A href="/docs/troubleshooting#input-elements-must-be-either-controlled-or-uncontrolled">
+                <A href="/docs/v1/troubleshooting#input-elements-must-be-either-controlled-or-uncontrolled">
                   warns in development
                 </A>
                 .
@@ -148,14 +148,13 @@ export default function ApiPage() {
           },
           {
             name: 'onComplete',
-            type: '(value: string) => unknown',
+            type: '(...args: any[]) => unknown',
             description: (
               <>
                 Called once when the value transitions from shorter than{' '}
-                <code>maxLength</code> to exactly <code>maxLength</code>, with
-                the complete value as a string. Editing a full code and
-                refilling it fires it again; re-rendering with the same full
-                value does not.
+                <code>maxLength</code> to exactly <code>maxLength</code>.
+                Editing a full code and refilling it fires it again;
+                re-rendering with the same full value does not.
               </>
             ),
           },
@@ -219,7 +218,7 @@ export default function ApiPage() {
                 Where the invisible text sits inside the input. It does not move
                 your slots; it changes which slot a tap lands on and where iOS
                 anchors its selection bubble.{' '}
-                <A href="/docs/mobile#text-alignment">Details</A>.
+                <A href="/docs/v1/mobile#text-alignment">Details</A>.
               </>
             ),
           },
@@ -243,7 +242,7 @@ export default function ApiPage() {
               <>
                 Whether to reserve clipped width so a password manager badge
                 lands beside the field instead of over the last slot.{' '}
-                <A href="/docs/password-managers">
+                <A href="/docs/v1/password-managers">
                   Full explanation and simulator
                 </A>
                 .
@@ -459,7 +458,8 @@ export default function ApiPage() {
         container. So <C>inputRef.current.focus()</C>, <C>.select()</C> and{' '}
         <C>.setSelectionRange()</C> all behave normally, and{' '}
         <C>react-hook-form</C> reaches the real input — see{' '}
-        <A href="/docs/forms">Forms</A> for the <C>register</C> typing caveat.
+        <A href="/docs/v1/forms">Forms</A> for the <C>register</C> typing
+        caveat.
       </P>
 
       <H2 id="noscript">Default no-JS stylesheet</H2>

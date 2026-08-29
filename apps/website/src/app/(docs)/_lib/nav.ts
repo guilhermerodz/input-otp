@@ -9,6 +9,7 @@ import {
   versionForPathname,
   type DocsVersion,
 } from './versions'
+import { docsNavV1 } from './nav-v1'
 
 export interface DocsPageMeta {
   title: string
@@ -130,6 +131,7 @@ export const docsNav: DocsSection[] = [
  */
 const navByVersion: Record<string, DocsSection[]> = {
   [latestDocsVersion.id]: docsNav,
+  v1: docsNavV1,
 }
 
 export function docsNavForVersion(version: DocsVersion): DocsSection[] {

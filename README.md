@@ -175,8 +175,7 @@ type OTPInputProps = {
 
   value?: string
   onChange?: (newValue: string) => unknown   // a string, not an event
-  onComplete?: (...args: any[]) => unknown // fires once, on the transition to full;
-                                           // receives the value as a string (narrows in 2.0)
+  onComplete?: (value: string) => unknown    // fires once, on the transition to full
 
   pattern?: string | RegExp               // gates every change; no default
   placeholder?: string                    // per-slot placeholder characters
@@ -206,6 +205,23 @@ Every other `<input>` attribute is forwarded — `name`, `required`, `disabled`,
 typo); pass `spellCheck` yourself to override.
 
 Full reference: [**input-otp.rodz.dev/docs/api**](https://input-otp.rodz.dev/docs/api).
+
+### Migrating to 2.0
+
+2.0.0 contains a single type-level breaking change and no runtime changes:
+`onComplete` is typed `(value: string) => unknown` instead of the old variadic
+`(...args: any[]) => unknown`. If you passed a handler with extra or non-string
+parameters — for example react-hook-form's `handleSubmit(onSubmit)` directly —
+wrap it:
+
+```diff
+- <OTPInput maxLength={6} onComplete={handleSubmit(onSubmit)} />
++ <OTPInput maxLength={6} onComplete={() => handleSubmit(onSubmit)()} />
+```
+
+Everything else compiles unchanged. See the
+[changelog](https://github.com/guilhermerodz/input-otp/blob/master/CHANGELOG.md)
+for details.
 
 ## Contributing
 
