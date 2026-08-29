@@ -32,6 +32,7 @@ export function BaseOTPInput(
             <div
               data-testid={`slot-${idx}`}
               data-test-char={slot.char ?? undefined}
+              data-input-otp-slot
               key={idx}
               className={cn(
                 'transition-all duration-300 rounded-md border-black bg-white text-black w-10 h-14 border-[4px]',
