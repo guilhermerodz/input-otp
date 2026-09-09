@@ -192,8 +192,8 @@ export default function ApiPage() {
                 <code>
                   pasted =&gt; pasted.replaceAll(&apos;-&apos;, &apos;&apos;)
                 </code>
-                . Paste is always handled by the library on every platform; this
-                prop only transforms the clipboard text before insertion.
+                . Paste is always handled by the library on every platform;
+                this prop only transforms the clipboard text before insertion.
               </>
             ),
           },
