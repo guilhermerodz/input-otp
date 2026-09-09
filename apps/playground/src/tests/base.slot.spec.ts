@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
-
 test.beforeEach(async ({ page }) => {
   await page.goto('/base')
 })

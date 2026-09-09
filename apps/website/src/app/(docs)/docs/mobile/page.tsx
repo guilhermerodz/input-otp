@@ -179,11 +179,11 @@ export default function MobilePage() {
       <P>
         Even with the menu showing, letting the browser perform the insertion on
         iOS produces the wrong value. The library handles pastes on every
-        platform: it reads <C>clipboardData</C>, calls{' '}
-        <C>preventDefault()</C>, overwrites from the caret through the end of
-        the value, truncates to <C>maxLength</C>, checks the pattern, and
-        restores the selection itself. <C>pasteTransformer</C> only rewrites the
-        clipboard text before that process.
+        platform: it reads <C>clipboardData</C>, calls <C>preventDefault()</C>,
+        overwrites from the caret through the end of the value, truncates to{' '}
+        <C>maxLength</C>, checks the pattern, and restores the selection itself.{' '}
+        <C>pasteTransformer</C> only rewrites the clipboard text before that
+        process.
       </P>
       <P>
         That restoration is the part worth knowing about: after a paste the

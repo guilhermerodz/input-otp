@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { modifier } from './util/modifier'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/base')

@@ -7,7 +7,7 @@ export function BaseOTPInput(
   overrideProps: Partial<React.ComponentProps<typeof OTPInput>> = {},
 ) {
   const [value, setValue] = React.useState('')
-  const [disabled, setDisabled] = React.useState(false)
+  const [disabled] = React.useState(false)
 
   return (
     <OTPInput

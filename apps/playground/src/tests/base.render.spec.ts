@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-const modifier = process.platform === 'darwin' ? 'Meta' : 'Control'
-
 test.beforeEach(async ({ page }) => {
   await page.goto('/base')
 })
@@ -12,7 +10,10 @@ test.describe('Base tests - Render', () => {
     const renderer = page.getByTestId('input-otp-renderer')
 
     await input.focus()
-    await expect(renderer).toHaveAttribute('data-test-render-is-focused', 'true')
+    await expect(renderer).toHaveAttribute(
+      'data-test-render-is-focused',
+      'true',
+    )
 
     await input.blur()
     await page.waitForTimeout(100)
@@ -28,6 +29,9 @@ test.describe('Base tests - Render', () => {
     const rect = _rect!
     await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2)
 
-    await expect(renderer).toHaveAttribute('data-test-render-is-hovering', 'true')
+    await expect(renderer).toHaveAttribute(
+      'data-test-render-is-hovering',
+      'true',
+    )
   })
 })
