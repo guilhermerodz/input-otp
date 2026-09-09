@@ -158,14 +158,13 @@ export default function ValidationPage() {
       </ComponentPreview>
       <CodeBlock code={PASTE_VARIANTS} lang="ts" />
 
-      <Callout type="note" title="How pastes work">
-        <p>
-          The library handles paste events on every platform. A paste overwrites
-          from the caret through the end of the value and is truncated to{' '}
-          <C>maxLength</C>; <C>pasteTransformer</C> only rewrites the clipboard
-          text before that value is validated and inserted.
-        </p>
-      </Callout>
+      <P>
+        For the library&apos;s paste overwrite behavior, see{' '}
+        <A href="/docs/edge-cases#native-paste-inserts-the-wrong-value">
+          Edge cases
+        </A>
+        .
+      </P>
 
       <H2>Verifying the code</H2>
       <P>
