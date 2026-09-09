@@ -93,4 +93,41 @@ test.describe('Base tests - Paste', () => {
 
     await expect(input).toHaveValue('123456')
   })
+
+  test('should leave read-only and disabled inputs to native paste', async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === 'firefox',
+      "Firefox's ClipboardEvent constructor ignores custom clipboardData",
+    )
+
+    const input = page.getByRole('textbox')
+
+    await input.pressSequentially('12')
+
+    for (const property of ['readOnly', 'disabled'] as const) {
+      const wasNotPrevented = await input.evaluate((el, property) => {
+        const input = el as HTMLInputElement
+        input[property] = true
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text/plain', '1111')
+        return input.dispatchEvent(
+          new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData,
+          }),
+        )
+      }, property)
+
+      expect(wasNotPrevented).toBe(true)
+      await expect(input).toHaveValue('12')
+      await input.evaluate((el, property) => {
+        const input = el as HTMLInputElement
+        input[property] = false
+      }, property)
+    }
+  })
 })

@@ -325,7 +325,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
         const input = inputRef.current
-        if (!e.clipboardData || !input) {
+        if (!e.clipboardData || !input || input.readOnly || input.disabled) {
           return
         }
 
@@ -433,8 +433,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           ref={inputRef}
           spellCheck={props.spellCheck ?? false}
           onPaste={e => {
-            _pasteListener(e)
             props.onPaste?.(e)
+            if (!e.defaultPrevented) {
+              _pasteListener(e)
+            }
           }}
           onChange={_changeListener}
           onMouseOver={e => {
