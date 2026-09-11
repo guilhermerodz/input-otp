@@ -66,10 +66,13 @@ const SYNC_TIMEOUTS = `export function syncTimeouts(cb: () => unknown) {
 
 const IOS_METRICS = `@supports (-webkit-touch-callout: none) {
   [data-input-otp] {
+    font-size: 16px !important;       /* the focus-zoom threshold */
+    width: 1000% !important;          /* 10x layout box…           */
+    height: 1000% !important;
+    transform: scale(0.1) !important; /* …painted at 1/10th        */
+    transform-origin: 0 0 !important;
     letter-spacing: -.6em !important;
-    font-weight: 100 !important;
-    font-stretch: ultra-condensed;
-    font-optical-sizing: none !important;
+    text-indent: -9999px !important;  /* park the text offscreen   */
     left: -1px !important;
     right: 1px !important;
   }
@@ -78,10 +81,10 @@ const IOS_METRICS = `@supports (-webkit-touch-callout: none) {
 const OPACITY = `opacity: '1', // Mandatory for iOS hold-paste`
 
 const ROOT_HEIGHT = `const updateRootHeight = () => {
-  container.style.setProperty('--root-height', \`\${input.clientHeight}px\`)
+  container.style.setProperty('--root-height', \`\${container.clientHeight}px\`)
 }
 updateRootHeight()
-new ResizeObserver(updateRootHeight).observe(input)
+new ResizeObserver(updateRootHeight).observe(container)
 
 // …consumed by the input's own style:
 fontSize: 'var(--root-height)'`
@@ -426,7 +429,8 @@ export default function EdgeCasesPage() {
             <A href="https://github.com/guilhermerodz/input-otp/issues/32">
               #32
             </A>
-            . It remains a cosmetic limitation in 1.5.0.
+            . It remains a cosmetic limitation in stable 1.5.0;{' '}
+            <C>1.6.0-beta.0</C> carries an experimental mitigation.
           </>
         }
         cause={
@@ -438,13 +442,13 @@ export default function EdgeCasesPage() {
         }
         fix={
           <>
-            The stable implementation compresses the underlying text with
-            collapsed letter spacing and light, condensed metrics. This keeps
-            the native highlight narrow but cannot remove it completely. The
-            input stays in its normal layout box because moving or scaling it
-            can destabilise focus, selection handles and the native edit menu.
-            The artifact is cosmetic; typing, AutoFill, Select All and Paste
-            continue to work.
+            The 1.6 beta parks the text offscreen at rest and scales the input
+            down 10x with a compensating 10x layout box. During a pointer
+            gesture, it reveals the text at the fingertip so the copy/paste menu
+            can anchor, then hides it on typing, blur or scroll. Computed{' '}
+            <C>font-size</C> stays at 16px to avoid focus zoom. This is an
+            experiment, not the stable 1.5 behavior, until the geometry has
+            completed a real-device soak.
           </>
         }
       >
@@ -551,10 +555,10 @@ export default function EdgeCasesPage() {
         }
         fix={
           <>
-            A <C>ResizeObserver</C> publishes the input&apos;s pixel height as{' '}
-            <C>--root-height</C>, and the input&apos;s <C>font-size</C> is set
-            from it. Native UI then tracks the height of the field while the
-            rendered slots remain fully controlled by your layout.
+            A <C>ResizeObserver</C> publishes the container&apos;s pixel height
+            as <C>--root-height</C>, and the input&apos;s <C>font-size</C> is
+            set from it. The 1.6 beta measures the container because its iOS
+            input layout box is enlarged 10x by the scale-down experiment.
           </>
         }
       >

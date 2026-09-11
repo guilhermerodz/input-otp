@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0-beta.0]
+
+Experimental beta that reintroduces the iOS native-selection workaround withdrawn before 1.5.0 stable. This is not a stable candidate: promote it only after a fresh real-device soak covering SMS AutoFill, Select All → Paste, type-over-when-full, RTL and iPadOS input methods.
+
+- fix(input): experimentally eliminate the iOS native selection artifact
+  - Park the underlying text offscreen at rest, then reveal it at the pointer position only while the native edit menu needs an on-screen anchor.
+  - Collapse and scale the rendered text while keeping a compensating layout box and a 16px computed font size.
+  - On iOS 12 and older, the artifact stays hidden but edit-menu anchoring may be unavailable because Pointer Events are not supported.
+- chore(input): measure `--root-height` from the container while the iOS input uses an enlarged layout box
+- chore(playground): add `/ios-probe` and `/shadcn` pages for manual device testing
+- docs: mark the workaround as 1.6 beta-only and keep the 1.5 stable behavior explicit
+
 ## [1.5.0]
 
 Promotes the safe 1.5.0-beta.2 code without functional changes. Everything in this release is backwards-compatible: no public type changes and no behavior changes beyond the bug fixes below. Two beta.1 experiments are deliberately excluded — the iOS native-selection workaround (the thin native selection artifact remains a known cosmetic limitation) and the `onComplete` type narrowing, which returns in 2.0.0 as a documented breaking change.
