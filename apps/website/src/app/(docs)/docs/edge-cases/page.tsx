@@ -103,10 +103,6 @@ const SAFE_INSERT = `function safeInsertRule(sheet: CSSStyleSheet, rule: string)
   }
 }`
 
-const SSR_GUARD = `isIOS:
-  typeof window !== 'undefined' &&
-  window?.CSS?.supports?.('-webkit-touch-callout', 'none')`
-
 const INITIAL_SYNC = `// The browser may have restored a value into the input before React
 // hydrated. Adopt it instead of clobbering it.
 if (initialLoadRef.current.value !== input.value) {
@@ -127,14 +123,17 @@ if (newValue.length > 0 && regexp && !regexp.test(newValue)) {
   return // the whole change is dropped
 }`
 
-const PASTE_RESTORE = `input.value = newValue
+const PASTE_OVERWRITE = `const start = input.selectionStart ?? 0
+
+// Paste is not a keystroke: overwrite from the caret through the end
+// of the value, don't splice into the (possibly one-character) selection.
+const newValue = (value.slice(0, start) + content).slice(0, maxLength)
+
+input.value = newValue
 onChange(newValue)
 
-const start = Math.min(newValue.length, maxLength - 1)
 const end = newValue.length
-input.setSelectionRange(start, end)
-setMirrorSelectionStart(start)
-setMirrorSelectionEnd(end)`
+input.setSelectionRange(Math.min(end, maxLength - 1), end)`
 
 const BLUR_REGRESSION = `// Removed in 1.4.0:
 // re-focusing the input after a badge appeared fired a blur the user
@@ -281,6 +280,43 @@ export default function EdgeCasesPage() {
             pass. A cheap recomputation was judged better than a missed one.
           </p>
         </Callout>
+      </EdgeCase>
+
+      <EdgeCase
+        title="Native paste inserts the wrong value"
+        platforms={['All']}
+        symptom={
+          <>
+            With <C>&quot;12&quot;</C> already in the field, moving the caret to
+            slot 0 and pasting <C>&quot;1111&quot;</C> produces{' '}
+            <C>&quot;11112&quot;</C> instead of <C>&quot;1111&quot;</C> — the
+            paste merges with whatever was left over instead of overwriting it.
+          </>
+        }
+        cause={
+          <>
+            A caret move narrows the selection to one character (see above) —
+            correct for a keystroke, wrong for a paste. Splicing a paste into
+            that narrow range re-appends everything after it, no matter how long
+            the pasted content is. Relying on the browser&apos;s own insertion
+            doesn&apos;t avoid this either: native paste replaces exactly the
+            same narrowed selection.
+          </>
+        }
+        fix={
+          <>
+            Handle <C>onPaste</C> directly, on every platform: read{' '}
+            <C>clipboardData</C>, <C>preventDefault()</C>, then overwrite from
+            the caret through the end of the value instead of splicing into the
+            selection. Truncate to <C>maxLength</C>, test the pattern, then
+            restore the selection explicitly so a full paste leaves the last
+            slot selected instead of a caret past the end.{' '}
+            <C>pasteTransformer</C> now only transforms the pasted string — the
+            corrected overwrite always runs, with or without it.
+          </>
+        }
+      >
+        <CodeBlock code={PASTE_OVERWRITE} lang="ts" />
       </EdgeCase>
 
       <H2>Making an input invisible</H2>
@@ -449,57 +485,6 @@ export default function EdgeCasesPage() {
         }
       >
         <CodeBlock code={IOS_METRICS} lang="css" />
-      </EdgeCase>
-
-      <EdgeCase
-        title="Native paste inserts the wrong value"
-        platforms={['iOS']}
-        symptom={
-          <>Pasting a code on iOS produces a mangled or truncated value.</>
-        }
-        cause={
-          <>
-            The browser&apos;s own insertion doesn&apos;t agree with the
-            field&apos;s collapsed metrics and rewritten selection.
-          </>
-        }
-        fix={
-          <>
-            Handle <C>onPaste</C> directly: read <C>clipboardData</C>,{' '}
-            <C>preventDefault()</C>, splice at the caret (replacing the
-            selection if any), truncate to <C>maxLength</C>, test the pattern,
-            then restore the selection explicitly so a full paste leaves the
-            last slot selected instead of a caret past the end. Passing{' '}
-            <C>pasteTransformer</C> enables this path on every platform.
-          </>
-        }
-      >
-        <CodeBlock code={PASTE_RESTORE} lang="ts" />
-      </EdgeCase>
-
-      <EdgeCase
-        title="CSS.supports doesn't exist during SSR"
-        platforms={['All']}
-        symptom={
-          <>
-            <C>TypeError: Cannot read properties of undefined</C> when the
-            component renders on a server.
-          </>
-        }
-        cause={
-          <>
-            iOS detection uses <C>window.CSS.supports</C>, and there is no{' '}
-            <C>window</C> in Node — nor a <C>CSS</C> object in some non-browser
-            DOM shims.
-          </>
-        }
-        fix={
-          <>
-            Guard the whole chain, not just <C>window</C>.
-          </>
-        }
-      >
-        <CodeBlock code={SSR_GUARD} lang="ts" />
       </EdgeCase>
 
       <H2>Geometry and hit testing</H2>

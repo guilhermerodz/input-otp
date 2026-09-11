@@ -66,9 +66,6 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
     const initialLoadRef = React.useRef({
       value,
       onChange,
-      isIOS:
-        typeof window !== 'undefined' &&
-        window?.CSS?.supports?.('-webkit-touch-callout', 'none'),
     })
     const inputMetadataRef = React.useRef<{
       prev: [number | null, number | null, 'none' | 'forward' | 'backward']
@@ -320,14 +317,15 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
       }
       setIsFocused(true)
     }, [maxLength])
-    // Fix iOS pasting
+    // Paste always overwrites from the caret forward, on every platform —
+    // native paste and the pre-existing custom iOS/pasteTransformer path both
+    // inherited keystroke-overwrite selection semantics (a narrow 1-char
+    // range from onDocumentSelectionChange), which wrongly preserved
+    // trailing characters after a paste longer than that narrow range.
     const _pasteListener = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
         const input = inputRef.current
-        if (
-          !pasteTransformer &&
-          (!initialLoadRef.current.isIOS || !e.clipboardData || !input)
-        ) {
+        if (!e.clipboardData || !input) {
           return
         }
 
@@ -335,14 +333,11 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
         const content = pasteTransformer ? pasteTransformer(_content) : _content
         e.preventDefault()
 
-        const start = inputRef.current?.selectionStart
-        const end = inputRef.current?.selectionEnd
+        const start = inputRef.current?.selectionStart ?? 0
 
-        const isReplacing = start !== end
-
-        const newValueUncapped = isReplacing
-          ? value.slice(0, start) + content + value.slice(end) // Replacing
-          : value.slice(0, start) + content + value.slice(start) // Inserting
+        // Paste is not a keystroke: it overwrites from `start` through the
+        // end of the value, it doesn't replace just the narrow selection.
+        const newValueUncapped = value.slice(0, start) + content
         const newValue = newValueUncapped.slice(0, maxLength)
 
         if (newValue.length > 0 && regexp && !regexp.test(newValue)) {

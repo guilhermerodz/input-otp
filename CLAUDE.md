@@ -33,14 +33,14 @@ Tests require the library to be built first (`pnpm build:lib`). Turbo handles th
 
 ## Library Architecture (packages/input-otp/src/)
 
-| File | Role |
-|------|------|
-| `input.tsx` | Core `OTPInput` component — renders invisible input, tracks selection state, handles all keyboard/paste/focus logic |
-| `types.ts` | TypeScript interfaces (`OTPInputProps`, slot types, render props) |
-| `regexp.ts` | Exported regex patterns: `REGEXP_ONLY_DIGITS`, `REGEXP_ONLY_CHARS`, `REGEXP_ONLY_DIGITS_AND_CHARS` |
-| `use-pwm-badge.tsx` | Password manager badge detection via `elementFromPoint` |
-| `sync-timeouts.ts` | Utility for synced timeouts at 0ms/10ms/50ms intervals |
-| `use-previous.ts` | Hook to track previous value |
+| File                | Role                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `input.tsx`         | Core `OTPInput` component — renders invisible input, tracks selection state, handles all keyboard/paste/focus logic |
+| `types.ts`          | TypeScript interfaces (`OTPInputProps`, slot types, render props)                                                   |
+| `regexp.ts`         | Exported regex patterns: `REGEXP_ONLY_DIGITS`, `REGEXP_ONLY_CHARS`, `REGEXP_ONLY_DIGITS_AND_CHARS`                  |
+| `use-pwm-badge.tsx` | Password manager badge detection via `elementFromPoint`                                                             |
+| `sync-timeouts.ts`  | Utility for synced timeouts at 0ms/10ms/50ms intervals                                                              |
+| `use-previous.ts`   | Hook to track previous value                                                                                        |
 
 The component exposes a `render` prop (or Context API) that receives slot state (char, focus, caret position) for custom UI rendering.
 
@@ -53,6 +53,9 @@ Library builds with tsup: entry `src/index.ts` → CJS (`dist/index.js`), ESM (`
 All tests are Playwright E2E tests in `apps/playground/src/tests/`. Test files cover typing, rendering, selections, slot behavior, props, word deletion, autofocus, and onComplete. Tests run across Chromium, Firefox, WebKit, and mobile viewports.
 
 Set `WINDOWED_TESTS=1` to run tests in headed mode with slow-mo.
+
+Paste tests skip Firefox because its synthetic `ClipboardEvent` discards custom
+clipboard data; the local test comment owns the simulator-specific details.
 
 ## Code Style
 

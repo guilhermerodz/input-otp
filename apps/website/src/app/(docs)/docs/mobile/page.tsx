@@ -178,16 +178,16 @@ export default function MobilePage() {
       <H3>Paste has to be handled by hand</H3>
       <P>
         Even with the menu showing, letting the browser perform the insertion on
-        iOS produces the wrong value. So on iOS — and on every platform once you
-        pass <C>pasteTransformer</C> — the library takes the paste over: it
-        reads <C>clipboardData</C>, calls <C>preventDefault()</C>, splices the
-        text in at the caret (replacing the selection if there is one),
-        truncates to <C>maxLength</C>, checks the pattern, and restores the
-        selection itself.
+        iOS produces the wrong value. The library handles the paste event
+        itself; its platform-independent overwrite behavior is documented in{' '}
+        <A href="/docs/edge-cases#native-paste-inserts-the-wrong-value">
+          Edge cases
+        </A>
+        .
       </P>
       <P>
-        That restoration is the part worth knowing about: after a paste the
-        caret is placed at <C>min(newValue.length, maxLength - 1)</C> through{' '}
+        After a paste the caret is placed at{' '}
+        <C>min(newValue.length, maxLength - 1)</C> through{' '}
         <C>newValue.length</C> — so a full code leaves the last slot selected
         rather than leaving the caret past the end.
       </P>

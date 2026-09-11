@@ -158,19 +158,13 @@ export default function ValidationPage() {
       </ComponentPreview>
       <CodeBlock code={PASTE_VARIANTS} lang="ts" />
 
-      <Callout type="note" title="What providing it changes">
-        <p>
-          Without <C>pasteTransformer</C>, the library only takes over the paste
-          event on iOS (where it has to —{' '}
-          <A href="/docs/edge-cases#ios-refuses-to-paste-into-an-invisible-input">
-            see why
-          </A>
-          ). Providing it switches on that manual path everywhere, which means
-          pastes are inserted by the library on all platforms: at the caret,
-          replacing the selection if there is one, and truncated to{' '}
-          <C>maxLength</C>.
-        </p>
-      </Callout>
+      <P>
+        For the library&apos;s paste overwrite behavior, see{' '}
+        <A href="/docs/edge-cases#native-paste-inserts-the-wrong-value">
+          Edge cases
+        </A>
+        .
+      </P>
 
       <H2>Verifying the code</H2>
       <P>
