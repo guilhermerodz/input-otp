@@ -69,6 +69,19 @@ const CONTROLLED_STUCK = `// onChange gives you a string, not an event.
 <OTPInput value={value} onChange={setValue} />          // ✓
 <OTPInput value={value} onChange={e => setValue(e.target.value)} />  // ✗`
 
+const ONCOMPLETE_TYPE = `// ✗ Compiled before 2.0 only because the type was (...args: any[]).
+//   handleSubmit(onSubmit) expects a form event — it never got one.
+<OTPInput maxLength={6} onComplete={handleSubmit(onSubmit)} />
+
+// ✓ Wrap it:
+<OTPInput maxLength={6} onComplete={() => handleSubmit(onSubmit)()} />
+
+// ✗ The handler always received a string, whatever the annotation said.
+<OTPInput maxLength={6} onComplete={(code: number) => verify(code)} />
+
+// ✓ Take the string and convert:
+<OTPInput maxLength={6} onComplete={(code) => verify(Number(code))} />`
+
 export default function TroubleshootingPage() {
   return (
     <DocsPage href={HREF}>
@@ -156,6 +169,26 @@ export default function TroubleshootingPage() {
         duplicate network requests, disable the field while the request is in
         flight; see{' '}
         <A href="/docs/forms#while-the-request-is-in-flight">Forms</A>.
+      </P>
+
+      <H3>
+        Type error on <C>onComplete</C> after upgrading to 2.0
+      </H3>
+      <P>
+        2.0.0&apos;s one breaking change: <C>onComplete</C> is typed{' '}
+        <C>(value: string) =&gt; unknown</C> instead of the old variadic{' '}
+        <C>(...args: any[]) =&gt; unknown</C>. Runtime behavior is identical —
+        the input has always called it with the complete value as a single
+        string — so this only surfaces where the old looseness hid a mismatch:
+      </P>
+      <CodeBlock code={ONCOMPLETE_TYPE} />
+      <P>
+        Zero-parameter handlers and <C>(code: string)</C> handlers compile
+        unchanged. See the{' '}
+        <A href="https://github.com/guilhermerodz/input-otp/blob/master/CHANGELOG.md">
+          changelog
+        </A>{' '}
+        for the full migration notes.
       </P>
 
       <H2>Setup</H2>

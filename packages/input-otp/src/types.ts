@@ -20,10 +20,16 @@ type OTPInputBaseProps = OverrideProps<
 
     textAlign?: 'left' | 'center' | 'right'
 
-    // Deliberately variadic until 2.0.0: narrowing to `(value: string)`
-    // breaks compilation of handlers typed with extra or non-string params
-    // (e.g. react-hook-form's `handleSubmit(onSubmit)` passed directly).
-    onComplete?: (...args: any[]) => unknown
+    /**
+     * Called once when the value transitions from shorter than `maxLength`
+     * to exactly `maxLength`. Receives the complete value as a string.
+     *
+     * Until 2.0.0 this was typed `(...args: any[]) => unknown`; the runtime
+     * has always passed the single string. Handlers declaring extra or
+     * non-string parameters no longer compile — see the 2.0.0 changelog
+     * for the migration.
+     */
+    onComplete?: (value: string) => unknown
     pushPasswordManagerStrategy?: 'increase-width' | 'none'
     pasteTransformer?: (pasted: string) => string
 

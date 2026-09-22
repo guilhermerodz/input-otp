@@ -210,18 +210,29 @@ export default function FormsPage() {
 
       <H2>react-hook-form</H2>
       <P>
-        <C>Controller</C> is the path of least resistance — its{' '}
-        <C>field</C> hands you <C>value</C> and an <C>onChange</C> that accepts
-        exactly the string input-otp emits, so the spread type-checks as-is:
+        <C>Controller</C> is the path of least resistance — its <C>field</C>{' '}
+        hands you <C>value</C> and an <C>onChange</C> that accepts exactly the
+        string input-otp emits, so the spread type-checks as-is:
       </P>
       <CodeBlock code={RHF_CONTROLLER} />
+      <Callout type="note" title="Since 2.0, the wrap is enforced">
+        <p>
+          Passing <C>handleSubmit(onValid)</C> to <C>onComplete</C> directly
+          used to compile because the prop was typed <C>(...args: any[])</C> —
+          but the submit handler expected a form event and received the code
+          string instead. 2.0 types the prop <C>(value: string)</C>, so the
+          direct pass is now a compile error; the wrapped form above is the fix.
+          See <A href="/docs/troubleshooting">Troubleshooting</A> for the other
+          pattern this catches.
+        </p>
+      </Callout>
       <P>
         <C>register</C> reaches the real input too (<C>ref</C> is forwarded),
         but its TypeScript types say <C>onChange</C> takes an event while
         input-otp calls it with a string. react-hook-form unwraps plain values
-        at runtime, so only the compiler objects — spread <C>register</C>{' '}
-        as-is and strict TypeScript rejects the <C>onChange</C> collision. A
-        one-line adapter satisfies it:
+        at runtime, so only the compiler objects — spread <C>register</C> as-is
+        and strict TypeScript rejects the <C>onChange</C> collision. A one-line
+        adapter satisfies it:
       </P>
       <CodeBlock code={RHF_REGISTER} />
 

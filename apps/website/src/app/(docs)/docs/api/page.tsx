@@ -148,13 +148,14 @@ export default function ApiPage() {
           },
           {
             name: 'onComplete',
-            type: '(...args: any[]) => unknown',
+            type: '(value: string) => unknown',
             description: (
               <>
                 Called once when the value transitions from shorter than{' '}
-                <code>maxLength</code> to exactly <code>maxLength</code>.
-                Editing a full code and refilling it fires it again;
-                re-rendering with the same full value does not.
+                <code>maxLength</code> to exactly <code>maxLength</code>, with
+                the complete value as a string. Editing a full code and
+                refilling it fires it again; re-rendering with the same full
+                value does not.
               </>
             ),
           },
