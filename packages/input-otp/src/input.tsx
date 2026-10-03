@@ -538,6 +538,8 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(
           // (wrapping them in <font>), which crashes React on the next
           // update — and a one-time code is never meaningful to translate.
           translate="no"
+          // A one-time code is read left to right, even on RTL pages.
+          dir="ltr"
           style={rootStyle}
           className={containerClassName}
         >
